@@ -1,30 +1,17 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="card w-80 bg-base-200">
+    <div class="card-body gap-3">
+      <input placeholder="Email" class="input" />
+      <label class="label">
+        <input type="checkbox" class="toggle toggle-sm" />
+        Submit to newsletter
+      </label>
+      <label class="label">
+        <input type="checkbox" class="toggle toggle-sm" />
+        Accept terms of use
+      </label>
+      <button class="btn btn-neutral">Save</button>
+    </div>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
