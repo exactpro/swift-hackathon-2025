@@ -4,10 +4,6 @@ on:
   push:
     paths:
       - 'gui/**'
-  pull_request:
-    branches: [ main, master, develop ]
-    paths:
-      - 'gui/**'
 
 jobs:
   lint:
