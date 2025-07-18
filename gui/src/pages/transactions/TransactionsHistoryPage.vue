@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount } from 'vue'
+import { onBeforeUnmount } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import {
@@ -11,12 +11,47 @@ import UUID from '../../components/UUID.vue'
 import RelDate from '../../components/RelDate.vue'
 import { usePagination } from '../../composables/usePagination.js'
 import config from '../../../config.js'
+import SortBtn from '../../components/SortBtn.vue'
+import type { SortItem } from '../../components/SortBtn.vue'
+import type { JSONify, Transaction } from '../../services/mock-backend/types.js'
 
 const { state: transactions } = useAsyncState(fetchTransactions, [])
+
+const sortQueue: SortItem[] = []
+
+function sortBy(
+  items: JSONify<Transaction>[],
+  { label: _, getProp, direction = 'asc' }: SortItem
+) {
+  items.sort((a, b) => {
+    const aValue = getProp(a)
+    const bValue = getProp(b)
+
+    if (aValue < bValue) return direction === 'asc' ? -1 : 1
+    if (aValue > bValue) return direction === 'asc' ? 1 : -1
+    return 0
+  })
+}
+
+function sortFromTable(sortItem: SortItem) {
+  sortBy(transactions.value, sortItem)
+  // Delete new sort item if it already exists
+  const existingIndex = sortQueue.findIndex(
+    (item) => item.label === sortItem.label
+  )
+  if (existingIndex !== -1) {
+    sortQueue.splice(existingIndex, 1)
+  }
+  sortQueue.push(sortItem)
+}
+
 const { state: unsubscribe } = useAsyncState(
-  subscribeToTransactionsUpdates(
-    (transactionsUpdated) => (transactions.value = transactionsUpdated)
-  ),
+  subscribeToTransactionsUpdates((transactionsUpdated) => {
+    for (const sortItem of sortQueue) {
+      sortBy(transactionsUpdated, sortItem)
+    }
+    transactions.value = transactionsUpdated
+  }),
   () => {}
 )
 
@@ -90,19 +125,110 @@ onBeforeUnmount(() => {
             <th></th>
           </tr>
           <tr>
-            <th>Type</th>
-            <th>Status</th>
-            <th>UETR</th>
-            <th class="border-l-2 border-base-content">BIC</th>
-            <th>Client</th>
-            <th>Amount</th>
-            <th>Currency</th>
-            <th class="border-l-2 border-base-content">BIC</th>
-            <th>Client</th>
-            <th>Amount</th>
-            <th class="border-r-2 border-base-content">Currency</th>
-            <th>Created</th>
-            <th>Updated</th>
+            <th>
+              Type
+              <SortBtn
+                label="Type"
+                :getProp="(item) => item.type"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              Status
+              <SortBtn
+                label="Status"
+                :getProp="(item) => item.status"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              UETR
+              <SortBtn
+                label="UETR"
+                :getProp="(item) => item.uetr"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th class="border-l-2 border-base-content">
+              BIC
+              <SortBtn
+                label="Debtor BIC"
+                :getProp="(item) => item.debtor.bic"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              Client
+              <SortBtn
+                label="Debtor Client"
+                :getProp="(item) => item.debtor.clientId"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              Amount
+              <SortBtn
+                label="Debtor Amount"
+                :getProp="(item) => parseFloat(item.debtor.amount)"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              Currency
+              <SortBtn
+                label="Debtor Currency"
+                :getProp="(item) => item.debtor.currency"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th class="border-l-2 border-base-content">
+              BIC
+              <SortBtn
+                label="Creditor BIC"
+                :getProp="(item) => item.creditor.bic"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              Client
+              <SortBtn
+                label="Creditor Client"
+                :getProp="(item) => item.creditor.clientId"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              Amount
+              <SortBtn
+                label="Creditor Amount"
+                :getProp="(item) => parseFloat(item.creditor.amount)"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th class="border-r-2 border-base-content">
+              Currency
+              <SortBtn
+                label="Creditor Currency"
+                :getProp="(item) => item.creditor.currency"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              Created
+              <SortBtn
+                label="Created"
+                :getProp="(item) => new Date(item.createdAt)"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              Updated
+              <SortBtn
+                label="Updated"
+                :getProp="(item) => new Date(item.updatedAt)"
+                @sort="sortFromTable"
+              />
+            </th>
             <th>Actions</th>
           </tr>
         </thead>
