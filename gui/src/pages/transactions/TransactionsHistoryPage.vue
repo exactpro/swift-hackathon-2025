@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount } from 'vue'
 import { useAsyncState } from '@vueuse/core'
+import { Icon } from '@iconify/vue'
 import {
   fetchTransactions,
   subscribeToTransactionsUpdates
@@ -8,20 +9,23 @@ import {
 
 import UUID from '../../components/UUID.vue'
 import RelDate from '../../components/RelDate.vue'
+import { usePagination } from '../../composables/usePagination.js'
 import config from '../../../config.js'
 
-const { state: transactions } = useAsyncState(fetchTransactions, null)
+const { state: transactions } = useAsyncState(fetchTransactions, [])
 const { state: unsubscribe } = useAsyncState(
   subscribeToTransactionsUpdates(
     (transactionsUpdated) => (transactions.value = transactionsUpdated)
   ),
   () => {}
 )
-const displayedTransactions = computed(() => {
-  if (!transactions.value) return []
-  // First 10 transactions for display
-  return transactions.value.slice(0, 10)
-})
+
+const {
+  currentPageItems: displayedTransactions,
+  beforeButtons,
+  currentPage,
+  afterButtons
+} = usePagination(transactions, {})
 
 onBeforeUnmount(() => {
   unsubscribe.value()
@@ -31,6 +35,47 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <h1>Transactions History</h1>
+
+    <div class="mt-4 flex justify-center">
+      <nav class="join">
+        <button
+          v-for="(btn, i) in beforeButtons"
+          class="join-item btn"
+          @click="
+            () => {
+              if (btn.action) btn.action()
+            }
+          "
+          :class="{
+            'btn-disabled': !btn.action
+          }"
+          :key="i"
+        >
+          <Icon v-if="btn.icon" :icon="btn.icon" />
+          <span v-else-if="btn.label">{{ btn.label }}</span>
+        </button>
+        <button class="join-item btn btn-primary">
+          {{ currentPage }}
+        </button>
+        <button
+          v-for="(btn, i) in afterButtons"
+          class="join-item btn"
+          @click="
+            () => {
+              if (btn.action) btn.action()
+            }
+          "
+          :class="{
+            'btn-disabled': !btn.action
+          }"
+          :key="i"
+        >
+          <Icon v-if="btn.icon" :icon="btn.icon" />
+          <span v-else-if="btn.label">{{ btn.label }}</span>
+        </button>
+      </nav>
+    </div>
+
     <div class="overflow-x-auto">
       <table class="table table-xs">
         <thead>
@@ -133,6 +178,46 @@ onBeforeUnmount(() => {
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="mt-4 flex justify-center">
+      <nav class="join">
+        <button
+          v-for="(btn, i) in beforeButtons"
+          class="join-item btn"
+          @click="
+            () => {
+              if (btn.action) btn.action()
+            }
+          "
+          :class="{
+            'btn-disabled': !btn.action
+          }"
+          :key="i"
+        >
+          <Icon v-if="btn.icon" :icon="btn.icon" />
+          <span v-else-if="btn.label">{{ btn.label }}</span>
+        </button>
+        <button class="join-item btn btn-primary">
+          {{ currentPage }}
+        </button>
+        <button
+          v-for="(btn, i) in afterButtons"
+          class="join-item btn"
+          @click="
+            () => {
+              if (btn.action) btn.action()
+            }
+          "
+          :class="{
+            'btn-disabled': !btn.action
+          }"
+          :key="i"
+        >
+          <Icon v-if="btn.icon" :icon="btn.icon" />
+          <span v-else-if="btn.label">{{ btn.label }}</span>
+        </button>
+      </nav>
     </div>
   </div>
 </template>
