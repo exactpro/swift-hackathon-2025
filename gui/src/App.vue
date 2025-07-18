@@ -1,7 +1,38 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, RouterLink } from 'vue-router'
+import { Icon } from '@iconify/vue'
+
+const sidebarLinks = [
+  { name: 'Transactions', path: '/transactions' },
+  { name: 'Clients', path: '/clients' }
+]
 </script>
 
 <template>
-  <RouterView />
+  <nav class="navbar bg-primary text-primary-content shadow-sm">
+    <div class="flex-1">
+      <RouterLink to="/" class="btn btn-ghost text-xl">
+        <Icon icon="mdi:bank" class="inline-block mr-2" />
+        Bank A Portal
+      </RouterLink>
+    </div>
+    <div class="flex-none">
+      <ul class="menu menu-horizontal px-1">
+        <li v-for="link of sidebarLinks">
+          <RouterLink :to="link.path" active-class="menu-active">{{
+            link.name
+          }}</RouterLink>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <main class="drawer-content p-10">
+    <RouterView />
+  </main>
 </template>
+
+<style>
+html {
+  scrollbar-gutter: unset !important;
+}
+</style>

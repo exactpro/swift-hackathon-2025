@@ -1,13 +1,9 @@
-import {
-  createMemoryHistory,
-  createRouter,
-  type RouteRecordRaw
-} from 'vue-router'
+import { createWebHistory, createRouter, type RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('./pages/HomePage.vue')
+    redirect: '/transactions'
   },
 
   // Client routes with nested children
@@ -40,7 +36,7 @@ const routes: RouteRecordRaw[] = [
           import('./pages/transactions/TransactionsHistoryPage.vue')
       },
       {
-        path: 'status/:transaction_id',
+        path: 'status/:uetr',
         component: () =>
           import('./pages/transactions/TransactionStatusPage.vue')
       },
@@ -59,6 +55,6 @@ const routes: RouteRecordRaw[] = [
 ]
 
 export const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(),
   routes
 })
