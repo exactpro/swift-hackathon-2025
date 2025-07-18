@@ -1,5 +1,9 @@
 export type Currency = 'EUR' | 'USD' | 'S-USDC'
-export type TransactionStatus = 'pending' | 'completed' | 'cancelled'
+export type TransactionStatus =
+  | 'pending'
+  | 'completed'
+  | 'cancelled'
+  | 'rejected'
 export type TransactionType = 'transfer' | 'incoming transfer' | 'cancel'
 export type TransactionParty = {
   name: string

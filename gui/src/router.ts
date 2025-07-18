@@ -36,7 +36,7 @@ const routes: RouteRecordRaw[] = [
           import('./pages/transactions/TransactionsHistoryPage.vue')
       },
       {
-        path: 'status/:uetr',
+        path: ':uetr',
         component: () =>
           import('./pages/transactions/TransactionStatusPage.vue')
       },

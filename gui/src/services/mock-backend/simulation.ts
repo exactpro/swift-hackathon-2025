@@ -7,14 +7,27 @@ import type {
   TransactionStatus
 } from './types.js'
 import { faker } from '@faker-js/faker'
+import type { BackendUpdates } from './utils.js'
 
 /**
  * Initializes start data in state and cron jobs for changing state from the other end.
  * @param ownBIC - BIC of the own bank
  */
-export function simulate(ownBIC: string) {
+export function simulate(ownBIC: string, emitter: BackendUpdates) {
   const currencies: Currency[] = ['EUR', 'USD', 'S-USDC']
-  const statuses: TransactionStatus[] = ['pending', 'completed', 'cancelled']
+  const statuses: TransactionStatus[] = [
+    'pending',
+    'completed',
+    'cancelled',
+    'rejected'
+  ]
+
+  function emitTransactionsUpdated() {
+    state.transactions.sort((a, b) => {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    })
+    emitter.updateTransactions(state.transactions)
+  }
 
   for (let i = 0; i < 10; i++) {
     const client: Client = {
@@ -59,14 +72,35 @@ export function simulate(ownBIC: string) {
     }
   }
 
+  state.transactions.reverse()
+  console.log('Mock backend initialized with data:', state)
+
   setInterval(() => {
     const transaction = faker.helpers.arrayElement(
-      state.transactions.filter((t) => t.status === 'pending')
+      state.transactions.filter(
+        (t) => t.status === 'pending' && t.type === 'transfer'
+      )
     )
     transaction.status = 'completed'
     transaction.updatedAt = new Date()
+    emitTransactionsUpdated()
     console.log(
       `Transaction ${transaction.uetr} status changed to completed`,
+      transaction
+    )
+  }, 3000)
+
+  setInterval(() => {
+    const transaction = faker.helpers.arrayElement(
+      state.transactions.filter(
+        (t) => t.status === 'pending' && t.type === 'transfer'
+      )
+    )
+    transaction.status = 'rejected'
+    transaction.updatedAt = new Date()
+    emitTransactionsUpdated()
+    console.log(
+      `Transaction ${transaction.uetr} status changed to rejected`,
       transaction
     )
   }, 3000)
@@ -99,6 +133,7 @@ export function simulate(ownBIC: string) {
       incomingTransaction
     )
     state.transactions.push(incomingTransaction)
+    emitTransactionsUpdated()
   }, 5000)
   return state
 }
