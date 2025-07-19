@@ -363,7 +363,7 @@ function clearFilters() {
                 v-model="filters.uetr"
                 type="text"
                 placeholder="Search UETR..."
-                class="input input-bordered w-full"
+                class="input input-bordered input-xs w-full"
                 list="uetr-list"
               />
               <datalist id="uetr-list">
@@ -393,7 +393,7 @@ function clearFilters() {
                 v-model="filters.debtorBic"
                 type="text"
                 placeholder="Search BIC..."
-                class="input input-bordered w-full"
+                class="input input-bordered input-xs w-full"
                 list="debtor-bic-list"
               />
               <datalist id="debtor-bic-list">
@@ -414,7 +414,7 @@ function clearFilters() {
                 v-model="filters.debtorClientId"
                 type="text"
                 placeholder="Search Client ID..."
-                class="input input-bordered w-full"
+                class="input input-bordered input-xs w-full"
                 list="debtor-client-list"
               />
               <datalist id="debtor-client-list">
@@ -437,7 +437,7 @@ function clearFilters() {
                     v-model.number="filters.debtorAmountFrom"
                     type="number"
                     placeholder="From"
-                    class="input input-bordered input-sm flex-1"
+                    class="input input-bordered input-xs flex-1"
                     :min="availableOptions.debtorAmountRange.min"
                     :max="availableOptions.debtorAmountRange.max"
                   />
@@ -445,7 +445,7 @@ function clearFilters() {
                     v-model.number="filters.debtorAmountTo"
                     type="number"
                     placeholder="To"
-                    class="input input-bordered input-sm flex-1"
+                    class="input input-bordered input-xs flex-1"
                     :min="availableOptions.debtorAmountRange.min"
                     :max="availableOptions.debtorAmountRange.max"
                   />
@@ -497,7 +497,7 @@ function clearFilters() {
                 v-model="filters.creditorBic"
                 type="text"
                 placeholder="Search BIC..."
-                class="input input-bordered w-full"
+                class="input input-bordered input-xs w-full"
                 list="creditor-bic-list"
               />
               <datalist id="creditor-bic-list">
@@ -518,7 +518,7 @@ function clearFilters() {
                 v-model="filters.creditorClientId"
                 type="text"
                 placeholder="Search Client ID..."
-                class="input input-bordered w-full"
+                class="input input-bordered input-xs w-full"
                 list="creditor-client-list"
               />
               <datalist id="creditor-client-list">
@@ -541,7 +541,7 @@ function clearFilters() {
                     v-model.number="filters.creditorAmountFrom"
                     type="number"
                     placeholder="From"
-                    class="input input-bordered input-sm flex-1"
+                    class="input input-bordered input-xs flex-1"
                     :min="availableOptions.creditorAmountRange.min"
                     :max="availableOptions.creditorAmountRange.max"
                   />
@@ -549,7 +549,7 @@ function clearFilters() {
                     v-model.number="filters.creditorAmountTo"
                     type="number"
                     placeholder="To"
-                    class="input input-bordered input-sm flex-1"
+                    class="input input-bordered input-xs flex-1"
                     :min="availableOptions.creditorAmountRange.min"
                     :max="availableOptions.creditorAmountRange.max"
                   />
@@ -603,7 +603,7 @@ function clearFilters() {
                   <input
                     v-model="filters.createdFrom"
                     type="datetime-local"
-                    class="input input-bordered input-sm w-full"
+                    class="input input-bordered input-xs w-full"
                     step="1"
                   />
                 </div>
@@ -612,7 +612,7 @@ function clearFilters() {
                   <input
                     v-model="filters.createdTo"
                     type="datetime-local"
-                    class="input input-bordered input-sm w-full"
+                    class="input input-bordered input-xs w-full"
                     step="1"
                   />
                 </div>
@@ -630,7 +630,7 @@ function clearFilters() {
                   <input
                     v-model="filters.updatedFrom"
                     type="datetime-local"
-                    class="input input-bordered input-sm w-full"
+                    class="input input-bordered input-xs w-full"
                     step="1"
                   />
                 </div>
@@ -639,7 +639,7 @@ function clearFilters() {
                   <input
                     v-model="filters.updatedTo"
                     type="datetime-local"
-                    class="input input-bordered input-sm w-full"
+                    class="input input-bordered input-xs w-full"
                     step="1"
                   />
                 </div>
