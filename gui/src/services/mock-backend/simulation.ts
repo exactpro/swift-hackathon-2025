@@ -88,7 +88,7 @@ export function simulate(ownBIC: string, emitter: BackendUpdates) {
       `Transaction ${transaction.uetr} status changed to completed`,
       transaction
     )
-  }, 3000)
+  }, 30000)
 
   setInterval(() => {
     const transaction = faker.helpers.arrayElement(
@@ -103,7 +103,7 @@ export function simulate(ownBIC: string, emitter: BackendUpdates) {
       `Transaction ${transaction.uetr} status changed to rejected`,
       transaction
     )
-  }, 3000)
+  }, 40000)
 
   setInterval(() => {
     const recipient = faker.helpers.arrayElement(state.clients)
@@ -134,6 +134,6 @@ export function simulate(ownBIC: string, emitter: BackendUpdates) {
     )
     state.transactions.push(incomingTransaction)
     emitTransactionsUpdated()
-  }, 5000)
+  }, 50000)
   return state
 }
