@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, isRef } from 'vue'
+import { onBeforeUnmount, isRef, ref } from 'vue'
 import { useAsyncState, type MaybeRef } from '@vueuse/core'
 import {
   fetchTransactions,
@@ -12,10 +12,12 @@ import { usePagination } from '../../composables/usePagination.js'
 import config from '../../../config.js'
 import SortBtn from '../../components/SortBtn.vue'
 import PaginationNav from '../../components/PaginationNav.vue'
+import FilterControls from '../../components/FilterControls.vue'
 import type { SortItem } from '../../components/SortBtn.vue'
 import type { JSONify, Transaction } from '../../services/mock-backend/types.js'
 
 const { state: transactions } = useAsyncState(fetchTransactions, [])
+const filteredTransactions = ref(transactions.value)
 
 const sortQueue: SortItem[] = []
 
@@ -41,7 +43,7 @@ function sortBy(
 }
 
 function sortFromTable(sortItem: SortItem) {
-  sortBy(transactions, sortItem)
+  sortBy(filteredTransactions, sortItem)
   // Delete new sort item if it already exists
   const existingIndex = sortQueue.findIndex(
     (item) => item.label === sortItem.label
@@ -54,9 +56,6 @@ function sortFromTable(sortItem: SortItem) {
 
 const { state: unsubscribe } = useAsyncState(
   subscribeToTransactionsUpdates((transactionsUpdated) => {
-    for (const sortItem of sortQueue) {
-      sortBy(transactionsUpdated, sortItem)
-    }
     transactions.value = transactionsUpdated
   }),
   () => {}
@@ -67,7 +66,7 @@ const {
   beforeButtons,
   currentPage,
   afterButtons
-} = usePagination(transactions, {})
+} = usePagination(filteredTransactions, {})
 
 onBeforeUnmount(() => {
   unsubscribe.value()
@@ -77,6 +76,17 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <h1>Transactions History</h1>
+    <FilterControls
+      :items="transactions"
+      @filtered="
+        (filteredTransactionsNew) => {
+          filteredTransactions = filteredTransactionsNew
+          for (const sortItem of sortQueue) {
+            sortBy(filteredTransactions, sortItem)
+          }
+        }
+      "
+    />
 
     <div class="mb-4 flex justify-center">
       <PaginationNav
