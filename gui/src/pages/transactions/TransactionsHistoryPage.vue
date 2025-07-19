@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onBeforeUnmount } from 'vue'
-import { useAsyncState } from '@vueuse/core'
+import { onBeforeUnmount, isRef } from 'vue'
+import { useAsyncState, type MaybeRef } from '@vueuse/core'
 import {
   fetchTransactions,
   subscribeToTransactionsUpdates
@@ -20,21 +20,28 @@ const { state: transactions } = useAsyncState(fetchTransactions, [])
 const sortQueue: SortItem[] = []
 
 function sortBy(
-  items: JSONify<Transaction>[],
+  items: MaybeRef<JSONify<Transaction>[]>,
   { label: _, getProp, direction = 'asc' }: SortItem
 ) {
-  items.sort((a, b) => {
+  function sortCallback(a: JSONify<Transaction>, b: JSONify<Transaction>) {
     const aValue = getProp(a)
     const bValue = getProp(b)
 
     if (aValue < bValue) return direction === 'asc' ? -1 : 1
     if (aValue > bValue) return direction === 'asc' ? 1 : -1
     return 0
-  })
+  }
+  if (isRef(items)) {
+    // Pagination computed does not detect sorting of a ref array
+    items.value = items.value.slice().sort(sortCallback)
+    return
+  }
+  // If items is not a ref, we assume it's a plain array
+  items.sort(sortCallback)
 }
 
 function sortFromTable(sortItem: SortItem) {
-  sortBy(transactions.value, sortItem)
+  sortBy(transactions, sortItem)
   // Delete new sort item if it already exists
   const existingIndex = sortQueue.findIndex(
     (item) => item.label === sortItem.label
