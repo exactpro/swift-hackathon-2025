@@ -26,7 +26,7 @@ const sidebarLinks = [
       </ul>
     </div>
   </nav>
-  <main class="drawer-content p-10">
+  <main class="drawer-content p-3 lg:p-10 md:p-6">
     <RouterView />
   </main>
 </template>
