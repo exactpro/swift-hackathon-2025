@@ -64,6 +64,15 @@ watch(
   { immediate: true }
 )
 
+function getDirection(item: JSONify<Transaction>) {
+  if (item.debtor.bic === config.ownBic) {
+    return 'out'
+  } else if (item.creditor.bic === config.ownBic) {
+    return 'in'
+  }
+  return 'N/A'
+}
+
 const {
   currentPageItems: displayedTransactions,
   beforeButtons,
@@ -88,6 +97,7 @@ const {
             <th></th>
             <th></th>
             <th></th>
+            <th></th>
             <th colspan="4" class="border-l-2 border-base-content">Debtor</th>
             <th colspan="4" class="border-x-2 border-base-content">Creditor</th>
             <th></th>
@@ -100,6 +110,14 @@ const {
               <SortBtn
                 label="Type"
                 :getProp="(item) => item.type"
+                @sort="sortFromTable"
+              />
+            </th>
+            <th>
+              Dir
+              <SortBtn
+                label="Direction"
+                :getProp="getDirection"
                 @sort="sortFromTable"
               />
             </th>
@@ -212,11 +230,22 @@ const {
                 class="badge badge-xs"
                 :class="{
                   'badge-primary': transaction.type === 'transfer',
-                  'badge-secondary': transaction.type === 'incoming transfer',
                   'badge-accent': transaction.type === 'cancel'
                 }"
               >
                 {{ transaction.type }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="badge badge-xs"
+                :class="{
+                  'badge-info': getDirection(transaction) === 'out',
+                  'badge-success': getDirection(transaction) === 'in',
+                  'badge-ghost': getDirection(transaction) === 'N/A'
+                }"
+              >
+                {{ getDirection(transaction) }}
               </span>
             </td>
             <td>
