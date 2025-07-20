@@ -4,7 +4,7 @@ export type TransactionStatus =
   | 'completed'
   | 'cancelled'
   | 'rejected'
-export type TransactionType = 'transfer' | 'incoming transfer' | 'cancel'
+export type TransactionType = 'transfer' | 'cancel'
 export type TransactionParty = {
   name: string
   bic: string

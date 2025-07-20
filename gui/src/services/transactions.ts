@@ -20,3 +20,21 @@ export async function subscribeToTransactionsUpdates(
   }
   return () => {}
 }
+
+export async function fetchTransactionFormData() {
+  if (config.useMock) {
+    const { getTransactionFormData } = await import('./mock-backend/api.js')
+    return getTransactionFormData()
+  }
+  return null
+}
+
+export async function newTransaction(
+  transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'>
+): Promise<JSONify<Transaction>> {
+  if (config.useMock) {
+    const { newTransaction } = await import('./mock-backend/api.js')
+    return newTransaction(transaction)
+  }
+  return {} as JSONify<Transaction>
+}

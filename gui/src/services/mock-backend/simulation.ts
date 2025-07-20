@@ -110,7 +110,7 @@ export function simulate(ownBIC: string, emitter: BackendUpdates) {
     const incomingTransaction: Transaction = {
       uetr: faker.string.uuid(),
       status: 'pending',
-      type: 'incoming transfer',
+      type: 'transfer',
       debtor: {
         name: faker.person.fullName(),
         bic: faker.finance.bic(),

@@ -37,7 +37,14 @@ function formatAccountBalance(account: Account) {
 <template>
   <div>
     <div class="grid grid-cols-2 my-4">
-      <h1 class="text-lg font-bold">Client {{ displayTitle }}</h1>
+      <div class="flex flex-wrap gap-2 items-center">
+        <h1 class="text-lg font-bold inline-block">
+          Client {{ displayTitle }}
+        </h1>
+        <span v-if="client" class="text-sm text-gray-500">
+          {{ client.id }}
+        </span>
+      </div>
       <div class="text-right">
         <button
           @click="refresh"
@@ -69,7 +76,7 @@ function formatAccountBalance(account: Account) {
         <div class="text-right">
           <RouterLink
             class="btn btn-primary btn-sm"
-            :to="`/transactions/new?debtor=${client.id}&from_currency=${account.currency}`"
+            :to="`/transactions/new?debtor_id=${client.id}&from_currency=${account.currency}&debtor_name=${client.fullName}`"
           >
             Transfer
           </RouterLink>

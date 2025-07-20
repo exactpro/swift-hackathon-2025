@@ -1,7 +1,8 @@
 import { simulate } from './simulation'
-import type { Transaction, JSONify } from './types'
+import type { Transaction, JSONify, Currency } from './types'
 import { BackendUpdates, deepCopy } from './utils'
 import config from '../../../config.js'
+import { faker } from '@faker-js/faker'
 
 const emitter = new BackendUpdates()
 
@@ -63,4 +64,31 @@ export function getClientData(clientId: string) {
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     })
   }
+}
+
+export function getTransactionFormData() {
+  const currencies: Currency[] = ['EUR', 'USD', 'S-USDC']
+  return {
+    currencies,
+    exchangeValues: {
+      EUR: 1.16,
+      USD: 1,
+      SUSDC: 1.01
+    }
+  }
+}
+
+export function newTransaction(
+  transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'>
+): JSONify<Transaction> {
+  const newTransaction: Transaction = {
+    ...transaction,
+    uetr: faker.string.uuid(),
+    status: 'pending',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+  state.transactions.push(newTransaction)
+  emitter.updateTransactions(state.transactions)
+  return deepCopy(newTransaction)
 }
