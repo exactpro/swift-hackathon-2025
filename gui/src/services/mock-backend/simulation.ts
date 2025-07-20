@@ -39,7 +39,7 @@ export function simulate(ownBIC: string, emitter: BackendUpdates) {
     for (let currency of currencies) {
       const account: Account = {
         ownerId: client.id,
-        id: faker.string.uuid(),
+        id: faker.finance.accountNumber(),
         balance: faker.number.int({ min: 1000, max: 100000 }),
         currency
       }

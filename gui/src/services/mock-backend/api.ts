@@ -24,3 +24,20 @@ export function subscribeToTransactionsUpdates(
     emitter.removeEventListener('transactions-updated', callbackWrapper)
   }
 }
+
+export function getClients() {
+  const clients = deepCopy(state.clients)
+  return clients.map((client) => {
+    const accounts = deepCopy(
+      state.accounts.filter((account) => account.ownerId === client.id)
+    )
+    return {
+      ...client,
+      accounts: {
+        EUR: accounts.find((account) => account.currency === 'EUR'),
+        USD: accounts.find((account) => account.currency === 'USD'),
+        SUSDC: accounts.find((account) => account.currency === 'S-USDC')
+      }
+    }
+  })
+}
