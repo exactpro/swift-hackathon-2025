@@ -30,7 +30,11 @@ const { state: clients } = useAsyncState(fetchAllClients, [])
           <span class="text-accent">S-USDC</span>
         </div>
         <div class="row-span-2 md:row-span-1 text-right">
-          <RouterLink class="btn btn-primary btn-sm" :to="`/clients/${client.id}`">View</RouterLink>
+          <RouterLink
+            class="btn btn-primary btn-sm"
+            :to="`/clients/${client.id}`"
+            >View</RouterLink
+          >
         </div>
       </div>
     </section>

@@ -41,3 +41,26 @@ export function getClients() {
     }
   })
 }
+
+export function getClientData(clientId: string) {
+  const client = state.clients.find((c) => c.id === clientId)
+  if (!client) {
+    return null
+  }
+
+  return {
+    ...client,
+    accounts: deepCopy(
+      state.accounts.filter((account) => account.ownerId === client.id)
+    ),
+    transactions: deepCopy(
+      state.transactions.filter(
+        (transaction) =>
+          transaction.debtor.clientId === client.id ||
+          transaction.creditor.clientId === client.id
+      )
+    ).sort((a, b) => {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    })
+  }
+}
