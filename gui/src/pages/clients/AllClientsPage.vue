@@ -3,6 +3,7 @@ import { useAsyncState } from '@vueuse/core'
 import { fetchAllClients } from '../../services/clients.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import UUID from '../../components/UUID.vue'
+import { RouterLink } from 'vue-router'
 
 const { state: clients } = useAsyncState(fetchAllClients, [])
 </script>
@@ -27,6 +28,9 @@ const { state: clients } = useAsyncState(fetchAllClients, [])
         <div class="whitespace-nowrap">
           {{ formatNumber(client.accounts.SUSDC?.balance || 0) }}
           <span class="text-accent">S-USDC</span>
+        </div>
+        <div class="row-span-2 md:row-span-1 text-right">
+          <RouterLink class="btn btn-primary btn-sm" :to="`/clients/${client.id}`">View</RouterLink>
         </div>
       </div>
     </section>
