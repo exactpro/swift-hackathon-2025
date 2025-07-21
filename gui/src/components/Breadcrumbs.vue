@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-const props = defineProps<{
+defineProps<{
   items: { title: string; link: string }[]
 }>()
 </script>
