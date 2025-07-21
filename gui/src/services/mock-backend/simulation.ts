@@ -78,7 +78,10 @@ export function simulate(ownBIC: string, emitter: BackendUpdates) {
   setInterval(() => {
     const transaction = faker.helpers.arrayElement(
       state.transactions.filter(
-        (t) => t.status === 'pending' && t.type === 'transfer'
+        (t) =>
+          t.status === 'pending' &&
+          t.type === 'transfer' &&
+          t.creditor.bic !== ownBIC
       )
     )
     transaction.status = 'completed'
