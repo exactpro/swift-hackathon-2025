@@ -12,7 +12,7 @@ defineProps<{
   <nav class="join">
     <button
       v-for="(btn, i) in beforeButtons"
-      class="join-item btn"
+      class="join-item btn btn-sm md:btn-md"
       @click="
         () => {
           if (btn.action) btn.action()
@@ -26,12 +26,12 @@ defineProps<{
       <Icon v-if="btn.icon" :icon="btn.icon" />
       <span v-else-if="btn.label">{{ btn.label }}</span>
     </button>
-    <button class="join-item btn btn-primary">
+    <button class="join-item btn btn-primary btn-sm md:btn-md">
       {{ currentPage }}
     </button>
     <button
       v-for="(btn, i) in afterButtons"
-      class="join-item btn"
+      class="join-item btn btn-sm md:btn-md"
       @click="
         () => {
           if (btn.action) btn.action()
