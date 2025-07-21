@@ -81,7 +81,7 @@ export function simulate(ownBIC: string, emitter: BackendUpdates) {
         (t) =>
           t.status === 'pending' &&
           t.type === 'transfer' &&
-          t.creditor.bic !== ownBIC
+          t.debtor.bic === ownBIC
       )
     )
     transaction.status = 'completed'
