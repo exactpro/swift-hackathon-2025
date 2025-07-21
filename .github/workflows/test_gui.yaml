@@ -1,0 +1,42 @@
+name: GUI Tests and Linting
+
+on:
+  push:
+    paths:
+      - 'gui/**'
+
+jobs:
+  lint:
+    name: Lint GUI Code
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.1'
+          cache: 'npm'
+          cache-dependency-path: 'gui/package-lock.json'
+          
+      - name: Install dependencies
+        working-directory: ./gui
+        run: npm ci
+        
+      - name: Run TypeScript type checking
+        working-directory: ./gui
+        run: npm run typecheck
+        
+      - name: Run ESLint
+        working-directory: ./gui
+        run: npm run lint:js
+        
+      - name: Run Prettier check
+        working-directory: ./gui
+        run: npm run lint:prettier
+        
+      - name: Build project
+        working-directory: ./gui
+        run: npm run build

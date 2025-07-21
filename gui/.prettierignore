@@ -1,0 +1,11 @@
+node_modules
+.turbo
+*.log*
+.nuxt
+.nitro
+.cache
+.output
+.env
+dist
+build
+*.md
