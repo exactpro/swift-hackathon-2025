@@ -23,9 +23,6 @@ export function simulate(ownBIC: string, emitter: BackendUpdates) {
   ]
 
   function emitTransactionsUpdated() {
-    state.transactions.sort((a, b) => {
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    })
     emitter.updateTransactions(state.transactions)
   }
 

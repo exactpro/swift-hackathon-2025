@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import SortBtn from './SortBtn.vue'
-import { RouterLink } from 'vue-router'
 import { isRef, toRef, ref, watch } from 'vue'
 import { type MaybeRef } from '@vueuse/core'
 
@@ -11,6 +10,7 @@ import PaginationNav from './PaginationNav.vue'
 import config from '../../config.js'
 import type { SortItem } from './SortBtn.vue'
 import type { JSONify, Transaction } from '../services/mock-backend/types.js'
+import TransactionActions from './TransactionActions.vue'
 
 const props = defineProps<{
   transactions: JSONify<Transaction>[]
@@ -79,6 +79,17 @@ const {
   currentPage,
   afterButtons
 } = usePagination(localTransactions, {})
+
+const emit = defineEmits<{
+  (
+    e: 'transactionAccepted',
+    acceptedTransaction: JSONify<Transaction> | null
+  ): void
+  (
+    e: 'transactionRejected',
+    rejectedTransaction: JSONify<Transaction> | null
+  ): void
+}>()
 </script>
 
 <template>
@@ -293,12 +304,11 @@ const {
               <RelDate class="badge-info" :date="transaction.updatedAt" />
             </td>
             <td>
-              <RouterLink
-                :to="`/transactions/${transaction.uetr}`"
-                class="btn btn-primary btn-sm"
-              >
-                View
-              </RouterLink>
+              <TransactionActions
+                :transaction="transaction"
+                @transactionAccepted="emit('transactionAccepted', $event)"
+                @transactionRejected="emit('transactionRejected', $event)"
+              />
             </td>
           </tr>
         </tbody>

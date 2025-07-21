@@ -12,11 +12,16 @@ import { Icon } from '@iconify/vue'
 const route = useRoute()
 const clientId = route.params.client_id as string
 
-const {
-  state: client,
-  executeImmediate: refresh,
-  isLoading
-} = useAsyncState(fetchClientData(clientId), null)
+const { state: client, isLoading } = useAsyncState(
+  fetchClientData(clientId),
+  null
+)
+
+async function refresh() {
+  isLoading.value = true
+  client.value = await fetchClientData(clientId)
+  isLoading.value = false
+}
 
 const displayTitle = computed(() => {
   return client.value ? client.value.fullName : clientId
@@ -91,7 +96,11 @@ function formatAccountBalance(account: Account) {
       </div>
     </section>
     <section v-if="client">
-      <TransactionsTable :transactions="client.transactions" />
+      <TransactionsTable
+        :transactions="client.transactions"
+        @transaction-accepted="refresh"
+        @transaction-rejected="refresh"
+      />
     </section>
   </div>
 </template>

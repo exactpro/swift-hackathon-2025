@@ -31,10 +31,30 @@ export async function fetchTransactionFormData() {
 
 export async function newTransaction(
   transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'>
-): Promise<JSONify<Transaction>> {
+): Promise<JSONify<Transaction> | null> {
   if (config.useMock) {
     const { newTransaction } = await import('./mock-backend/api.js')
     return newTransaction(transaction)
   }
-  return {} as JSONify<Transaction>
+  return null
+}
+
+export async function acceptTransaction(
+  uetr: string
+): Promise<JSONify<Transaction> | null> {
+  if (config.useMock) {
+    const { acceptTransaction } = await import('./mock-backend/api.js')
+    return acceptTransaction(uetr)
+  }
+  return null
+}
+
+export async function rejectTransaction(
+  uetr: string
+): Promise<JSONify<Transaction> | null> {
+  if (config.useMock) {
+    const { rejectTransaction } = await import('./mock-backend/api.js')
+    return rejectTransaction(uetr)
+  }
+  return null
 }

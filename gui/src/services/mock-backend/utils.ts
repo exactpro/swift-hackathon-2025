@@ -6,6 +6,9 @@ export function deepCopy<T>(obj: T): JSONify<T> {
 
 export class BackendUpdates extends EventTarget {
   updateTransactions(transactions: Transaction[]) {
+    transactions.sort((a, b) => {
+      return b.updatedAt.getTime() - a.updatedAt.getTime()
+    })
     this.dispatchEvent(
       new CustomEvent('transactions-updated', {
         detail: deepCopy(transactions)
