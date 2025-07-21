@@ -98,6 +98,16 @@ export function simulate(ownBIC: string, emitter: BackendUpdates) {
     )
     transaction.status = 'rejected'
     transaction.updatedAt = new Date()
+    if (transaction.debtor.bic === ownBIC) {
+      const account = state.accounts.find(
+        (a) =>
+          a.ownerId === transaction.debtor.clientId &&
+          a.currency === transaction.debtor.currency
+      )
+      if (account) {
+        account.balance += transaction.debtor.amount
+      }
+    }
     emitTransactionsUpdated()
     console.log(
       `Transaction ${transaction.uetr} status changed to rejected`,
