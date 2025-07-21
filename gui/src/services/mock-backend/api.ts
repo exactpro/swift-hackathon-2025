@@ -92,3 +92,65 @@ export function newTransaction(
   emitter.updateTransactions(state.transactions)
   return deepCopy(newTransaction)
 }
+
+export interface ExchangeProps {
+  clientId: string
+  fromCurrency: Currency
+  toCurrency: Currency
+  amount: number
+}
+
+const CURRENCY_KEYS: Record<Currency, 'EUR' | 'USD' | 'SUSDC'> = {
+  EUR: 'EUR',
+  USD: 'USD',
+  'S-USDC': 'SUSDC'
+}
+
+export function exchange(props: ExchangeProps): boolean {
+  const { clientId, fromCurrency, toCurrency, amount } = props
+  const client = state.clients.find((c) => c.id === clientId)
+  if (!client) {
+    console.error('Client not found:', clientId)
+    return false
+  }
+
+  const account = state.accounts.find(
+    (a) => a.ownerId === clientId && a.currency === fromCurrency
+  )
+  if (!account || account.balance < amount) {
+    console.error('Insufficient funds in account:', account)
+    return false
+  }
+
+  const exchangeValues = getTransactionFormData().exchangeValues
+
+  const fromValue = exchangeValues[CURRENCY_KEYS[fromCurrency]]
+  const toValue = exchangeValues[CURRENCY_KEYS[toCurrency]]
+  if (!fromValue || !toValue) {
+    console.error(
+      'Exchange values not available for currencies:',
+      fromCurrency,
+      toCurrency
+    )
+    return false
+  }
+
+  const exchangedAmount = (amount * fromValue) / toValue
+  const toAccount = state.accounts.find(
+    (a) => a.ownerId === clientId && a.currency === toCurrency
+  )
+  if (!toAccount) {
+    console.error('Target account not found:', toCurrency)
+    return false
+  }
+
+  // Update balances
+  if (account.balance < amount) {
+    console.error('Insufficient funds in account:', account)
+    return false
+  }
+  account.balance -= amount
+  toAccount.balance += exchangedAmount
+
+  return true
+}

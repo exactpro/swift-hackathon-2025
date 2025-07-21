@@ -8,6 +8,7 @@ import {
 } from '../../../services/transactions'
 import type { Currency } from '../../../services/mock-backend/types'
 import config from '../../../../config'
+import { calculateExchangeValue } from '../../../utils/calculateExchangeValue'
 
 const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
 
@@ -38,40 +39,17 @@ const form = reactive<TransferForm>({
   creditorAmount: null
 })
 
-const CURRENCY_KEYS: Record<Currency, 'EUR' | 'USD' | 'SUSDC'> = {
-  EUR: 'EUR',
-  USD: 'USD',
-  'S-USDC': 'SUSDC'
-}
-
-function calculateExchangeValue(
-  amount: number,
-  fromCurrency: Currency,
-  toCurrency: Currency
-): number {
-  const fromValue = utils.value?.exchangeValues[CURRENCY_KEYS[fromCurrency]]
-  const toValue = utils.value?.exchangeValues[CURRENCY_KEYS[toCurrency]]
-  if (!fromValue || !toValue) {
-    console.error(
-      'Exchange values not available for currencies:',
-      fromCurrency,
-      toCurrency
-    )
-    return amount
-  }
-  const exchangedEmount = (amount * fromValue) / toValue
-  return parseFloat(exchangedEmount.toFixed(2))
-}
-
 watch(
   toRef(() => form.debtorCurrency),
   (newCurrency, oldCurrency) => {
+    if (!utils.value) return
     if (!form.creditorCurrency && !newCurrency) return
     if (form.debtorAmount) {
       form.debtorAmount = calculateExchangeValue(
         form.debtorAmount,
         oldCurrency as Currency,
-        newCurrency as Currency
+        newCurrency as Currency,
+        utils.value.exchangeValues
       )
       return
     }
@@ -79,7 +57,8 @@ watch(
       form.debtorAmount = calculateExchangeValue(
         form.creditorAmount,
         form.creditorCurrency as Currency,
-        newCurrency as Currency
+        newCurrency as Currency,
+        utils.value.exchangeValues
       )
     }
   }
@@ -88,12 +67,14 @@ watch(
 watch(
   toRef(() => form.creditorCurrency),
   (newCurrency, oldCurrency) => {
+    if (!utils.value) return
     if (!newCurrency && !form.debtorCurrency) return
     if (form.creditorAmount) {
       form.creditorAmount = calculateExchangeValue(
         form.creditorAmount,
         oldCurrency as Currency,
-        newCurrency as Currency
+        newCurrency as Currency,
+        utils.value.exchangeValues
       )
       return
     }
@@ -101,7 +82,8 @@ watch(
       form.creditorAmount = calculateExchangeValue(
         form.debtorAmount,
         form.debtorCurrency as Currency,
-        newCurrency as Currency
+        newCurrency as Currency,
+        utils.value.exchangeValues
       )
     }
   }
@@ -110,11 +92,13 @@ watch(
 watch(
   toRef(() => form.debtorAmount),
   (newAmount) => {
+    if (!utils.value) return
     if (form.debtorCurrency && form.creditorCurrency) {
       form.creditorAmount = calculateExchangeValue(
         newAmount ?? 0,
         form.debtorCurrency as Currency,
-        form.creditorCurrency as Currency
+        form.creditorCurrency as Currency,
+        utils.value.exchangeValues
       )
       return
     }
@@ -124,11 +108,13 @@ watch(
 watch(
   toRef(() => form.creditorAmount),
   (newAmount) => {
+    if (!utils.value) return
     if (form.debtorCurrency && form.creditorCurrency) {
       form.debtorAmount = calculateExchangeValue(
         newAmount ?? 0,
         form.creditorCurrency as Currency,
-        form.debtorCurrency as Currency
+        form.debtorCurrency as Currency,
+        utils.value.exchangeValues
       )
       return
     }

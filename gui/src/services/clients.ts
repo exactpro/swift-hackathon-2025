@@ -3,7 +3,8 @@ import type {
   Client,
   JSONify,
   Account,
-  Transaction
+  Transaction,
+  Currency
 } from './mock-backend/types.js'
 
 interface AllClientsResponseItem extends JSONify<Client> {
@@ -35,4 +36,24 @@ export async function fetchClientData(
     return getClientData(clientId)
   }
   return null
+}
+
+export async function exchangeCurrency(
+  clientId: string,
+  fromCurrency: Currency,
+  toCurrency: Currency,
+  amount: number
+): Promise<boolean> {
+  if (config.useMock) {
+    const { exchange } = await import('./mock-backend/api.js')
+    return exchange({
+      clientId,
+      fromCurrency,
+      toCurrency,
+      amount
+    })
+  }
+  // In a real application, this would call the backend API to perform the exchange
+  console.warn('Exchange operation is not implemented in mock mode.')
+  return false
 }

@@ -46,6 +46,13 @@ function formatAccountBalance(account: Account) {
         </span>
       </div>
       <div class="text-right">
+        <RouterLink
+          v-if="client"
+          class="btn btn-primary btn-sm mr-2"
+          :to="`/exchange?client_id=${client.id}&client_name=${client.fullName}`"
+        >
+          Exchange <Icon icon="mdi:swap-horizontal" class="inline-block" />
+        </RouterLink>
         <button
           @click="refresh"
           :disabled="isLoading"
