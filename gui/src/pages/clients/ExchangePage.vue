@@ -2,12 +2,8 @@
 import { onMounted, watch, reactive, toRef, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
-import {
-  fetchTransactionFormData,
-  newTransaction
-} from '../../services/transactions'
+import { fetchTransactionFormData } from '../../services/transactions'
 import type { Currency } from '../../services/mock-backend/types'
-import config from '../../../config'
 import {
   calculateExchangeValue,
   CURRENCY_KEYS
