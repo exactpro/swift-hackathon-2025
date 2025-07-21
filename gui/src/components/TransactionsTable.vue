@@ -9,7 +9,11 @@ import { usePagination } from '../composables/usePagination.js'
 import PaginationNav from './PaginationNav.vue'
 import config from '../../config.js'
 import type { SortItem } from './SortBtn.vue'
-import type { JSONify, Transaction } from '../services/mock-backend/types.js'
+import type {
+  JSONify,
+  Transaction,
+  TransactionParty
+} from '../services/mock-backend/types.js'
 import TransactionActions from './TransactionActions.vue'
 
 const props = defineProps<{
@@ -71,6 +75,10 @@ function getDirection(item: JSONify<Transaction>) {
     return 'in'
   }
   return 'N/A'
+}
+
+function getClientPageLink(party: TransactionParty): string {
+  return `/clients/${party.clientId}`
 }
 
 const {
@@ -160,7 +168,7 @@ const emit = defineEmits<{
               Client
               <SortBtn
                 label="Debtor Client"
-                :getProp="(item) => item.debtor.clientId"
+                :getProp="(item) => item.debtor.name"
                 @sort="sortFromTable"
               />
             </th>
@@ -192,7 +200,7 @@ const emit = defineEmits<{
               Client
               <SortBtn
                 label="Creditor Client"
-                :getProp="(item) => item.creditor.clientId"
+                :getProp="(item) => item.creditor.name"
                 @sort="sortFromTable"
               />
             </th>
@@ -281,7 +289,21 @@ const emit = defineEmits<{
             >
               {{ transaction.debtor.bic }}
             </td>
-            <td><UUID :uuid="transaction.debtor.clientId" /></td>
+            <td>
+              <div v-if="transaction.debtor.bic !== config.ownBic">
+                {{ transaction.debtor.name }}
+              </div>
+              <div v-else>
+                <RouterLink
+                  class="link"
+                  :to="getClientPageLink(transaction.debtor)"
+                >
+                  {{ transaction.debtor.name }}</RouterLink
+                >
+              </div>
+
+              <UUID :uuid="transaction.debtor.clientId" />
+            </td>
             <td>{{ transaction.debtor.amount }}</td>
             <td>{{ transaction.debtor.currency }}</td>
             <td
@@ -292,7 +314,21 @@ const emit = defineEmits<{
             >
               {{ transaction.creditor.bic }}
             </td>
-            <td><UUID :uuid="transaction.creditor.clientId" /></td>
+            <td>
+              <div v-if="transaction.creditor.bic !== config.ownBic">
+                {{ transaction.creditor.name }}
+              </div>
+              <div v-else>
+                <RouterLink
+                  class="link"
+                  creditor
+                  :to="getClientPageLink(transaction.creditor)"
+                >
+                  {{ transaction.creditor.name }}</RouterLink
+                >
+              </div>
+              <UUID :uuid="transaction.creditor.clientId" />
+            </td>
             <td>{{ transaction.creditor.amount }}</td>
             <td class="border-r-2 border-base-content">
               {{ transaction.creditor.currency }}

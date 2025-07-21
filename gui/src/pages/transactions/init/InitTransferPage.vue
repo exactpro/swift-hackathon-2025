@@ -9,6 +9,7 @@ import {
 import type { Currency } from '../../../services/mock-backend/types'
 import config from '../../../../config'
 import { calculateExchangeValue } from '../../../utils/calculateExchangeValue'
+import Breadcrumbs from '../../../components/Breadcrumbs.vue'
 
 const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
 
@@ -180,6 +181,12 @@ async function startTransaction() {
 
 <template>
   <div class="container mx-auto p-6 max-w-4xl">
+    <Breadcrumbs
+      :items="[
+        { title: 'Transactions', link: '/transactions' },
+        { title: 'New Transfer', link: '/transactions/new' }
+      ]"
+    />
     <h1 class="text-2xl font-bold mb-8">Transfer Funds</h1>
 
     <form

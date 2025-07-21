@@ -4,13 +4,17 @@ import { fetchAllClients } from '../../services/clients.js'
 import { formatNumber } from '../../utils/formatNumber.js'
 import UUID from '../../components/UUID.vue'
 import { RouterLink } from 'vue-router'
+import Breadcrumbs from '../../components/Breadcrumbs.vue'
 
 const { state: clients } = useAsyncState(fetchAllClients, [])
 </script>
 
 <template>
   <div>
-    <h1>Clients</h1>
+    <Breadcrumbs :items="[{ title: 'Clients', link: '/clients' }]" />
+    <div class="grid grid-cols-2 my-4">
+      <h1 class="text-lg font-bold inline-block">Clients</h1>
+    </div>
     <section>
       <div v-for="client in clients" :key="client.id" class="client-card">
         <div class="font-bold col-span-2 md:col-span-1">

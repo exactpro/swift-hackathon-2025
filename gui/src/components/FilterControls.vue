@@ -298,13 +298,11 @@ function clearFilters() {
 </script>
 
 <template>
-  <div class="card bg-base-100 shadow-xl mb-6">
+  <div class="card bg-base-200 shadow-xl mb-6">
     <div class="card-body">
-      <h2 class="card-title">Filter Transactions</h2>
-
-      <details class="collapse collapse-arrow bg-base-200 rounded-box">
+      <details class="collapse collapse-arrow bg-base-300 rounded-box">
         <summary class="collapse-title text-lg font-medium">
-          Advanced Filters
+          <h2 class="card-title">Filter Transactions</h2>
         </summary>
         <div class="collapse-content">
           <div

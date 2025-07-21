@@ -9,6 +9,7 @@ import {
   CURRENCY_KEYS
 } from '../../utils/calculateExchangeValue'
 import { exchangeCurrency } from '../../services/clients'
+import Breadcrumbs from '../../components/Breadcrumbs.vue'
 
 const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
 
@@ -180,6 +181,12 @@ async function startExchange() {
 
 <template>
   <div class="container mx-auto p-6 max-w-4xl">
+    <Breadcrumbs
+      :items="[
+        { title: 'Clients', link: '/clients' },
+        { title: 'Exchange', link: '/exchange' }
+      ]"
+    />
     <h1 class="text-2xl font-bold mb-8">Currency Exchange</h1>
 
     <form v-if="utils" @submit.prevent="startExchange" class="space-y-8">

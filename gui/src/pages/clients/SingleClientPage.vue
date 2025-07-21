@@ -8,6 +8,7 @@ import type { Account } from '../../services/mock-backend/types'
 import { RouterLink } from 'vue-router'
 import TransactionsTable from '../../components/TransactionsTable.vue'
 import { Icon } from '@iconify/vue'
+import Breadcrumbs from '../../components/Breadcrumbs.vue'
 
 const route = useRoute()
 const clientId = route.params.client_id as string
@@ -38,9 +39,15 @@ function formatAccountBalance(account: Account) {
   }
   return `${formattedBalance} ${account.currency}`
 }
+
+const breadcrumbs = computed(() => [
+  { title: 'Clients', link: '/clients' },
+  { title: displayTitle.value, link: `/clients/${clientId}` }
+])
 </script>
 <template>
   <div>
+    <Breadcrumbs :items="breadcrumbs" />
     <div class="grid grid-cols-2 my-4">
       <div class="flex flex-wrap gap-2 items-center">
         <h1 class="text-lg font-bold inline-block">

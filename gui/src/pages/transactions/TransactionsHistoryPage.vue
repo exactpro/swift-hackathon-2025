@@ -7,6 +7,7 @@ import {
 } from '../../services/transactions.js'
 import FilterControls from '../../components/FilterControls.vue'
 import TransactionsTable from '../../components/TransactionsTable.vue'
+import Breadcrumbs from '../../components/Breadcrumbs.vue'
 
 const { state: transactions } = useAsyncState(fetchTransactions, [])
 const filteredTransactions = ref(transactions.value)
@@ -25,7 +26,18 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
-    <h1>Transactions History</h1>
+    <Breadcrumbs :items="[{ title: 'Transactions', link: '/transactions' }]" />
+    <div class="grid grid-cols-2 my-4">
+      <h1 class="text-lg font-bold inline-block">Transactions History</h1>
+      <div class="flex justify-end flex-wrap gap-2">
+        <RouterLink class="btn btn-primary btn-sm" :to="`/transactions/new`">
+          Transfer Funds
+        </RouterLink>
+        <RouterLink class="btn btn-primary btn-sm" :to="`/exchange`">
+          Exchange Currency
+        </RouterLink>
+      </div>
+    </div>
     <FilterControls
       :items="transactions"
       @filtered="
