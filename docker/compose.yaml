@@ -1,0 +1,112 @@
+services:
+  kafka:
+    image: apache/kafka:latest
+    hostname: kafka
+    container_name: kafka-broker
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: OaZ6qrUNLdj9
+  akhq:
+    image: tchiotludo/akhq
+    restart: unless-stopped
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka:29092"
+
+    ports:
+      - 8080:8080
+    links:
+      - kafka
+  kcat:
+    image: edenhill/kcat:1.7.1
+    entrypoint: ["sh", "-c"]
+    command:
+      - "sleep 10 ; echo -e 'foobar1\nfoobar2' | kcat -b kafka:29092 -t swiftnet -T -P"
+    links:
+      - kafka
+    depends_on:
+      - kafka
+  besu-node:
+    image: hyperledger/besu:latest
+    container_name: besu-dev
+    ports:
+      - "8545:8545"    # JSON-RPC HTTP
+      - "30303:30303"  # P2P
+    volumes:
+      - besu-data:/opt/besu/data
+    configs:
+      - source: besu-genesis
+        target: /opt/besu/genesis.json
+        uid: "1000"  # adjust if your host-UID/GID differ
+        gid: "1000"
+    command: >
+      --data-path=/opt/besu/data
+      --genesis-file=/opt/besu/genesis.json
+      --rpc-http-enabled=true
+      --rpc-http-host=0.0.0.0
+      --rpc-http-port=8545
+      --rpc-http-cors-origins=all
+      --host-allowlist=*
+      --network-id=1337
+      --min-gas-price=0
+      --logging=INFO
+configs:
+  besu-genesis:
+    content: |
+      {
+        "config": {
+          "chainId": 1337,
+          "londonBlock": 0,
+          "contractSizeLimit": 2147483647,
+          "ethash": {
+            "fixeddifficulty": 100
+          }
+        },
+        "nonce": "0x42",
+        "baseFeePerGas":"0x0",
+        "timestamp": "0x0",
+        "extraData": "0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa",
+        "gasLimit": "0x1fffffffffffff",
+        "difficulty": "0x10000",
+        "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "coinbase": "0x0000000000000000000000000000000000000000",
+        "alloc": {
+          "fe3b557e8fb62b89f4916b721be55ceb828dbd73": {
+            "privateKey": "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63",
+            "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
+            "balance": "0xad78ebc5ac6200000"
+          },
+          "627306090abaB3A6e1400e9345bC60c78a8BEf57": {
+            "privateKey": "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3",
+            "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
+            "balance": "90000000000000000000000"
+          },
+          "f17f52151EbEF6C7334FAD080c5704D77216b732": {
+            "privateKey": "ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f",
+            "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
+            "balance": "90000000000000000000000"
+          }
+        }
+      }
+volumes:
+  besu-data:
+    driver: local
