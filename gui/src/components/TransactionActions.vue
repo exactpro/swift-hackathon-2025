@@ -1,19 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { joinURL } from 'ufo'
 import type { JSONify, Transaction } from '../services/mock-backend/types'
-import { useBankBaseRoute } from '../composables/useBankBaseRoute'
+import { useBankRoute } from '../composables/useBankRoute'
 
 const props = defineProps<{
   transaction: JSONify<Transaction>
 }>()
 
-const bankBasePath = useBankBaseRoute()
-
-const transactionStatusLink = computed(() => {
-  const transactionId = props.transaction.uetr
-  return joinURL(bankBasePath.value, 'transfers', transactionId)
-})
+const transactionStatusLink = useBankRoute('transfers', props.transaction.uetr)
 
 defineEmits<{
   (e: 'transactionAccepted', acceptedTransaction: JSONify<Transaction> | null): void
