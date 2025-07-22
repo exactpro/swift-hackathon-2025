@@ -1,5 +1,5 @@
 import { simulate } from './simulation'
-import type { Transaction, JSONify, Currency } from './types'
+import type { Transaction, JSONify, Currency, TransactionDetails } from './types'
 import { BackendUpdates, deepCopy } from './utils'
 import { faker } from '@faker-js/faker'
 
@@ -134,4 +134,68 @@ export function exchange(props: ExchangeProps): boolean {
   toAccount.balance += exchangedAmount
 
   return true
+}
+
+export function getTransactionDetails(uetr: string): JSONify<{
+  transaction: Transaction
+  details: TransactionDetails[]
+}> | null {
+  const transaction = state.transactions.find((t) => t.uetr === uetr)
+  if (!transaction) {
+    return null
+  }
+
+  const isCompleted = transaction.status === 'completed'
+
+  const details: TransactionDetails[] = [
+    {
+      businessStep: {
+        title: 'Debit Sender',
+        status: 'received',
+        viewerUrl: '#'
+      },
+      swiftMessage: null,
+      dltMessage: null
+    },
+    {
+      businessStep: {
+        title: 'FX Trade',
+        status: 'received',
+        viewerUrl: '#'
+      },
+      swiftMessage: null,
+      dltMessage: null
+    },
+    {
+      businessStep: {
+        title: 'Transfer Funds',
+        status: isCompleted ? 'received' : 'expecting',
+        viewerUrl: '#'
+      },
+      swiftMessage: {
+        title: 'pacs.008',
+        status: 'received',
+        viewerUrl: '#'
+      },
+      dltMessage: {
+        title: 'DLT Message',
+        status: isCompleted ? 'received' : 'expecting',
+        viewerUrl: '#'
+      }
+    },
+    {
+      businessStep: {
+        title: 'Credit Beneficiary',
+        status: isCompleted ? 'received' : 'expecting',
+        viewerUrl: '#'
+      },
+      swiftMessage: null,
+      dltMessage: null
+    }
+  ]
+
+  return {
+    transaction: deepCopy(transaction),
+    details: deepCopy(details)
+  }
 }

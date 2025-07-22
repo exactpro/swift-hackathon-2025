@@ -32,6 +32,18 @@ export type Client = {
   id: string
 }
 
+export type TransactionMessageStatus = {
+  status: 'expecting' | 'received'
+  title: string
+  viewerUrl: string
+}
+
+export type TransactionDetails = {
+  businessStep: TransactionMessageStatus | null
+  swiftMessage: TransactionMessageStatus | null
+  dltMessage: TransactionMessageStatus | null
+}
+
 export type JSONify<T> = T extends Date
   ? string
   : T extends Array<infer U>

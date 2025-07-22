@@ -1,5 +1,5 @@
 import config from '../../config.js'
-import type { Transaction, JSONify } from './mock-backend/types.js'
+import type { Transaction, JSONify, TransactionDetails } from './mock-backend/types.js'
 
 export async function fetchTransactions(bic: string): Promise<JSONify<Transaction[]>> {
   if (config.useMock) {
@@ -38,6 +38,16 @@ export async function newTransaction(
   if (config.useMock) {
     const { newTransaction } = await import('./mock-backend/api.js')
     return newTransaction(transaction)
+  }
+  return null
+}
+
+export async function fetchTransactionDetails(
+  uetr: string
+): Promise<JSONify<{ transaction: Transaction; details: JSONify<TransactionDetails>[] }> | null> {
+  if (config.useMock) {
+    const { getTransactionDetails } = await import('./mock-backend/api.js')
+    return getTransactionDetails(uetr)
   }
   return null
 }
