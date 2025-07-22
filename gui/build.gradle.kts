@@ -24,8 +24,21 @@ tasks {
         dependsOn(npmInstall)
     }
 
+    val zipTask = register<Zip>("zip") {
+        dependsOn(npmBuildTask)
+
+        from(project.layout.projectDirectory.dir("dist")) {
+            into("/")
+        }
+
+        archiveFileName.set("ui-dist-${project.version}.zip")
+
+        destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
+    }
+
     build {
         dependsOn(npmBuildTask)
+        dependsOn(zipTask)
     }
 
     clean {
