@@ -13,10 +13,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.vue'
 const route = useRoute()
 const clientId = route.params.client_id as string
 
-const { state: client, isLoading } = useAsyncState(
-  fetchClientData(clientId),
-  null
-)
+const { state: client, isLoading } = useAsyncState(fetchClientData(clientId), null)
 
 async function refresh() {
   isLoading.value = true
@@ -50,9 +47,7 @@ const breadcrumbs = computed(() => [
     <Breadcrumbs :items="breadcrumbs" />
     <div class="grid grid-cols-2 my-4">
       <div class="flex flex-wrap gap-2 items-center">
-        <h1 class="text-lg font-bold inline-block">
-          Client {{ displayTitle }}
-        </h1>
+        <h1 class="text-lg font-bold inline-block">Client {{ displayTitle }}</h1>
         <span v-if="client" class="text-sm text-gray-500">
           {{ client.id }}
         </span>
@@ -71,9 +66,7 @@ const breadcrumbs = computed(() => [
           class="btn btn-secondary btn-sm"
           :class="{ disabled: isLoading }"
         >
-          <template v-if="!isLoading">
-            Refresh <Icon icon="mdi:refresh" class="inline-block" />
-          </template>
+          <template v-if="!isLoading"> Refresh <Icon icon="mdi:refresh" class="inline-block" /> </template>
           <template v-else>
             <span class="loading loading-spinner loading-sm"></span>
           </template>
@@ -88,9 +81,7 @@ const breadcrumbs = computed(() => [
       >
         <div>
           <div class="font-bold">{{ account.currency }} Token Account</div>
-          <div class="text-accent">
-            Balance: {{ formatAccountBalance(account) }}
-          </div>
+          <div class="text-accent">Balance: {{ formatAccountBalance(account) }}</div>
         </div>
         <div class="text-right">
           <RouterLink

@@ -126,78 +126,51 @@ const availableOptions = computed(() => {
 const filteredItems = computed(() => {
   return props.items.filter((item) => {
     // Status filter
-    if (
-      filters.value.status.length > 0 &&
-      !filters.value.status.includes(item.status)
-    ) {
+    if (filters.value.status.length > 0 && !filters.value.status.includes(item.status)) {
       return false
     }
 
     // Type filter
-    if (
-      filters.value.type.length > 0 &&
-      !filters.value.type.includes(item.type)
-    ) {
+    if (filters.value.type.length > 0 && !filters.value.type.includes(item.type)) {
       return false
     }
 
     // UETR filter
-    if (
-      filters.value.uetr &&
-      !item.uetr.toLowerCase().includes(filters.value.uetr.toLowerCase())
-    ) {
+    if (filters.value.uetr && !item.uetr.toLowerCase().includes(filters.value.uetr.toLowerCase())) {
       return false
     }
 
     // Debtor BIC filter
-    if (
-      filters.value.debtorBic &&
-      !item.debtor.bic
-        .toLowerCase()
-        .includes(filters.value.debtorBic.toLowerCase())
-    ) {
+    if (filters.value.debtorBic && !item.debtor.bic.toLowerCase().includes(filters.value.debtorBic.toLowerCase())) {
       return false
     }
 
     // Debtor Client ID filter
     if (
       filters.value.debtorClientId &&
-      !item.debtor.clientId
-        .toLowerCase()
-        .includes(filters.value.debtorClientId.toLowerCase())
+      !item.debtor.clientId.toLowerCase().includes(filters.value.debtorClientId.toLowerCase())
     ) {
       return false
     }
 
     // Debtor Amount range filter
     const debtorAmount = parseFloat(item.debtor.amount.toString())
-    if (
-      filters.value.debtorAmountFrom !== null &&
-      debtorAmount < filters.value.debtorAmountFrom
-    ) {
+    if (filters.value.debtorAmountFrom !== null && debtorAmount < filters.value.debtorAmountFrom) {
       return false
     }
-    if (
-      filters.value.debtorAmountTo !== null &&
-      debtorAmount > filters.value.debtorAmountTo
-    ) {
+    if (filters.value.debtorAmountTo !== null && debtorAmount > filters.value.debtorAmountTo) {
       return false
     }
 
     // Debtor Currency filter
-    if (
-      filters.value.debtorCurrency.length > 0 &&
-      !filters.value.debtorCurrency.includes(item.debtor.currency)
-    ) {
+    if (filters.value.debtorCurrency.length > 0 && !filters.value.debtorCurrency.includes(item.debtor.currency)) {
       return false
     }
 
     // Creditor BIC filter
     if (
       filters.value.creditorBic &&
-      !item.creditor.bic
-        .toLowerCase()
-        .includes(filters.value.creditorBic.toLowerCase())
+      !item.creditor.bic.toLowerCase().includes(filters.value.creditorBic.toLowerCase())
     ) {
       return false
     }
@@ -205,33 +178,22 @@ const filteredItems = computed(() => {
     // Creditor Client ID filter
     if (
       filters.value.creditorClientId &&
-      !item.creditor.clientId
-        .toLowerCase()
-        .includes(filters.value.creditorClientId.toLowerCase())
+      !item.creditor.clientId.toLowerCase().includes(filters.value.creditorClientId.toLowerCase())
     ) {
       return false
     }
 
     // Creditor Amount range filter
     const creditorAmount = parseFloat(item.creditor.amount.toString())
-    if (
-      filters.value.creditorAmountFrom !== null &&
-      creditorAmount < filters.value.creditorAmountFrom
-    ) {
+    if (filters.value.creditorAmountFrom !== null && creditorAmount < filters.value.creditorAmountFrom) {
       return false
     }
-    if (
-      filters.value.creditorAmountTo !== null &&
-      creditorAmount > filters.value.creditorAmountTo
-    ) {
+    if (filters.value.creditorAmountTo !== null && creditorAmount > filters.value.creditorAmountTo) {
       return false
     }
 
     // Creditor Currency filter
-    if (
-      filters.value.creditorCurrency.length > 0 &&
-      !filters.value.creditorCurrency.includes(item.creditor.currency)
-    ) {
+    if (filters.value.creditorCurrency.length > 0 && !filters.value.creditorCurrency.includes(item.creditor.currency)) {
       return false
     }
 
@@ -305,9 +267,7 @@ function clearFilters() {
           <h2 class="card-title">Filter Transactions</h2>
         </summary>
         <div class="collapse-content">
-          <div
-            class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pt-4"
-          >
+          <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 pt-4">
             <!-- Transaction Type -->
             <div class="form-control">
               <label class="label">
@@ -365,21 +325,13 @@ function clearFilters() {
                 list="uetr-list"
               />
               <datalist id="uetr-list">
-                <option
-                  v-for="uetr in availableOptions.uetrs"
-                  :key="uetr"
-                  :value="uetr"
-                />
+                <option v-for="uetr in availableOptions.uetrs" :key="uetr" :value="uetr" />
               </datalist>
             </div>
 
             <!-- Debtor Section -->
             <div class="col-span-full">
-              <h3
-                class="text-lg font-semibold text-blue-600 border-l-4 border-blue-500 pl-2 mb-4"
-              >
-                Debtor Filters
-              </h3>
+              <h3 class="text-lg font-semibold text-blue-600 border-l-4 border-blue-500 pl-2 mb-4">Debtor Filters</h3>
             </div>
 
             <!-- Debtor BIC -->
@@ -395,11 +347,7 @@ function clearFilters() {
                 list="debtor-bic-list"
               />
               <datalist id="debtor-bic-list">
-                <option
-                  v-for="bic in availableOptions.debtorBics"
-                  :key="bic"
-                  :value="bic"
-                />
+                <option v-for="bic in availableOptions.debtorBics" :key="bic" :value="bic" />
               </datalist>
             </div>
 
@@ -416,11 +364,7 @@ function clearFilters() {
                 list="debtor-client-list"
               />
               <datalist id="debtor-client-list">
-                <option
-                  v-for="clientId in availableOptions.debtorClientIds"
-                  :key="clientId"
-                  :value="clientId"
-                />
+                <option v-for="clientId in availableOptions.debtorClientIds" :key="clientId" :value="clientId" />
               </datalist>
             </div>
 
@@ -479,9 +423,7 @@ function clearFilters() {
 
             <!-- Creditor Section -->
             <div class="col-span-full">
-              <h3
-                class="text-lg font-semibold text-green-600 border-l-4 border-green-500 pl-2 mb-4"
-              >
+              <h3 class="text-lg font-semibold text-green-600 border-l-4 border-green-500 pl-2 mb-4">
                 Creditor Filters
               </h3>
             </div>
@@ -499,11 +441,7 @@ function clearFilters() {
                 list="creditor-bic-list"
               />
               <datalist id="creditor-bic-list">
-                <option
-                  v-for="bic in availableOptions.creditorBics"
-                  :key="bic"
-                  :value="bic"
-                />
+                <option v-for="bic in availableOptions.creditorBics" :key="bic" :value="bic" />
               </datalist>
             </div>
 
@@ -520,11 +458,7 @@ function clearFilters() {
                 list="creditor-client-list"
               />
               <datalist id="creditor-client-list">
-                <option
-                  v-for="clientId in availableOptions.creditorClientIds"
-                  :key="clientId"
-                  :value="clientId"
-                />
+                <option v-for="clientId in availableOptions.creditorClientIds" :key="clientId" :value="clientId" />
               </datalist>
             </div>
 
@@ -583,11 +517,7 @@ function clearFilters() {
 
             <!-- Date Filters -->
             <div class="col-span-full">
-              <h3
-                class="text-lg font-semibold text-purple-600 border-l-4 border-purple-500 pl-2 mb-4"
-              >
-                Date Filters
-              </h3>
+              <h3 class="text-lg font-semibold text-purple-600 border-l-4 border-purple-500 pl-2 mb-4">Date Filters</h3>
             </div>
 
             <!-- Created Date Range -->
@@ -649,12 +579,8 @@ function clearFilters() {
 
       <!-- Actions -->
       <div class="card-actions justify-end">
-        <button @click="clearFilters" class="btn btn-outline">
-          Clear All Filters
-        </button>
-        <div class="badge badge-info">
-          {{ filteredItems.length }} / {{ items.length }} transactions
-        </div>
+        <button @click="clearFilters" class="btn btn-outline">Clear All Filters</button>
+        <div class="badge badge-info">{{ filteredItems.length }} / {{ items.length }} transactions</div>
       </div>
     </div>
   </div>

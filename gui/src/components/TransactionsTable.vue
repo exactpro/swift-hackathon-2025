@@ -1,33 +1,29 @@
 <script setup lang="ts">
 import SortBtn from './SortBtn.vue'
 import { isRef, toRef, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { type MaybeRef } from '@vueuse/core'
 
 import UUID from './UUID.vue'
 import RelDate from './RelDate.vue'
 import { usePagination } from '../composables/usePagination.js'
 import PaginationNav from './PaginationNav.vue'
-import config from '../../config.js'
 import type { SortItem } from './SortBtn.vue'
-import type {
-  JSONify,
-  Transaction,
-  TransactionParty
-} from '../services/mock-backend/types.js'
+import type { JSONify, Transaction, TransactionParty } from '../services/mock-backend/types.js'
 import TransactionActions from './TransactionActions.vue'
 
 const props = defineProps<{
   transactions: JSONify<Transaction>[]
 }>()
 
+const route = useRoute()
+const ownBic = route.meta.bic as string
+
 const localTransactions = ref(props.transactions)
 
 const sortQueue: SortItem[] = []
 
-function sortBy(
-  items: MaybeRef<JSONify<Transaction>[]>,
-  { label: _, getProp, direction = 'asc' }: SortItem
-) {
+function sortBy(items: MaybeRef<JSONify<Transaction>[]>, { label: _, getProp, direction = 'asc' }: SortItem) {
   function sortCallback(a: JSONify<Transaction>, b: JSONify<Transaction>) {
     const aValue = getProp(a)
     const bValue = getProp(b)
@@ -48,9 +44,7 @@ function sortBy(
 function sortFromTable(sortItem: SortItem) {
   sortBy(localTransactions, sortItem)
   // Delete new sort item if it already exists
-  const existingIndex = sortQueue.findIndex(
-    (item) => item.label === sortItem.label
-  )
+  const existingIndex = sortQueue.findIndex((item) => item.label === sortItem.label)
   if (existingIndex !== -1) {
     sortQueue.splice(existingIndex, 1)
   }
@@ -69,9 +63,9 @@ watch(
 )
 
 function getDirection(item: JSONify<Transaction>) {
-  if (item.debtor.bic === config.ownBic) {
+  if (item.debtor.bic === ownBic) {
     return 'out'
-  } else if (item.creditor.bic === config.ownBic) {
+  } else if (item.creditor.bic === ownBic) {
     return 'in'
   }
   return 'N/A'
@@ -89,25 +83,15 @@ const {
 } = usePagination(localTransactions, {})
 
 const emit = defineEmits<{
-  (
-    e: 'transactionAccepted',
-    acceptedTransaction: JSONify<Transaction> | null
-  ): void
-  (
-    e: 'transactionRejected',
-    rejectedTransaction: JSONify<Transaction> | null
-  ): void
+  (e: 'transactionAccepted', acceptedTransaction: JSONify<Transaction> | null): void
+  (e: 'transactionRejected', rejectedTransaction: JSONify<Transaction> | null): void
 }>()
 </script>
 
 <template>
   <div>
     <div class="mb-4 flex justify-center">
-      <PaginationNav
-        :currentPage="currentPage"
-        :beforeButtons="beforeButtons"
-        :afterButtons="afterButtons"
-      />
+      <PaginationNav :currentPage="currentPage" :beforeButtons="beforeButtons" :afterButtons="afterButtons" />
     </div>
     <div class="overflow-x-auto">
       <table class="table table-xs">
@@ -126,51 +110,27 @@ const emit = defineEmits<{
           <tr>
             <th>
               Type
-              <SortBtn
-                label="Type"
-                :getProp="(item) => item.type"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Type" :getProp="(item) => item.type" @sort="sortFromTable" />
             </th>
             <th>
               Dir
-              <SortBtn
-                label="Direction"
-                :getProp="getDirection"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Direction" :getProp="getDirection" @sort="sortFromTable" />
             </th>
             <th>
               Status
-              <SortBtn
-                label="Status"
-                :getProp="(item) => item.status"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Status" :getProp="(item) => item.status" @sort="sortFromTable" />
             </th>
             <th>
               UETR
-              <SortBtn
-                label="UETR"
-                :getProp="(item) => item.uetr"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="UETR" :getProp="(item) => item.uetr" @sort="sortFromTable" />
             </th>
             <th class="border-l-2 border-base-content">
               BIC
-              <SortBtn
-                label="Debtor BIC"
-                :getProp="(item) => item.debtor.bic"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Debtor BIC" :getProp="(item) => item.debtor.bic" @sort="sortFromTable" />
             </th>
             <th>
               Client
-              <SortBtn
-                label="Debtor Client"
-                :getProp="(item) => item.debtor.name"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Debtor Client" :getProp="(item) => item.debtor.name" @sort="sortFromTable" />
             </th>
             <th>
               Amount
@@ -182,27 +142,15 @@ const emit = defineEmits<{
             </th>
             <th>
               Currency
-              <SortBtn
-                label="Debtor Currency"
-                :getProp="(item) => item.debtor.currency"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Debtor Currency" :getProp="(item) => item.debtor.currency" @sort="sortFromTable" />
             </th>
             <th class="border-l-2 border-base-content">
               BIC
-              <SortBtn
-                label="Creditor BIC"
-                :getProp="(item) => item.creditor.bic"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Creditor BIC" :getProp="(item) => item.creditor.bic" @sort="sortFromTable" />
             </th>
             <th>
               Client
-              <SortBtn
-                label="Creditor Client"
-                :getProp="(item) => item.creditor.name"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Creditor Client" :getProp="(item) => item.creditor.name" @sort="sortFromTable" />
             </th>
             <th>
               Amount
@@ -214,36 +162,21 @@ const emit = defineEmits<{
             </th>
             <th class="border-r-2 border-base-content">
               Currency
-              <SortBtn
-                label="Creditor Currency"
-                :getProp="(item) => item.creditor.currency"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Creditor Currency" :getProp="(item) => item.creditor.currency" @sort="sortFromTable" />
             </th>
             <th>
               Created
-              <SortBtn
-                label="Created"
-                :getProp="(item) => new Date(item.createdAt)"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Created" :getProp="(item) => new Date(item.createdAt)" @sort="sortFromTable" />
             </th>
             <th>
               Updated
-              <SortBtn
-                label="Updated"
-                :getProp="(item) => new Date(item.updatedAt)"
-                @sort="sortFromTable"
-              />
+              <SortBtn label="Updated" :getProp="(item) => new Date(item.updatedAt)" @sort="sortFromTable" />
             </th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody v-if="displayedTransactions">
-          <tr
-            v-for="transaction in displayedTransactions"
-            :key="transaction.uetr"
-          >
+          <tr v-for="transaction in displayedTransactions" :key="transaction.uetr">
             <td>
               <span
                 class="badge badge-xs"
@@ -284,20 +217,17 @@ const emit = defineEmits<{
             <td
               class="border-l-2 border-base-content"
               :class="{
-                'text-accent': transaction.debtor.bic === config.ownBic
+                'text-accent': transaction.debtor.bic === ownBic
               }"
             >
               {{ transaction.debtor.bic }}
             </td>
             <td>
-              <div v-if="transaction.debtor.bic !== config.ownBic">
+              <div v-if="transaction.debtor.bic !== ownBic">
                 {{ transaction.debtor.name }}
               </div>
               <div v-else>
-                <RouterLink
-                  class="link"
-                  :to="getClientPageLink(transaction.debtor)"
-                >
+                <RouterLink class="link" :to="getClientPageLink(transaction.debtor)">
                   {{ transaction.debtor.name }}</RouterLink
                 >
               </div>
@@ -309,21 +239,17 @@ const emit = defineEmits<{
             <td
               class="border-l-2 border-base-content"
               :class="{
-                'text-accent': transaction.creditor.bic === config.ownBic
+                'text-accent': transaction.creditor.bic === ownBic
               }"
             >
               {{ transaction.creditor.bic }}
             </td>
             <td>
-              <div v-if="transaction.creditor.bic !== config.ownBic">
+              <div v-if="transaction.creditor.bic !== ownBic">
                 {{ transaction.creditor.name }}
               </div>
               <div v-else>
-                <RouterLink
-                  class="link"
-                  creditor
-                  :to="getClientPageLink(transaction.creditor)"
-                >
+                <RouterLink class="link" creditor :to="getClientPageLink(transaction.creditor)">
                   {{ transaction.creditor.name }}</RouterLink
                 >
               </div>
@@ -351,11 +277,7 @@ const emit = defineEmits<{
       </table>
     </div>
     <div class="mt-4 flex justify-center">
-      <PaginationNav
-        :currentPage="currentPage"
-        :beforeButtons="beforeButtons"
-        :afterButtons="afterButtons"
-      />
+      <PaginationNav :currentPage="currentPage" :beforeButtons="beforeButtons" :afterButtons="afterButtons" />
     </div>
   </div>
 </template>

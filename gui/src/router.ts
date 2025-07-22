@@ -1,54 +1,92 @@
 import { createWebHistory, createRouter, type RouteRecordRaw } from 'vue-router'
+import { joinURL } from 'ufo'
+import config from '../config'
 
-const routes: RouteRecordRaw[] = [
+const adminRoutes: RouteRecordRaw[] = [
   {
-    path: '/',
-    redirect: '/transactions'
-  },
-
-  // Client routes with nested children
-  {
-    path: '/clients',
+    path: '',
+    redirect: (to) => {
+      return {
+        path: joinURL(to.path, 'dashboard')
+      }
+    },
     children: [
       {
-        path: '',
-        component: () => import('./pages/clients/AllClientsPage.vue')
-      },
-      {
-        path: ':client_id',
-        component: () => import('./pages/clients/SingleClientPage.vue')
+        path: 'dashboard',
+        component: () => import('./pages/admin/TransactionsHistoryPage.vue')
       }
     ]
-  },
+  }
+]
 
+const clientRoutes: RouteRecordRaw[] = [
   {
-    path: '/exchange',
+    path: '',
+    component: () => import('./pages/clients/SingleClientPage.vue')
+  },
+  {
+    path: 'exchange',
     component: () => import('./pages/clients/ExchangePage.vue')
   },
-
-  // Transaction routes with nested children
   {
-    path: '/transactions',
+    path: 'transfers',
     children: [
       {
-        path: '',
-        component: () =>
-          import('./pages/transactions/TransactionsHistoryPage.vue')
+        path: 'new',
+        component: () => import('./pages/transactions/init/InitTransferPage.vue')
       },
       {
         path: ':uetr',
-        component: () =>
-          import('./pages/transactions/TransactionStatusPage.vue')
+        component: () => import('./pages/transactions/TransactionStatusPage.vue')
+      }
+    ]
+  }
+]
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/banka',
+    meta: {
+      bankName: config.bankA.name,
+      bic: config.bankA.bic
+    },
+    children: [
+      {
+        path: 'admin',
+        component: () => import('./layouts/AdminLayout.vue'),
+        children: adminRoutes
       },
       {
-        path: 'new',
-        component: () =>
-          import('./pages/transactions/init/InitTransferPage.vue')
+        path: '',
+        meta: {
+          clientName: config.bankA.client.name,
+          clientId: config.bankA.client.id
+        },
+        component: () => import('./layouts/ClientLayout.vue'),
+        children: clientRoutes
+      }
+    ]
+  },
+  {
+    path: '/bankb',
+    meta: {
+      bankName: config.bankB.name,
+      bic: config.bankB.bic
+    },
+    children: [
+      {
+        path: 'admin',
+        component: () => import('./layouts/AdminLayout.vue'),
+        children: adminRoutes
       },
       {
-        path: 'cancel',
-        component: () =>
-          import('./pages/transactions/init/CancelTransferPage.vue')
+        path: '',
+        meta: {
+          clientName: config.bankB.client.name,
+          clientId: config.bankB.client.id
+        },
+        component: () => import('./layouts/ClientLayout.vue'),
+        children: clientRoutes
       }
     ]
   }

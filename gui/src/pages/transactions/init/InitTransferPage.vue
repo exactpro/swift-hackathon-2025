@@ -2,12 +2,8 @@
 import { onMounted, watch, reactive, toRef, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
-import {
-  fetchTransactionFormData,
-  newTransaction
-} from '../../../services/transactions'
+import { fetchTransactionFormData, newTransaction } from '../../../services/transactions'
 import type { Currency } from '../../../services/mock-backend/types'
-import config from '../../../../config'
 import { calculateExchangeValue } from '../../../utils/calculateExchangeValue'
 import Breadcrumbs from '../../../components/Breadcrumbs.vue'
 
@@ -27,6 +23,8 @@ interface TransferForm {
 
 const route = useRoute()
 const router = useRouter()
+
+const ownBic = route.meta.bic as string
 
 const form = reactive<TransferForm>({
   debtorClientId: '',
@@ -159,7 +157,7 @@ async function startTransaction() {
   isSending.value = true
   await newTransaction({
     debtor: {
-      bic: config.ownBic,
+      bic: ownBic,
       clientId: form.debtorClientId,
       name: form.debtorName,
       currency: form.debtorCurrency as Currency,
@@ -189,11 +187,7 @@ async function startTransaction() {
     />
     <h1 class="text-2xl font-bold mb-8">Transfer Funds</h1>
 
-    <form
-      v-if="utils"
-      @submit.prevent="startTransaction"
-      class="grid grid-cols-1 lg:grid-cols-2 gap-8"
-    >
+    <form v-if="utils" @submit.prevent="startTransaction" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Debtor Section -->
       <section class="card bg-base-200 shadow-lg">
         <div class="card-body">
@@ -204,24 +198,14 @@ async function startTransaction() {
             <label class="label">
               <span class="label-text font-medium">Client ID</span>
             </label>
-            <input
-              v-model="form.debtorClientId"
-              type="text"
-              placeholder="XXX"
-              class="input input-bordered w-full"
-            />
+            <input v-model="form.debtorClientId" type="text" placeholder="XXX" class="input input-bordered w-full" />
           </div>
 
           <div class="form-control mb-4">
             <label class="label">
               <span class="label-text font-medium">Name</span>
             </label>
-            <input
-              v-model="form.debtorName"
-              type="text"
-              placeholder="John Doe"
-              class="input input-bordered w-full"
-            />
+            <input v-model="form.debtorName" type="text" placeholder="John Doe" class="input input-bordered w-full" />
           </div>
 
           <!-- Currency -->
@@ -230,16 +214,8 @@ async function startTransaction() {
               <span class="label-text font-medium">Currency</span>
             </label>
             <div class="relative">
-              <select
-                v-model="form.debtorCurrency"
-                placeholder="Select currency"
-                class="select select-bordered w-full"
-              >
-                <option
-                  v-for="currency in utils.currencies"
-                  :key="currency"
-                  :value="currency"
-                >
+              <select v-model="form.debtorCurrency" placeholder="Select currency" class="select select-bordered w-full">
+                <option v-for="currency in utils.currencies" :key="currency" :value="currency">
                   {{ currency }}
                 </option>
               </select>
@@ -276,10 +252,7 @@ async function startTransaction() {
               <span class="label-text font-medium">BIC</span>
             </label>
             <div class="relative">
-              <input
-                v-model="form.creditorBank"
-                class="input input-bordered w-full"
-              />
+              <input v-model="form.creditorBank" class="input input-bordered w-full" />
             </div>
           </div>
 
@@ -288,24 +261,14 @@ async function startTransaction() {
             <label class="label">
               <span class="label-text font-medium">Client ID</span>
             </label>
-            <input
-              v-model="form.creditorClientId"
-              type="text"
-              placeholder="XXX"
-              class="input input-bordered w-full"
-            />
+            <input v-model="form.creditorClientId" type="text" placeholder="XXX" class="input input-bordered w-full" />
           </div>
 
           <div class="form-control mb-4">
             <label class="label">
               <span class="label-text font-medium">Name</span>
             </label>
-            <input
-              v-model="form.creditorName"
-              type="text"
-              placeholder="John Doe"
-              class="input input-bordered w-full"
-            />
+            <input v-model="form.creditorName" type="text" placeholder="John Doe" class="input input-bordered w-full" />
           </div>
 
           <!-- Currency -->
@@ -319,11 +282,7 @@ async function startTransaction() {
                 placeholder="Select currency"
                 class="select select-bordered w-full"
               >
-                <option
-                  v-for="currency in utils.currencies"
-                  :key="currency"
-                  :value="currency"
-                >
+                <option v-for="currency in utils.currencies" :key="currency" :value="currency">
                   {{ currency }}
                 </option>
               </select>

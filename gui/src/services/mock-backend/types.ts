@@ -1,9 +1,5 @@
 export type Currency = 'EUR' | 'USD' | 'S-USDC'
-export type TransactionStatus =
-  | 'pending'
-  | 'completed'
-  | 'cancelled'
-  | 'rejected'
+export type TransactionStatus = 'pending' | 'completed' | 'cancelled' | 'rejected'
 export type TransactionType = 'transfer' | 'cancel'
 export type TransactionParty = {
   name: string
@@ -31,6 +27,7 @@ export type Account = {
 }
 
 export type Client = {
+  bic: string
   fullName: string
   id: string
 }

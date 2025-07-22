@@ -4,10 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
 import { fetchTransactionFormData } from '../../services/transactions'
 import type { Currency } from '../../services/mock-backend/types'
-import {
-  calculateExchangeValue,
-  CURRENCY_KEYS
-} from '../../utils/calculateExchangeValue'
+import { calculateExchangeValue, CURRENCY_KEYS } from '../../utils/calculateExchangeValue'
 import { exchangeCurrency } from '../../services/clients'
 import Breadcrumbs from '../../components/Breadcrumbs.vue'
 
@@ -208,11 +205,7 @@ async function startExchange() {
             <label class="label">
               <span class="label-text font-medium">Client Name</span>
             </label>
-            <input
-              v-model="form.clientName"
-              type="text"
-              placeholder="John Doe"
-            />
+            <input v-model="form.clientName" type="text" placeholder="John Doe" />
           </div>
         </div>
       </section>
@@ -230,16 +223,9 @@ async function startExchange() {
                 <span class="label-text font-medium">Currency</span>
               </label>
               <div class="relative">
-                <select
-                  v-model="form.fromCurrency"
-                  class="select select-bordered w-full"
-                >
+                <select v-model="form.fromCurrency" class="select select-bordered w-full">
                   <option value="" disabled>Select currency</option>
-                  <option
-                    v-for="currency in utils.currencies"
-                    :key="currency"
-                    :value="currency"
-                  >
+                  <option v-for="currency in utils.currencies" :key="currency" :value="currency">
                     {{ currency }}
                   </option>
                 </select>
@@ -276,16 +262,9 @@ async function startExchange() {
                 <span class="label-text font-medium">Currency</span>
               </label>
               <div class="relative">
-                <select
-                  v-model="form.toCurrency"
-                  class="select select-bordered w-full"
-                >
+                <select v-model="form.toCurrency" class="select select-bordered w-full">
                   <option value="" disabled>Select currency</option>
-                  <option
-                    v-for="currency in utils.currencies"
-                    :key="currency"
-                    :value="currency"
-                  >
+                  <option v-for="currency in utils.currencies" :key="currency" :value="currency">
                     {{ currency }}
                   </option>
                 </select>
@@ -316,11 +295,7 @@ async function startExchange() {
       <div class="card bg-base-200 shadow">
         <div class="card-body text-center">
           <p
-            v-if="
-              form.fromCurrency &&
-              form.toCurrency &&
-              form.fromCurrency !== form.toCurrency
-            "
+            v-if="form.fromCurrency && form.toCurrency && form.fromCurrency !== form.toCurrency"
             class="text-sm text-gray-600"
           >
             Exchange Rate: 1 {{ form.fromCurrency }} =
