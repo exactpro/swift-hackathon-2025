@@ -4,6 +4,7 @@ import { fetchTransactionDetails } from '../../services/transactions'
 import { useRoute } from 'vue-router'
 import TransactionsTableHeader from '../../components/TransactionsTable/TransactionsTableHeader.vue'
 import TransactionsTableRow from '../../components/TransactionsTable/TransactionsTableRow.vue'
+import MessageBlock from '../../components/TransactionStatus/MessageBlock.vue'
 import { Icon } from '@iconify/vue'
 
 const route = useRoute()
@@ -15,10 +16,6 @@ async function refresh() {
   isLoading.value = true
   transactionDetails.value = await fetchTransactionDetails(uetr)
   isLoading.value = false
-}
-
-function getStatusIcon(status: 'expecting' | 'received') {
-  return status === 'received' ? 'mdi:check-circle' : 'mdi:clock-outline'
 }
 </script>
 
@@ -73,11 +70,11 @@ function getStatusIcon(status: 'expecting' | 'received') {
 
           <!-- Flow Steps -->
           <div class="space-y-4 overflow-x-auto">
-            <!-- Header Row -->
             <div
               class="grid gap-4 mb-6"
               :style="`grid-template-columns: 200px repeat(${transactionDetails.details.length}, 1fr)`"
             >
+              <!-- Header Row -->
               <div class="text-center font-bold text-lg">Network</div>
               <div
                 v-for="(detail, index) in transactionDetails.details"
@@ -86,13 +83,8 @@ function getStatusIcon(status: 'expecting' | 'received') {
               >
                 {{ detail.businessStep?.title }}
               </div>
-            </div>
 
-            <!-- Business Flow Row -->
-            <div
-              class="grid gap-4 items-center"
-              :style="`grid-template-columns: 200px repeat(${transactionDetails.details.length}, 1fr)`"
-            >
+              <!-- Business Flow Row -->
               <div class="card bg-primary text-primary-content shadow-sm">
                 <div class="card-body p-3 text-center">
                   <div class="badge badge-primary-content mb-2 badge-sm">Business Flow</div>
@@ -100,29 +92,10 @@ function getStatusIcon(status: 'expecting' | 'received') {
                 </div>
               </div>
               <div v-for="(detail, index) in transactionDetails.details" :key="index" class="text-center">
-                <div
-                  :class="
-                    detail.businessStep?.status === 'received'
-                      ? 'card bg-primary text-primary-content shadow-sm h-full'
-                      : 'card bg-base-100 border-2 border-dashed border-primary shadow-sm h-full'
-                  "
-                >
-                  <div class="card-body p-2 text-center">
-                    <h4 class="font-medium text-sm">{{ detail.businessStep?.title }}</h4>
-                    <div class="flex items-center justify-center gap-1 mt-1">
-                      <Icon :icon="getStatusIcon(detail.businessStep?.status || 'expecting')" class="w-4 h-4" />
-                      <span class="text-xs">{{ detail.businessStep?.status || 'expecting' }}</span>
-                    </div>
-                  </div>
-                </div>
+                <MessageBlock :message="detail.businessStep" network-type="primary" no-message-text="No step" no-link />
               </div>
-            </div>
 
-            <!-- SWIFT Net Row -->
-            <div
-              class="grid gap-4 items-center"
-              :style="`grid-template-columns: 200px repeat(${transactionDetails.details.length}, 1fr)`"
-            >
+              <!-- SWIFT Net Row -->
               <div class="card bg-secondary text-secondary-content shadow-sm">
                 <div class="card-body p-3 text-center">
                   <div class="badge badge-secondary-content mb-2 badge-sm">SWIFT Net</div>
@@ -130,51 +103,10 @@ function getStatusIcon(status: 'expecting' | 'received') {
                 </div>
               </div>
               <div v-for="(detail, index) in transactionDetails.details" :key="index" class="text-center">
-                <div
-                  v-if="detail.swiftMessage"
-                  :class="
-                    detail.swiftMessage.status === 'received'
-                      ? 'card bg-secondary text-secondary-content shadow-sm h-full'
-                      : 'card bg-base-100 border-2 border-dashed border-secondary shadow-sm h-full'
-                  "
-                >
-                  <a
-                    v-if="detail.swiftMessage.status === 'received' && detail.swiftMessage.viewerUrl"
-                    :href="detail.swiftMessage.viewerUrl"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="block"
-                  >
-                    <div class="card-body p-2 text-center hover:opacity-80 transition-opacity">
-                      <h4 class="font-medium text-sm">{{ detail.swiftMessage.title }}</h4>
-                      <div class="flex items-center justify-center gap-1 mt-1">
-                        <Icon :icon="getStatusIcon(detail.swiftMessage.status)" class="w-4 h-4" />
-                        <span class="text-xs">{{ detail.swiftMessage.status }}</span>
-                      </div>
-                    </div>
-                  </a>
-                  <div v-else class="card-body p-2 text-center">
-                    <h4 class="font-medium text-sm">{{ detail.swiftMessage.title }}</h4>
-                    <div class="flex items-center justify-center gap-1 mt-1">
-                      <Icon :icon="getStatusIcon(detail.swiftMessage.status)" class="w-4 h-4" />
-                      <span class="text-xs">{{ detail.swiftMessage.status }}</span>
-                    </div>
-                    <button v-if="detail.swiftMessage.viewerUrl" class="btn btn-xs btn-outline mt-1">Modal</button>
-                  </div>
-                </div>
-                <div v-else class="card bg-base-300 border-2 border-dashed border-gray-400 shadow-sm h-full">
-                  <div class="card-body p-2 text-center text-gray-500">
-                    <span class="text-xs">No message</span>
-                  </div>
-                </div>
+                <MessageBlock :message="detail.swiftMessage" network-type="secondary" no-message-text="No message" />
               </div>
-            </div>
 
-            <!-- DLT Net Row -->
-            <div
-              class="grid gap-4 items-center"
-              :style="`grid-template-columns: 200px repeat(${transactionDetails.details.length}, 1fr)`"
-            >
+              <!-- DLT Net Row -->
               <div class="card bg-accent text-accent-content shadow-sm">
                 <div class="card-body p-3 text-center">
                   <div class="badge badge-accent-content mb-2 badge-sm">DLT Net</div>
@@ -182,45 +114,12 @@ function getStatusIcon(status: 'expecting' | 'received') {
                 </div>
               </div>
               <div v-for="(detail, index) in transactionDetails.details" :key="index" class="text-center">
-                <div
-                  v-if="detail.dltMessage"
-                  :class="
-                    detail.dltMessage.status === 'received'
-                      ? 'card bg-accent text-accent-content shadow-sm h-full'
-                      : 'card bg-base-100 border-2 border-dashed border-accent shadow-sm h-full'
-                  "
-                >
-                  <a
-                    v-if="detail.dltMessage.status === 'received' && detail.dltMessage.viewerUrl"
-                    :href="detail.dltMessage.viewerUrl"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="block"
-                  >
-                    <div class="card-body p-2 text-center hover:opacity-80 transition-opacity">
-                      <h4 class="font-medium text-sm">{{ detail.dltMessage.title }}</h4>
-                      <div class="flex items-center justify-center gap-1 mt-1">
-                        <Icon :icon="getStatusIcon(detail.dltMessage.status)" class="w-4 h-4" />
-                        <span class="text-xs">{{ detail.dltMessage.status }}</span>
-                      </div>
-                    </div>
-                  </a>
-                  <div v-else class="card-body p-2 text-center">
-                    <h4 class="font-medium text-sm">{{ detail.dltMessage.title }}</h4>
-                    <div class="flex items-center justify-center gap-1 mt-1">
-                      <Icon :icon="getStatusIcon(detail.dltMessage.status)" class="w-4 h-4" />
-                      <span class="text-xs">{{ detail.dltMessage.status }}</span>
-                    </div>
-                    <div v-if="detail.dltMessage.status === 'expecting'" class="mt-1">
-                      <div class="badge badge-warning badge-xs">In progress</div>
-                    </div>
-                  </div>
-                </div>
-                <div v-else class="card bg-base-300 border-2 border-dashed border-gray-400 shadow-sm h-full">
-                  <div class="card-body p-2 text-center text-gray-500">
-                    <span class="text-xs">No message</span>
-                  </div>
-                </div>
+                <MessageBlock
+                  :message="detail.dltMessage"
+                  network-type="accent"
+                  no-message-text="No message"
+                  :show-in-progress-badge="true"
+                />
               </div>
             </div>
           </div>
