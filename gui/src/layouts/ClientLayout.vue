@@ -5,6 +5,7 @@ import { useBankRoute } from '../composables/useBankRoute.js'
 
 const route = useRoute()
 const clientName = route.meta.clientName as string
+const bankName = route.meta.bankName as string
 
 const homeLink = useBankRoute()
 </script>
@@ -14,7 +15,7 @@ const homeLink = useBankRoute()
     <div class="flex-1">
       <RouterLink :to="homeLink" class="btn btn-ghost text-xl">
         <Icon icon="mdi:bank" class="inline-block mr-2" />
-        Bank A Client
+        {{ bankName }} Client
       </RouterLink>
     </div>
     <div class="flex-none">
