@@ -7,6 +7,7 @@ import type { Currency } from '../../services/mock-backend/types'
 import { calculateExchangeValue, CURRENCY_KEYS } from '../../utils/calculateExchangeValue'
 import { exchangeCurrency } from '../../services/clients'
 import Breadcrumbs from '../../components/Breadcrumbs.vue'
+import { useBankRoute } from '../../composables/useBankRoute'
 
 const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
 
@@ -174,16 +175,19 @@ async function startExchange() {
   isExchanging.value = false
   router.push(`/clients/${form.clientId}`)
 }
+
+const homeLink = useBankRoute()
+const exchangeLink = useBankRoute('exchange')
+
+const breadcrumbs = computed(() => [
+  { title: 'Home', link: homeLink.value },
+  { title: 'Exchange', link: exchangeLink.value }
+])
 </script>
 
 <template>
   <div class="container mx-auto p-6 max-w-4xl">
-    <Breadcrumbs
-      :items="[
-        { title: 'Clients', link: '/clients' },
-        { title: 'Exchange', link: '/exchange' }
-      ]"
-    />
+    <Breadcrumbs :items="breadcrumbs" />
     <h1 class="text-2xl font-bold mb-8">Currency Exchange</h1>
 
     <form v-if="utils" @submit.prevent="startExchange" class="space-y-8">

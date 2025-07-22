@@ -9,8 +9,9 @@ import RelDate from './RelDate.vue'
 import { usePagination } from '../composables/usePagination.js'
 import PaginationNav from './PaginationNav.vue'
 import type { SortItem } from './SortBtn.vue'
-import type { JSONify, Transaction, TransactionParty } from '../services/mock-backend/types.js'
+import type { JSONify, Transaction } from '../services/mock-backend/types.js'
 import TransactionActions from './TransactionActions.vue'
+import { useBankRoute } from '../composables/useBankRoute.js'
 
 const props = defineProps<{
   transactions: JSONify<Transaction>[]
@@ -71,9 +72,9 @@ function getDirection(item: JSONify<Transaction>) {
   return 'N/A'
 }
 
-function getClientPageLink(party: TransactionParty): string {
-  return `/clients/${party.clientId}`
-}
+const clientPageLink = useBankRoute()
+
+const clientId = route.meta.clientId as string | undefined
 
 const {
   currentPageItems: displayedTransactions,
@@ -223,13 +224,11 @@ const emit = defineEmits<{
               {{ transaction.debtor.bic }}
             </td>
             <td>
-              <div v-if="transaction.debtor.bic !== ownBic">
-                {{ transaction.debtor.name }}
+              <div v-if="clientId && transaction.debtor.clientId === clientId">
+                <RouterLink class="link text-accent" :to="clientPageLink"> {{ transaction.debtor.name }}</RouterLink>
               </div>
               <div v-else>
-                <RouterLink class="link" :to="getClientPageLink(transaction.debtor)">
-                  {{ transaction.debtor.name }}</RouterLink
-                >
+                {{ transaction.debtor.name }}
               </div>
 
               <UUID :uuid="transaction.debtor.clientId" />
@@ -245,13 +244,13 @@ const emit = defineEmits<{
               {{ transaction.creditor.bic }}
             </td>
             <td>
-              <div v-if="transaction.creditor.bic !== ownBic">
-                {{ transaction.creditor.name }}
-              </div>
-              <div v-else>
-                <RouterLink class="link" creditor :to="getClientPageLink(transaction.creditor)">
+              <div v-if="clientId && transaction.creditor.clientId === clientId">
+                <RouterLink class="link text-accent" creditor :to="clientPageLink">
                   {{ transaction.creditor.name }}</RouterLink
                 >
+              </div>
+              <div v-else>
+                {{ transaction.creditor.name }}
               </div>
               <UUID :uuid="transaction.creditor.clientId" />
             </td>

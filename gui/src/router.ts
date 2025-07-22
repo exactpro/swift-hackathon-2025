@@ -45,6 +45,10 @@ const clientRoutes: RouteRecordRaw[] = [
 
 const routes: RouteRecordRaw[] = [
   {
+    path: '/',
+    component: () => import('./pages/RootNav.vue')
+  },
+  {
     path: '/banka',
     meta: {
       bankName: config.bankA.name,

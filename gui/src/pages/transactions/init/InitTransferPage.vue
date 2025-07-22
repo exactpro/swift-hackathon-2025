@@ -6,6 +6,7 @@ import { fetchTransactionFormData, newTransaction } from '../../../services/tran
 import type { Currency } from '../../../services/mock-backend/types'
 import { calculateExchangeValue } from '../../../utils/calculateExchangeValue'
 import Breadcrumbs from '../../../components/Breadcrumbs.vue'
+import { useBankRoute } from '../../../composables/useBankRoute'
 
 const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
 
@@ -175,16 +176,19 @@ async function startTransaction() {
   isSending.value = false
   router.push('/transactions')
 }
+
+const homeLink = useBankRoute()
+const newTransferLink = useBankRoute('transfers', 'new')
+
+const breadcrumbs = computed(() => [
+  { title: 'Home', link: homeLink.value },
+  { title: 'New Transfer', link: newTransferLink.value }
+])
 </script>
 
 <template>
   <div class="container mx-auto p-6 max-w-4xl">
-    <Breadcrumbs
-      :items="[
-        { title: 'Transactions', link: '/transactions' },
-        { title: 'New Transfer', link: '/transactions/new' }
-      ]"
-    />
+    <Breadcrumbs :items="breadcrumbs" />
     <h1 class="text-2xl font-bold mb-8">Transfer Funds</h1>
 
     <form v-if="utils" @submit.prevent="startTransaction" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
