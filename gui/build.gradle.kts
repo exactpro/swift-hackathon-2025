@@ -1,37 +1,34 @@
-import com.github.gradle.node.NodeExtension
 import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
-    id("base")
-    id("com.github.node-gradle.node")
+    base
+    id("com.github.node-gradle.node") version "7.1.0"
 }
 
-configure<NodeExtension> {
-    version.set("24.4.1")
-    npmVersion.set("10.8.1")
-    download.set(true)
-    workDir.set(file("${project.projectDir}/.gradle/nodejs"))
-    npmWorkDir.set(file("${project.projectDir}/.gradle/npm"))
+node {
+    version = "24.4.1"
+    npmVersion = "10.8.1"
+    download = true
+    workDir = file("${project.projectDir}/.gradle/nodejs")
+    npmWorkDir = file("${project.projectDir}/.gradle/npm")
 }
 
 tasks {
-    val npmInstallTask = named("npmInstall")
-
     val npmBuildTask = register<NpmTask>("npmBuild") {
-        args.set(listOf("run", "build"))
-        dependsOn(npmInstallTask)
+        args = listOf("run", "build")
+        dependsOn(npmInstall)
     }
 
-    val npmStartTask = register<NpmTask>("npmStart") {
-        args.set(listOf("run", "preview"))
-        dependsOn(npmInstallTask)
+    val runTask = register<NpmTask>("run") {
+        args = listOf("run", "preview")
+        dependsOn(npmInstall)
     }
 
-    named("build") {
+    build {
         dependsOn(npmBuildTask)
     }
 
-    named("clean") {
+    clean {
         doLast {
             delete(
                 "${project.projectDir}/dist",
