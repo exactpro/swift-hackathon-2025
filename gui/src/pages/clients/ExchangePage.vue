@@ -12,8 +12,6 @@ import { useBankRoute } from '../../composables/useBankRoute'
 const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
 
 interface ExchangeForm {
-  clientId: string
-  clientName: string
   fromCurrency: string
   fromAmount: number | null
   toCurrency: string
@@ -23,9 +21,10 @@ interface ExchangeForm {
 const route = useRoute()
 const router = useRouter()
 
+const clientId = route.meta.clientId as string
+const clientName = route.meta.clientName as string
+
 const form = reactive<ExchangeForm>({
-  clientId: '',
-  clientName: '',
   fromCurrency: '',
   fromAmount: null,
   toCurrency: '',
@@ -115,8 +114,6 @@ watch(
 
 const isFormComplete = computed(() => {
   return (
-    form.clientId &&
-    form.clientName &&
     form.fromCurrency &&
     form.fromAmount !== null &&
     form.toCurrency &&
@@ -127,12 +124,6 @@ const isFormComplete = computed(() => {
 
 onMounted(() => {
   // Auto-fill from query parameters
-  if (route.query.client_id) {
-    form.clientId = route.query.client_id as string
-  }
-  if (route.query.client_name) {
-    form.clientName = route.query.client_name as string
-  }
   if (route.query.from_currency) {
     form.fromCurrency = route.query.from_currency as string
   }
@@ -160,22 +151,6 @@ function getExchangeRate(fromCurrency: string, toCurrency: string): string {
   return rate.toFixed(4)
 }
 
-async function startExchange() {
-  if (!isFormComplete.value) {
-    console.warn('Form is not complete, cannot start exchange')
-    return
-  }
-  isExchanging.value = true
-  await exchangeCurrency(
-    form.clientId,
-    form.fromCurrency as Currency,
-    form.toCurrency as Currency,
-    form.fromAmount as number
-  )
-  isExchanging.value = false
-  router.push(`/clients/${form.clientId}`)
-}
-
 const homeLink = useBankRoute()
 const exchangeLink = useBankRoute('exchange')
 
@@ -183,6 +158,22 @@ const breadcrumbs = computed(() => [
   { title: 'Home', link: homeLink.value },
   { title: 'Exchange', link: exchangeLink.value }
 ])
+
+async function startExchange() {
+  if (!isFormComplete.value) {
+    console.warn('Form is not complete, cannot start exchange')
+    return
+  }
+  isExchanging.value = true
+  await exchangeCurrency(
+    clientId,
+    form.fromCurrency as Currency,
+    form.toCurrency as Currency,
+    form.fromAmount as number
+  )
+  isExchanging.value = false
+  router.push(homeLink.value)
+}
 </script>
 
 <template>
@@ -201,7 +192,7 @@ const breadcrumbs = computed(() => [
             <label class="label">
               <span class="label-text font-medium">Client ID</span>
             </label>
-            <input v-model="form.clientId" type="text" placeholder="XXX" />
+            <input :value="clientId" type="text" disabled />
           </div>
 
           <!-- Client Name -->
@@ -209,7 +200,7 @@ const breadcrumbs = computed(() => [
             <label class="label">
               <span class="label-text font-medium">Client Name</span>
             </label>
-            <input v-model="form.clientName" type="text" placeholder="John Doe" />
+            <input :value="clientName" type="text" disabled />
           </div>
         </div>
       </section>
