@@ -1,20 +1,25 @@
 import config from '../../config.js'
 import type { Transaction, JSONify } from './mock-backend/types.js'
 
-export async function fetchTransactions(): Promise<JSONify<Transaction[]>> {
+export async function fetchTransactions(bic: string): Promise<JSONify<Transaction[]>> {
   if (config.useMock) {
     const { getTransactions } = await import('./mock-backend/api.js')
-    return getTransactions()
+    return getTransactions().filter((tx) => tx.debtor.bic === bic || tx.creditor.bic === bic)
   }
   return []
 }
 
 export async function subscribeToTransactionsUpdates(
+  bic: string,
   callback: (transactions: JSONify<Transaction>[]) => void
 ): Promise<() => void> {
   if (config.useMock) {
+    function filteredCallback(transactions: JSONify<Transaction>[]) {
+      const filtered = transactions.filter((tx) => tx.debtor.bic === bic || tx.creditor.bic === bic)
+      callback(filtered)
+    }
     const { subscribeToTransactionsUpdates } = await import('./mock-backend/api.js')
-    return subscribeToTransactionsUpdates(callback)
+    return subscribeToTransactionsUpdates(filteredCallback)
   }
   return () => {}
 }

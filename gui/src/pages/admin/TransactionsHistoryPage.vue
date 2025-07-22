@@ -5,12 +5,16 @@ import { fetchTransactions, subscribeToTransactionsUpdates } from '../../service
 import FilterControls from '../../components/FilterControls.vue'
 import TransactionsTable from '../../components/TransactionsTable.vue'
 import Breadcrumbs from '../../components/Breadcrumbs.vue'
+import { useRoute } from 'vue-router'
 
-const { state: transactions } = useAsyncState(fetchTransactions, [])
+const route = useRoute()
+const bic = route.meta.bic as string
+
+const { state: transactions } = useAsyncState(() => fetchTransactions(bic), [])
 const filteredTransactions = ref(transactions.value)
 
 const { state: unsubscribe } = useAsyncState(
-  subscribeToTransactionsUpdates((transactionsUpdated) => {
+  subscribeToTransactionsUpdates(bic, (transactionsUpdated) => {
     transactions.value = transactionsUpdated
   }),
   () => {}
