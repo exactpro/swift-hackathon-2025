@@ -16,12 +16,12 @@ node {
 tasks {
     val npmBuildTask = register<NpmTask>("npmBuild") {
         args = listOf("run", "build")
-        dependsOn(npmInstall)
+        dependsOn(npmCi)
     }
 
     val runTask = register<NpmTask>("run") {
         args = listOf("run", "preview")
-        dependsOn(npmInstall)
+        dependsOn(npmCi)
     }
 
     val zipTask = register<Zip>("zip") {
