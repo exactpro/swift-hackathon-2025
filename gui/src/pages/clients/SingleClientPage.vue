@@ -6,17 +6,14 @@ import { computed } from 'vue'
 import { formatNumber } from '../../utils/formatNumber'
 import type { Account } from '../../services/mock-backend/types'
 import { RouterLink } from 'vue-router'
-import TransactionsTable from '../../components/TransactionsTable.vue'
+import TransactionsTable from '../../components/TransactionsTable/TransactionsTable.vue'
 import { Icon } from '@iconify/vue'
-import Breadcrumbs from '../../components/Breadcrumbs.vue'
+import { useBankRoute } from '../../composables/useBankRoute'
 
 const route = useRoute()
-const clientId = route.params.client_id as string
+const clientId = route.meta.clientId as string
 
-const { state: client, isLoading } = useAsyncState(
-  fetchClientData(clientId),
-  null
-)
+const { state: client, isLoading } = useAsyncState(fetchClientData(clientId), null)
 
 async function refresh() {
   isLoading.value = true
@@ -40,29 +37,25 @@ function formatAccountBalance(account: Account) {
   return `${formattedBalance} ${account.currency}`
 }
 
-const breadcrumbs = computed(() => [
-  { title: 'Clients', link: '/clients' },
-  { title: displayTitle.value, link: `/clients/${clientId}` }
-])
+const exchangeUrl = useBankRoute('exchange')
+const transferUrl = useBankRoute('transfers', 'new')
+function transferCurrencyUrl(currency: string) {
+  return `${transferUrl.value}?from_currency=${currency}`
+}
 </script>
 <template>
   <div>
-    <Breadcrumbs :items="breadcrumbs" />
     <div class="grid grid-cols-2 my-4">
       <div class="flex flex-wrap gap-2 items-center">
         <h1 class="text-lg font-bold inline-block">
-          Client {{ displayTitle }}
+          <Icon icon="mdi:account" class="inline-block" /> {{ displayTitle }}
         </h1>
         <span v-if="client" class="text-sm text-gray-500">
           {{ client.id }}
         </span>
       </div>
       <div class="text-right">
-        <RouterLink
-          v-if="client"
-          class="btn btn-primary btn-sm mr-2"
-          :to="`/exchange?client_id=${client.id}&client_name=${client.fullName}`"
-        >
+        <RouterLink v-if="client" class="btn btn-primary btn-sm mr-2" :to="exchangeUrl">
           Exchange <Icon icon="mdi:swap-horizontal" class="inline-block" />
         </RouterLink>
         <button
@@ -71,9 +64,7 @@ const breadcrumbs = computed(() => [
           class="btn btn-secondary btn-sm"
           :class="{ disabled: isLoading }"
         >
-          <template v-if="!isLoading">
-            Refresh <Icon icon="mdi:refresh" class="inline-block" />
-          </template>
+          <template v-if="!isLoading"> Refresh <Icon icon="mdi:refresh" class="inline-block" /> </template>
           <template v-else>
             <span class="loading loading-spinner loading-sm"></span>
           </template>
@@ -88,17 +79,10 @@ const breadcrumbs = computed(() => [
       >
         <div>
           <div class="font-bold">{{ account.currency }} Token Account</div>
-          <div class="text-accent">
-            Balance: {{ formatAccountBalance(account) }}
-          </div>
+          <div class="text-accent">Balance: {{ formatAccountBalance(account) }}</div>
         </div>
         <div class="text-right">
-          <RouterLink
-            class="btn btn-primary btn-sm"
-            :to="`/transactions/new?debtor_id=${client.id}&from_currency=${account.currency}&debtor_name=${client.fullName}`"
-          >
-            Transfer
-          </RouterLink>
+          <RouterLink class="btn btn-primary btn-sm" :to="transferCurrencyUrl(account.currency)"> Transfer </RouterLink>
         </div>
       </div>
     </section>

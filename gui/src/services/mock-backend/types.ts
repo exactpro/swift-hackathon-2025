@@ -1,9 +1,5 @@
 export type Currency = 'EUR' | 'USD' | 'S-USDC'
-export type TransactionStatus =
-  | 'pending'
-  | 'completed'
-  | 'cancelled'
-  | 'rejected'
+export type TransactionStatus = 'pending' | 'completed' | 'cancelled' | 'rejected'
 export type TransactionType = 'transfer' | 'cancel'
 export type TransactionParty = {
   name: string
@@ -31,8 +27,21 @@ export type Account = {
 }
 
 export type Client = {
+  bic: string
   fullName: string
   id: string
+}
+
+export type TransactionMessageStatus = {
+  status: 'expecting' | 'received'
+  title: string
+  viewerUrl: string
+}
+
+export type TransactionDetails = {
+  businessStep: TransactionMessageStatus | null
+  swiftMessage: TransactionMessageStatus | null
+  dltMessage: TransactionMessageStatus | null
 }
 
 export type JSONify<T> = T extends Date

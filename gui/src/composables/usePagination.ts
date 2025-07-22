@@ -13,11 +13,7 @@ export interface PaginationButton {
 
 export function usePagination<T>(
   items: Ref<T[]>,
-  {
-    itemsPerPage = 10,
-    aroundButtons = 2,
-    initPage = 1
-  }: Partial<PaginationOptions>
+  { itemsPerPage = 10, aroundButtons = 2, initPage = 1 }: Partial<PaginationOptions>
 ) {
   const totalItems = computed(() => items.value.length)
   const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage))
@@ -69,11 +65,7 @@ export function usePagination<T>(
         action: null
       })
     }
-    for (
-      let i = Math.max(2, currentPage.value - aroundButtons);
-      i < currentPage.value;
-      i++
-    ) {
+    for (let i = Math.max(2, currentPage.value - aroundButtons); i < currentPage.value; i++) {
       buttons.push({
         label: String(i),
         action: () => setPage(i)
@@ -84,11 +76,7 @@ export function usePagination<T>(
 
   const afterButtons = computed(() => {
     const buttons: PaginationButton[] = []
-    for (
-      let i = currentPage.value + 1;
-      i <= Math.min(totalPages.value, currentPage.value + aroundButtons);
-      i++
-    ) {
+    for (let i = currentPage.value + 1; i <= Math.min(totalPages.value, currentPage.value + aroundButtons); i++) {
       buttons.push({
         label: String(i),
         action: () => setPage(i)
