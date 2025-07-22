@@ -6,7 +6,7 @@ import { computed } from 'vue'
 import { formatNumber } from '../../utils/formatNumber'
 import type { Account } from '../../services/mock-backend/types'
 import { RouterLink } from 'vue-router'
-import TransactionsTable from '../../components/TransactionsTable.vue'
+import TransactionsTable from '../../components/TransactionsTable/TransactionsTable.vue'
 import { Icon } from '@iconify/vue'
 import { useBankRoute } from '../../composables/useBankRoute'
 

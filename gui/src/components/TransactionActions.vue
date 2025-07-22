@@ -9,8 +9,8 @@ const props = defineProps<{
 const transactionStatusLink = useBankRoute('transfers', props.transaction.uetr)
 
 defineEmits<{
-  (e: 'transactionAccepted', acceptedTransaction: JSONify<Transaction> | null): void
-  (e: 'transactionRejected', rejectedTransaction: JSONify<Transaction> | null): void
+  (e: 'transactionAccepted', acceptedTransaction: JSONify<Transaction>): void
+  (e: 'transactionRejected', rejectedTransaction: JSONify<Transaction>): void
 }>()
 </script>
 

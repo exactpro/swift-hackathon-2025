@@ -3,7 +3,7 @@ import { onBeforeUnmount, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { fetchTransactions, subscribeToTransactionsUpdates } from '../../services/transactions.js'
 import FilterControls from '../../components/FilterControls.vue'
-import TransactionsTable from '../../components/TransactionsTable.vue'
+import TransactionsTable from '../../components/TransactionsTable/TransactionsTable.vue'
 import Breadcrumbs from '../../components/Breadcrumbs.vue'
 import { useRoute } from 'vue-router'
 
