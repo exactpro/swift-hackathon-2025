@@ -9,7 +9,6 @@ import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
-import DatePicker from 'primevue/datepicker'
 import { Icon } from '@iconify/vue'
 
 import type { JSONify, Transaction } from '../services/mock-backend/types.js'
@@ -33,11 +32,11 @@ type TransformedTransaction = JSONify<Transaction> & {
 }
 
 import UUID from './UUID.vue'
-import RelDate from './RelDate.vue'
 import TransactionActions from './TransactionActions.vue'
 
 const props = defineProps<{
   transactions: JSONify<Transaction>[]
+  clientMode?: boolean
 }>()
 
 const route = useRoute()
@@ -94,7 +93,7 @@ const filters = ref({
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
   },
-  debtorClientId: {
+  debtorAccountId: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
   },
@@ -114,7 +113,7 @@ const filters = ref({
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
   },
-  creditorClientId: {
+  creditorAccountId: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
   },
@@ -137,7 +136,7 @@ const filters = ref({
 })
 
 // Options for dropdown filters
-const typeOptions = ref(['transfer', 'cancel'])
+// const typeOptions = ref(['transfer', 'cancel'])
 const directionOptions = ref(['in', 'out', 'N/A'])
 const statusOptions = ref(['completed', 'pending', 'cancelled', 'rejected'])
 const currencyOptions = computed(() => {
@@ -171,18 +170,6 @@ const getStatusSeverity = (status: string) => {
       return 'info'
     case 'rejected':
       return 'danger'
-    default:
-      return 'secondary'
-  }
-}
-
-// Type severity mapping
-const getTypeSeverity = (type: string) => {
-  switch (type) {
-    case 'transfer':
-      return 'info'
-    case 'cancel':
-      return 'warn'
     default:
       return 'secondary'
   }
@@ -233,7 +220,7 @@ const clearFilter = () => {
       operator: 'and',
       constraints: [{ value: null, matchMode: 'contains' }]
     },
-    debtorClientId: {
+    debtorAccountId: {
       operator: 'and',
       constraints: [{ value: null, matchMode: 'contains' }]
     },
@@ -253,7 +240,7 @@ const clearFilter = () => {
       operator: 'and',
       constraints: [{ value: null, matchMode: 'contains' }]
     },
-    creditorClientId: {
+    creditorAccountId: {
       operator: 'and',
       constraints: [{ value: null, matchMode: 'contains' }]
     },
@@ -296,10 +283,10 @@ const clearFilter = () => {
         'uetr',
         'debtorBic',
         'debtorName',
-        'debtorClientId',
+        'debtorAccountId',
         'creditorBic',
         'creditorName',
-        'creditorClientId'
+        'creditorAccountId'
       ]"
       sortMode="multiple"
       removableSort
@@ -323,16 +310,6 @@ const clearFilter = () => {
           </IconField>
         </div>
       </template>
-
-      <!-- Type Column -->
-      <Column field="type" header="Type" sortable>
-        <template #body="{ data }: { data: TransformedTransaction }">
-          <Tag :value="data.type" :severity="getTypeSeverity(data.type)" />
-        </template>
-        <template #filter="{ filterModel }">
-          <MultiSelect v-model="filterModel.value" :options="typeOptions" placeholder="Any" />
-        </template>
-      </Column>
 
       <!-- Direction Column -->
       <Column field="direction" header="Dir" sortable>
@@ -381,16 +358,6 @@ const clearFilter = () => {
         </template>
       </Column>
 
-      <!-- Debtor Name Column -->
-      <Column field="debtorName" header="Debtor Name" sortable>
-        <template #body="{ data }: { data: TransformedTransaction }">
-          {{ data.debtorName }}
-        </template>
-        <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
-        </template>
-      </Column>
-
       <!-- Debtor Client ID Column -->
       <Column field="debtorAccountId" header="Debtor Account ID" sortable>
         <template #body="{ data }: { data: TransformedTransaction }">
@@ -398,26 +365,6 @@ const clearFilter = () => {
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by account ID" />
-        </template>
-      </Column>
-
-      <!-- Debtor Amount Column -->
-      <Column field="debtorAmount" header="Debtor Amount" sortable dataType="numeric">
-        <template #body="{ data }: { data: TransformedTransaction }">
-          <span>{{ data.debtorAmount.toFixed(2) }}</span>
-        </template>
-        <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="number" placeholder="Amount" />
-        </template>
-      </Column>
-
-      <!-- Debtor Currency Column -->
-      <Column field="debtorCurrency" header="Debtor Currency" sortable>
-        <template #body="{ data }: { data: TransformedTransaction }">
-          <Tag :value="data.debtorCurrency" severity="secondary" />
-        </template>
-        <template #filter="{ filterModel }">
-          <MultiSelect v-model="filterModel.value" :options="currencyOptions" placeholder="Any" />
         </template>
       </Column>
 
@@ -438,16 +385,6 @@ const clearFilter = () => {
         </template>
       </Column>
 
-      <!-- Creditor Name Column -->
-      <Column field="creditorName" header="Creditor Name" sortable>
-        <template #body="{ data }: { data: TransformedTransaction }">
-          {{ data.creditorName }}
-        </template>
-        <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
-        </template>
-      </Column>
-
       <!-- Creditor Client ID Column -->
       <Column field="creditorAccountId" header="Creditor Account ID" sortable>
         <template #body="{ data }: { data: TransformedTransaction }">
@@ -459,7 +396,7 @@ const clearFilter = () => {
       </Column>
 
       <!-- Creditor Amount Column -->
-      <Column field="creditorAmount" header="Creditor Amount" sortable dataType="numeric">
+      <Column field="creditorAmount" header="Amount" sortable dataType="numeric">
         <template #body="{ data }: { data: TransformedTransaction }">
           <span>{{ data.creditorAmount.toFixed(2) }}</span>
         </template>
@@ -469,7 +406,7 @@ const clearFilter = () => {
       </Column>
 
       <!-- Creditor Currency Column -->
-      <Column field="creditorCurrency" header="Creditor Currency" sortable>
+      <Column field="creditorCurrency" header="Currency" sortable>
         <template #body="{ data }: { data: TransformedTransaction }">
           <Tag :value="data.creditorCurrency" severity="secondary" />
         </template>
@@ -478,42 +415,8 @@ const clearFilter = () => {
         </template>
       </Column>
 
-      <!-- Created At Column -->
-      <Column field="createdAtDate" header="Created" sortable dataType="date">
-        <template #body="{ data }: { data: TransformedTransaction }">
-          <RelDate :date="data.createdAt" />
-        </template>
-        <template #filter="{ filterModel }">
-          <DatePicker
-            v-model="filterModel.value"
-            dateFormat="yy-mm-dd"
-            showTime
-            showSeconds
-            showIcon
-            placeholder="Select date and time"
-          />
-        </template>
-      </Column>
-
-      <!-- Updated At Column -->
-      <Column field="updatedAtDate" header="Updated" sortable dataType="date">
-        <template #body="{ data }: { data: TransformedTransaction }">
-          <RelDate :date="data.updatedAt" />
-        </template>
-        <template #filter="{ filterModel }">
-          <DatePicker
-            v-model="filterModel.value"
-            dateFormat="yy-mm-dd"
-            showTime
-            showSeconds
-            showIcon
-            placeholder="Select date and time"
-          />
-        </template>
-      </Column>
-
       <!-- Actions Column -->
-      <Column header="Actions" :exportable="false">
+      <Column v-if="!clientMode" header="Actions" :exportable="false">
         <template #body="{ data }: { data: TransformedTransaction }">
           <TransactionActions :transaction="data" />
         </template>
