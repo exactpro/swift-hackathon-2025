@@ -16,3 +16,9 @@ import config from '../config'
     <RouterView />
   </div>
 </template>
+
+<style>
+html {
+  line-height: 1;
+}
+</style>
