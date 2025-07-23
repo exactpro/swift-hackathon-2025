@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import type { DataTableFilterMeta, DataTableOperatorFilterMetaData } from 'primevue/datatable'
+import type { DataTableFilterMeta } from 'primevue/datatable'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
@@ -10,6 +10,7 @@ import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
+import DatePicker from 'primevue/datepicker'
 import { Icon } from '@iconify/vue'
 
 import type { JSONify, Transaction } from '../../services/mock-backend/types.js'
@@ -17,6 +18,7 @@ import { getDirection } from '../../utils/transactions.js'
 import { useBankRoute } from '../../composables/useBankRoute.js'
 import UUID from '../UUID.vue'
 import RelDate from '../RelDate.vue'
+import TransactionActions from '../TransactionActions.vue'
 
 const props = defineProps<{
   transactions: JSONify<Transaction>[]
@@ -57,59 +59,67 @@ const filters = ref<DataTableFilterMeta>({
   type: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'in' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   direction: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'in' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   status: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'in' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   uetr: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   debtorBic: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   debtorName: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   debtorClientId: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   debtorCurrency: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'in' }]
-  } as DataTableOperatorFilterMetaData,
+  },
+  debtorAmount: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'equals' }]
+  },
   creditorBic: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   creditorName: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   creditorClientId: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'contains' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   creditorCurrency: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'in' }]
-  } as DataTableOperatorFilterMetaData,
+  },
+  creditorAmount: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'equals' }]
+  },
   createdAtDate: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'dateIs' }]
-  } as DataTableOperatorFilterMetaData,
+  },
   updatedAtDate: {
     operator: 'and',
     constraints: [{ value: null, matchMode: 'dateIs' }]
-  } as DataTableOperatorFilterMetaData
+  }
 })
 
 // Options for dropdown filters
@@ -220,6 +230,10 @@ const clearFilter = () => {
       operator: 'and',
       constraints: [{ value: null, matchMode: 'in' }]
     },
+    debtorAmount: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'equals' }]
+    },
     creditorBic: {
       operator: 'and',
       constraints: [{ value: null, matchMode: 'contains' }]
@@ -235,6 +249,10 @@ const clearFilter = () => {
     creditorCurrency: {
       operator: 'and',
       constraints: [{ value: null, matchMode: 'in' }]
+    },
+    creditorAmount: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'equals' }]
     },
     createdAtDate: {
       operator: 'and',
@@ -280,7 +298,7 @@ const clearFilter = () => {
       showGridlines
     >
       <template #header>
-        <div>
+        <div class="flex justify-between items-center">
           <Button type="button" label="Clear" outlined @click="clearFilter()">
             <template #icon>
               <Icon icon="mdi:filter-off" />
@@ -306,7 +324,7 @@ const clearFilter = () => {
       </Column>
 
       <!-- Direction Column -->
-      <Column field="direction" header="Direction" sortable>
+      <Column field="direction" header="Dir" sortable>
         <template #body="{ data }">
           <Tag :value="data.direction" :severity="getDirectionSeverity(data.direction)" />
         </template>
@@ -386,6 +404,9 @@ const clearFilter = () => {
         <template #body="{ data }">
           <span>{{ data.debtorAmount.toFixed(2) }}</span>
         </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="number" placeholder="Amount" />
+        </template>
       </Column>
 
       <!-- Debtor Currency Column -->
@@ -449,6 +470,9 @@ const clearFilter = () => {
         <template #body="{ data }">
           <span>{{ data.creditorAmount.toFixed(2) }}</span>
         </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="number" placeholder="Amount" />
+        </template>
       </Column>
 
       <!-- Creditor Currency Column -->
@@ -466,6 +490,16 @@ const clearFilter = () => {
         <template #body="{ data }">
           <RelDate :date="data.createdAt" />
         </template>
+        <template #filter="{ filterModel }">
+          <DatePicker
+            v-model="filterModel.value"
+            dateFormat="yy-mm-dd"
+            showTime
+            showSeconds
+            showIcon
+            placeholder="Select date and time"
+          />
+        </template>
       </Column>
 
       <!-- Updated At Column -->
@@ -473,23 +507,22 @@ const clearFilter = () => {
         <template #body="{ data }">
           <RelDate :date="data.updatedAt" />
         </template>
+        <template #filter="{ filterModel }">
+          <DatePicker
+            v-model="filterModel.value"
+            dateFormat="yy-mm-dd"
+            showTime
+            showSeconds
+            showIcon
+            placeholder="Select date and time"
+          />
+        </template>
       </Column>
 
       <!-- Actions Column -->
       <Column header="Actions" :exportable="false">
         <template #body="{ data }">
-          <div>
-            <Button
-              severity="secondary"
-              size="small"
-              @click="$router.push(`/transactions/${data.uetr}`)"
-              v-tooltip.top="'View Details'"
-            >
-              <template #icon>
-                <Icon icon="mdi:eye" />
-              </template>
-            </Button>
-          </div>
+          <TransactionActions :transaction="data" />
         </template>
       </Column>
 
