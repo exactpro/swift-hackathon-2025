@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import type { DataTableFilterMeta, DataTableOperatorFilterMetaData } from 'primevue/datatable'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
@@ -51,22 +52,64 @@ const transformedTransactions = computed(() => {
 })
 
 // Filters configuration for menu-based filtering
-const filters = ref({
+const filters = ref<DataTableFilterMeta>({
   global: { value: null, matchMode: 'contains' },
-  type: { value: null, matchMode: 'in' },
-  direction: { value: null, matchMode: 'in' },
-  status: { value: null, matchMode: 'in' },
-  uetr: { value: null, matchMode: 'contains' },
-  debtorBic: { value: null, matchMode: 'contains' },
-  debtorName: { value: null, matchMode: 'contains' },
-  debtorClientId: { value: null, matchMode: 'contains' },
-  debtorCurrency: { value: null, matchMode: 'in' },
-  creditorBic: { value: null, matchMode: 'contains' },
-  creditorName: { value: null, matchMode: 'contains' },
-  creditorClientId: { value: null, matchMode: 'contains' },
-  creditorCurrency: { value: null, matchMode: 'in' },
-  createdAtDate: { value: null, matchMode: 'dateIs' },
-  updatedAtDate: { value: null, matchMode: 'dateIs' }
+  type: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
+  } as DataTableOperatorFilterMetaData,
+  direction: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
+  } as DataTableOperatorFilterMetaData,
+  status: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
+  } as DataTableOperatorFilterMetaData,
+  uetr: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  } as DataTableOperatorFilterMetaData,
+  debtorBic: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  } as DataTableOperatorFilterMetaData,
+  debtorName: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  } as DataTableOperatorFilterMetaData,
+  debtorClientId: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  } as DataTableOperatorFilterMetaData,
+  debtorCurrency: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
+  } as DataTableOperatorFilterMetaData,
+  creditorBic: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  } as DataTableOperatorFilterMetaData,
+  creditorName: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  } as DataTableOperatorFilterMetaData,
+  creditorClientId: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  } as DataTableOperatorFilterMetaData,
+  creditorCurrency: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
+  } as DataTableOperatorFilterMetaData,
+  createdAtDate: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'dateIs' }]
+  } as DataTableOperatorFilterMetaData,
+  updatedAtDate: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'dateIs' }]
+  } as DataTableOperatorFilterMetaData
 })
 
 // Options for dropdown filters
@@ -145,20 +188,62 @@ const isOwnClient = (clientIdToCheck: string) => clientId && clientIdToCheck ===
 const clearFilter = () => {
   filters.value = {
     global: { value: null, matchMode: 'contains' },
-    type: { value: null, matchMode: 'in' },
-    direction: { value: null, matchMode: 'in' },
-    status: { value: null, matchMode: 'in' },
-    uetr: { value: null, matchMode: 'contains' },
-    debtorBic: { value: null, matchMode: 'contains' },
-    debtorName: { value: null, matchMode: 'contains' },
-    debtorClientId: { value: null, matchMode: 'contains' },
-    debtorCurrency: { value: null, matchMode: 'in' },
-    creditorBic: { value: null, matchMode: 'contains' },
-    creditorName: { value: null, matchMode: 'contains' },
-    creditorClientId: { value: null, matchMode: 'contains' },
-    creditorCurrency: { value: null, matchMode: 'in' },
-    createdAtDate: { value: null, matchMode: 'dateIs' },
-    updatedAtDate: { value: null, matchMode: 'dateIs' }
+    type: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    direction: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    status: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    uetr: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    debtorBic: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    debtorName: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    debtorClientId: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    debtorCurrency: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    creditorBic: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    creditorName: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    creditorClientId: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    creditorCurrency: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    createdAtDate: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'dateIs' }]
+    },
+    updatedAtDate: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'dateIs' }]
+    }
   }
 }
 </script>
@@ -205,7 +290,7 @@ const clearFilter = () => {
             <InputIcon>
               <Icon icon="mdi:magnify" />
             </InputIcon>
-            <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+            <InputText v-model="(filters.global as any).value" placeholder="Keyword Search" />
           </IconField>
         </div>
       </template>
