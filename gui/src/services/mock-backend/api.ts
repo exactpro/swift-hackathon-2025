@@ -1,5 +1,5 @@
 import { simulate } from './simulation'
-import type { Transaction, JSONify, Currency, TransactionDetails } from './types'
+import type { Transaction, JSONify, Currency, TransactionMessageStatus } from './types'
 import { BackendUpdates, deepCopy } from './utils'
 import { faker } from '@faker-js/faker'
 
@@ -143,7 +143,7 @@ export function exchange(props: ExchangeProps): boolean {
 
 export function getTransactionDetails(uetr: string): JSONify<{
   transaction: Transaction
-  details: TransactionDetails[]
+  messages: TransactionMessageStatus[]
 }> | null {
   const transaction = state.transactions.find((t) => t.uetr === uetr)
   if (!transaction) {
@@ -152,55 +152,33 @@ export function getTransactionDetails(uetr: string): JSONify<{
 
   const isCompleted = transaction.status === 'completed'
 
-  const details: TransactionDetails[] = [
-    {
-      businessStep: {
-        title: 'Debit Sender',
-        status: 'received',
-        viewerUrl: '#'
-      },
-      swiftMessage: null,
-      dltMessage: null
+  const now = new Date()
+
+  const details: TransactionMessageStatus[] = []
+  details.push({
+    type: 'SWIFT',
+    title: 'pacs.008',
+    summary: {
+      debtor: transaction.debtor.name,
+      creditor: transaction.creditor.name,
+      currency: transaction.creditor.currency,
+      amount: transaction.creditor.amount
     },
-    {
-      businessStep: {
-        title: 'FX Trade',
-        status: 'received',
-        viewerUrl: '#'
+    timestamp: new Date(Number(now) - 1000 * 60)
+  })
+  if (isCompleted) {
+    details.push({
+      type: 'DLT',
+      title: 'DLT Confirmation',
+      summary: {
+        status: 'Confirmed'
       },
-      swiftMessage: null,
-      dltMessage: null
-    },
-    {
-      businessStep: {
-        title: 'Transfer Funds',
-        status: isCompleted ? 'received' : 'expecting',
-        viewerUrl: '#'
-      },
-      swiftMessage: {
-        title: 'pacs.008',
-        status: 'received',
-        viewerUrl: '#'
-      },
-      dltMessage: {
-        title: 'DLT Message',
-        status: isCompleted ? 'received' : 'expecting',
-        viewerUrl: '#'
-      }
-    },
-    {
-      businessStep: {
-        title: 'Credit Beneficiary',
-        status: isCompleted ? 'received' : 'expecting',
-        viewerUrl: '#'
-      },
-      swiftMessage: null,
-      dltMessage: null
-    }
-  ]
+      timestamp: new Date(Number(now) - 1000 * 30)
+    })
+  }
 
   return {
     transaction: deepCopy(transaction),
-    details: deepCopy(details)
+    messages: deepCopy(details)
   }
 }

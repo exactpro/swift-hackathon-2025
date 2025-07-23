@@ -17,7 +17,7 @@ const adminRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'transfers/:uetr',
-        component: () => import('./pages/transactions/TransactionStatusPage.vue')
+        component: () => import('./pages/admin/TransactionStatusPage.vue')
       }
     ]
   }
