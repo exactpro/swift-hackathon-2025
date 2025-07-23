@@ -32,11 +32,6 @@ type TransformedTransaction = JSONify<Transaction> & {
   updatedAtDate: Date
 }
 
-// Type for filter model used in filter templates
-interface FilterModel {
-  value: any
-  matchMode?: string
-}
 import { useBankRoute } from '../composables/useBankRoute.js'
 import UUID from './UUID.vue'
 import RelDate from './RelDate.vue'
@@ -340,7 +335,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <Tag :value="data.type" :severity="getTypeSeverity(data.type)" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="typeOptions" placeholder="Any" />
         </template>
       </Column>
@@ -350,7 +345,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <Tag :value="data.direction" :severity="getDirectionSeverity(data.direction)" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="directionOptions" placeholder="Any" />
         </template>
       </Column>
@@ -360,7 +355,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <Tag :value="data.status" :severity="getStatusSeverity(data.status)" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="statusOptions" placeholder="Any" />
         </template>
       </Column>
@@ -370,7 +365,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <UUID :uuid="data.uetr" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by UETR" />
         </template>
       </Column>
@@ -387,7 +382,7 @@ const clearFilter = () => {
             {{ data.debtorBic }}
           </span>
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by BIC" />
         </template>
       </Column>
@@ -406,7 +401,7 @@ const clearFilter = () => {
             </div>
           </div>
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
         </template>
       </Column>
@@ -416,7 +411,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <UUID :uuid="data.debtorClientId" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by client ID" />
         </template>
       </Column>
@@ -426,7 +421,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <span>{{ data.debtorAmount.toFixed(2) }}</span>
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="number" placeholder="Amount" />
         </template>
       </Column>
@@ -436,7 +431,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <Tag :value="data.debtorCurrency" severity="secondary" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="currencyOptions" placeholder="Any" />
         </template>
       </Column>
@@ -453,7 +448,7 @@ const clearFilter = () => {
             {{ data.creditorBic }}
           </span>
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by BIC" />
         </template>
       </Column>
@@ -472,7 +467,7 @@ const clearFilter = () => {
             </div>
           </div>
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
         </template>
       </Column>
@@ -482,7 +477,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <UUID :uuid="data.creditorClientId" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by client ID" />
         </template>
       </Column>
@@ -492,7 +487,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <span>{{ data.creditorAmount.toFixed(2) }}</span>
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="number" placeholder="Amount" />
         </template>
       </Column>
@@ -502,7 +497,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <Tag :value="data.creditorCurrency" severity="secondary" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <MultiSelect v-model="filterModel.value" :options="currencyOptions" placeholder="Any" />
         </template>
       </Column>
@@ -512,7 +507,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <RelDate :date="data.createdAt" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <DatePicker
             v-model="filterModel.value"
             dateFormat="yy-mm-dd"
@@ -529,7 +524,7 @@ const clearFilter = () => {
         <template #body="{ data }: { data: TransformedTransaction }">
           <RelDate :date="data.updatedAt" />
         </template>
-        <template #filter="{ filterModel }: { filterModel: FilterModel }">
+        <template #filter="{ filterModel }">
           <DatePicker
             v-model="filterModel.value"
             dateFormat="yy-mm-dd"
