@@ -58,6 +58,18 @@ export function newTransaction(
     updatedAt: new Date()
   }
 
+  const creditorAccount = state.accounts.find((a) => a.id === newTransaction.creditor.accountId)
+  if (!creditorAccount) {
+    console.error('Creditor account not found:', newTransaction.creditor.accountId)
+    return null
+  }
+  const creditor = state.clients.find((c) => c.id === creditorAccount.ownerId)
+  if (!creditor) {
+    console.error('Creditor client not found:', creditorAccount.ownerId)
+    return null
+  }
+  transaction.creditor.name = creditor.fullName
+
   // Update debtor account balance
   const account = state.accounts.find((a) => a.id === newTransaction.debtor.accountId)
   if (!account) {

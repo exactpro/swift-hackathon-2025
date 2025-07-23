@@ -9,6 +9,8 @@ import config from '../../../config.js'
  * @param ownBIC - BIC of the own bank
  */
 export function simulate(emitter: BackendUpdates) {
+  // @ts-ignore
+  window.mockState = state // For debugging purposes
   const currencies: Currency[] = ['EUR', 'USD', 'S-USDC']
   const statuses: TransactionStatus[] = ['pending', 'completed']
 

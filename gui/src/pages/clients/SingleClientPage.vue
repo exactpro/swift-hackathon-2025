@@ -2,12 +2,13 @@
 import { useAsyncState } from '@vueuse/core'
 import { useRoute } from 'vue-router'
 import { fetchClientData } from '../../services/clients'
-import { computed } from 'vue'
-import { formatNumber } from '../../utils/formatNumber'
-import type { Account } from '../../services/mock-backend/types'
+import { computed, ref, watch } from 'vue'
+import { formatAccountBalance } from '../../utils/formatNumber'
 import { RouterLink } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useBankRoute } from '../../composables/useBankRoute'
+import TransferFundsWidget from '../../components/TransferFundsWidget.vue'
+import type { Account } from '../../services/mock-backend/types'
 
 const route = useRoute()
 const clientId = route.meta.clientId as string
@@ -24,22 +25,29 @@ const displayTitle = computed(() => {
   return client.value ? client.value.fullName : clientId
 })
 
-function formatAccountBalance(account: Account) {
-  const formattedBalance = formatNumber(account.balance)
-  if (account.currency === 'EUR') {
-    return `€${formattedBalance}`
-  } else if (account.currency === 'USD') {
-    return `$${formattedBalance}`
-  } else if (account.currency === 'S-USDC') {
-    return `${formattedBalance} S-USDC`
-  }
-  return `${formattedBalance} ${account.currency}`
-}
-
 const exchangeUrl = useBankRoute('exchange')
-const transferUrl = useBankRoute('transfers', 'new')
-function transferCurrencyUrl(currency: string) {
-  return `${transferUrl.value}?from_currency=${currency}`
+
+const transferFormRef = ref<InstanceType<typeof TransferFundsWidget> | null>(null)
+const accountToTransferFrom = ref<Account | null>(null)
+watch(
+  () => client.value,
+  (newClient) => {
+    if (newClient && newClient.accounts.length > 0) {
+      if (!accountToTransferFrom.value) {
+        accountToTransferFrom.value = newClient.accounts[0]
+      }
+    }
+  },
+  { immediate: true }
+)
+
+function chooseTransferAccount(account: Account) {
+  accountToTransferFrom.value = account
+  if (transferFormRef.value) {
+    transferFormRef.value.$el.scrollIntoView({
+      behavior: 'smooth'
+    })
+  }
 }
 </script>
 <template>
@@ -78,12 +86,19 @@ function transferCurrencyUrl(currency: string) {
       >
         <div>
           <div class="font-bold">{{ account.currency }} Token Account</div>
-          <div class="text-accent">Balance: {{ formatAccountBalance(account) }}</div>
+          <div class="text-accent">Balance: {{ formatAccountBalance(account.currency, account.balance) }}</div>
         </div>
         <div class="text-right">
-          <RouterLink class="btn btn-primary btn-sm" :to="transferCurrencyUrl(account.currency)"> Transfer </RouterLink>
+          <button class="btn btn-primary btn-sm" @click="chooseTransferAccount(account)">Transfer</button>
         </div>
       </div>
     </section>
+    <TransferFundsWidget
+      ref="transferFormRef"
+      v-if="client && accountToTransferFrom"
+      v-model:account="accountToTransferFrom"
+      @completed="refresh"
+      :debtorAccounts="client.accounts"
+    />
   </div>
 </template>

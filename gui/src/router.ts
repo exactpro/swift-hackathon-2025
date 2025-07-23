@@ -14,6 +14,10 @@ const adminRoutes: RouteRecordRaw[] = [
       {
         path: 'dashboard',
         component: () => import('./pages/admin/TransactionsHistoryPage.vue')
+      },
+      {
+        path: 'transfers/:uetr',
+        component: () => import('./pages/transactions/TransactionStatusPage.vue')
       }
     ]
   }
@@ -27,19 +31,6 @@ const clientRoutes: RouteRecordRaw[] = [
   {
     path: 'exchange',
     component: () => import('./pages/clients/ExchangePage.vue')
-  },
-  {
-    path: 'transfers',
-    children: [
-      {
-        path: 'new',
-        component: () => import('./pages/transactions/init/InitTransferPage.vue')
-      },
-      {
-        path: ':uetr',
-        component: () => import('./pages/transactions/TransactionStatusPage.vue')
-      }
-    ]
   }
 ]
 
