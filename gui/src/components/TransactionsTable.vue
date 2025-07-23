@@ -20,19 +20,18 @@ type TransformedTransaction = JSONify<Transaction> & {
   direction: string
   debtorBic: string
   debtorName: string
-  debtorClientId: string
   debtorAmount: number
   debtorCurrency: string
+  debtorAccountId: string
   creditorBic: string
   creditorName: string
-  creditorClientId: string
+  creditorAccountId: string
   creditorAmount: number
   creditorCurrency: string
   createdAtDate: Date
   updatedAtDate: Date
 }
 
-import { useBankRoute } from '../composables/useBankRoute.js'
 import UUID from './UUID.vue'
 import RelDate from './RelDate.vue'
 import TransactionActions from './TransactionActions.vue'
@@ -43,23 +42,21 @@ const props = defineProps<{
 
 const route = useRoute()
 const ownBic = route.meta.bic as string
-const clientId = route.meta.accountId as string | undefined
-const clientPageLink = useBankRoute()
 
 // Transform transactions for DataTable
-const transformedTransactions = computed(() => {
+const transformedTransactions = computed<TransformedTransaction[]>(() => {
   return props.transactions.map((transaction) => ({
     ...transaction,
     direction: getDirection(ownBic, transaction),
     debtorBic: transaction.debtor.bic,
     debtorName: transaction.debtor.name,
-    debtorClientId: transaction.debtor.accountId,
+    debtorAccountId: transaction.debtor.accountId,
     debtorAmount:
       typeof transaction.debtor.amount === 'string' ? parseFloat(transaction.debtor.amount) : transaction.debtor.amount,
     debtorCurrency: transaction.debtor.currency,
     creditorBic: transaction.creditor.bic,
     creditorName: transaction.creditor.name,
-    creditorClientId: transaction.creditor.accountId,
+    creditorAccountId: transaction.creditor.accountId,
     creditorAmount:
       typeof transaction.creditor.amount === 'string'
         ? parseFloat(transaction.creditor.amount)
@@ -207,9 +204,6 @@ const getDirectionSeverity = (direction: string) => {
 
 // Check if BIC belongs to current bank
 const isOwnBic = (bic: string) => bic === ownBic
-
-// Check if client belongs to current user
-const isOwnClient = (clientIdToCheck: string) => clientId && clientIdToCheck === clientId
 
 // Clear all filters
 const clearFilter = () => {
@@ -390,16 +384,7 @@ const clearFilter = () => {
       <!-- Debtor Name Column -->
       <Column field="debtorName" header="Debtor Name" sortable>
         <template #body="{ data }: { data: TransformedTransaction }">
-          <div>
-            <div v-if="isOwnClient(data.debtorClientId)">
-              <RouterLink :to="clientPageLink">
-                {{ data.debtorName }}
-              </RouterLink>
-            </div>
-            <div v-else>
-              {{ data.debtorName }}
-            </div>
-          </div>
+          {{ data.debtorName }}
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
@@ -407,12 +392,12 @@ const clearFilter = () => {
       </Column>
 
       <!-- Debtor Client ID Column -->
-      <Column field="debtorClientId" header="Debtor Client ID" sortable>
+      <Column field="debtorAccountId" header="Debtor Account ID" sortable>
         <template #body="{ data }: { data: TransformedTransaction }">
-          <UUID :uuid="data.debtorClientId" />
+          {{ data.debtorAccountId }}
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Search by client ID" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Search by account ID" />
         </template>
       </Column>
 
@@ -456,16 +441,7 @@ const clearFilter = () => {
       <!-- Creditor Name Column -->
       <Column field="creditorName" header="Creditor Name" sortable>
         <template #body="{ data }: { data: TransformedTransaction }">
-          <div>
-            <div v-if="isOwnClient(data.creditorClientId)">
-              <RouterLink :to="clientPageLink">
-                {{ data.creditorName }}
-              </RouterLink>
-            </div>
-            <div v-else>
-              {{ data.creditorName }}
-            </div>
-          </div>
+          {{ data.creditorName }}
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
@@ -473,12 +449,12 @@ const clearFilter = () => {
       </Column>
 
       <!-- Creditor Client ID Column -->
-      <Column field="creditorClientId" header="Creditor Client ID" sortable>
+      <Column field="creditorAccountId" header="Creditor Account ID" sortable>
         <template #body="{ data }: { data: TransformedTransaction }">
-          <UUID :uuid="data.creditorClientId" />
+          {{ data.creditorAccountId }}
         </template>
         <template #filter="{ filterModel }">
-          <InputText v-model="filterModel.value" type="text" placeholder="Search by client ID" />
+          <InputText v-model="filterModel.value" type="text" placeholder="Search by account ID" />
         </template>
       </Column>
 
