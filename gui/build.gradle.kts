@@ -35,7 +35,7 @@ tasks {
             into("/")
         }
 
-        archiveFileName.set("ui-dist-${project.version}.zip")
+        archiveFileName.set("ui-dist.zip")
 
         destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
     }
