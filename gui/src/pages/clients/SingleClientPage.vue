@@ -11,6 +11,8 @@ import TransferFundsWidget from '../../components/TransferFundsWidget.vue'
 import type { Account } from '../../services/mock-backend/types'
 
 const route = useRoute()
+const bankName = route.meta.bankName as string
+const bic = route.meta.bic as string
 const clientId = route.meta.clientId as string
 
 const { state: client, isLoading } = useAsyncState(fetchClientData(clientId), null)
@@ -52,17 +54,26 @@ function chooseTransferAccount(account: Account) {
 </script>
 <template>
   <div>
-    <div class="grid grid-cols-2 my-4">
-      <div class="flex flex-wrap gap-2 items-center">
-        <h1 class="text-lg font-bold inline-block">
-          <Icon icon="mdi:account" class="inline-block" /> {{ displayTitle }}
-        </h1>
-        <span v-if="client" class="text-sm text-gray-500">
-          {{ client.id }}
-        </span>
+    <div class="grid grid-cols-2 my-4 items-center gap-4">
+      <div>
+        <div class="flex flex-wrap gap-2 items-center">
+          <h1 class="text-lg font-bold inline-block">
+            <Icon icon="mdi:account" class="inline-block" /> {{ displayTitle }}
+          </h1>
+          <span v-if="client" class="text-sm text-gray-500">
+            {{ client.id }}
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-2 items-center">
+          <div class="text-lg font-bold inline-block"><Icon icon="mdi:bank" class="inline-block" /> {{ bankName }}</div>
+          <span v-if="client" class="text-sm text-gray-500">
+            {{ bic }}
+          </span>
+        </div>
       </div>
-      <div class="text-right">
-        <RouterLink v-if="client" class="btn btn-primary btn-sm mr-2" :to="exchangeUrl">
+
+      <div class="flex flex-wrap justify-end items-center gap-2">
+        <RouterLink v-if="client" class="btn btn-primary btn-sm" :to="exchangeUrl">
           Exchange <Icon icon="mdi:swap-horizontal" class="inline-block" />
         </RouterLink>
         <button
@@ -86,9 +97,10 @@ function chooseTransferAccount(account: Account) {
       >
         <div>
           <div class="font-bold">{{ account.currency }} Token Account</div>
+          <div class="text-gray-500">Account ID: {{ account.id }}</div>
           <div class="text-accent">Balance: {{ formatAccountBalance(account.currency, account.balance) }}</div>
         </div>
-        <div class="text-right">
+        <div class="flex justify-end items-center">
           <button class="btn btn-primary btn-sm" @click="chooseTransferAccount(account)">Transfer</button>
         </div>
       </div>
