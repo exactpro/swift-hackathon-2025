@@ -2,7 +2,7 @@
 import { onBeforeUnmount } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { fetchTransactions, subscribeToTransactionsUpdates } from '../../services/transactions.js'
-import TransactionsTable from '../../components/TransactionsTable/TransactionsTable.vue'
+import TransactionsTable from '../../components/TransactionsTable.vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()

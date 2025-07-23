@@ -1,9 +1,8 @@
 import config from '../../config.js'
-import type { Client, JSONify, Account, Transaction, Currency } from './mock-backend/types.js'
+import type { Client, JSONify, Account, Currency } from './mock-backend/types.js'
 
 interface ClientDataResponse extends JSONify<Client> {
   accounts: JSONify<Account>[]
-  transactions: JSONify<Transaction>[]
 }
 
 export async function fetchClientData(clientId: string): Promise<ClientDataResponse | null> {

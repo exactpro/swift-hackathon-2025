@@ -4,7 +4,7 @@ export type TransactionType = 'transfer' | 'cancel'
 export type TransactionParty = {
   name: string
   bic: string
-  clientId: string
+  accountId: string
   amount: number
   currency: Currency
 }

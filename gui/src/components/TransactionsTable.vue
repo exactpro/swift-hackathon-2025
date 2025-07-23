@@ -12,8 +12,8 @@ import InputIcon from 'primevue/inputicon'
 import DatePicker from 'primevue/datepicker'
 import { Icon } from '@iconify/vue'
 
-import type { JSONify, Transaction } from '../../services/mock-backend/types.js'
-import { getDirection } from '../../utils/transactions.js'
+import type { JSONify, Transaction } from '../services/mock-backend/types.js'
+import { getDirection } from '../utils/transactions.js'
 
 // Type for transformed transaction data used in DataTable
 type TransformedTransaction = JSONify<Transaction> & {
@@ -37,10 +37,10 @@ interface FilterModel {
   value: any
   matchMode?: string
 }
-import { useBankRoute } from '../../composables/useBankRoute.js'
-import UUID from '../UUID.vue'
-import RelDate from '../RelDate.vue'
-import TransactionActions from '../TransactionActions.vue'
+import { useBankRoute } from '../composables/useBankRoute.js'
+import UUID from './UUID.vue'
+import RelDate from './RelDate.vue'
+import TransactionActions from './TransactionActions.vue'
 
 const props = defineProps<{
   transactions: JSONify<Transaction>[]
@@ -48,7 +48,7 @@ const props = defineProps<{
 
 const route = useRoute()
 const ownBic = route.meta.bic as string
-const clientId = route.meta.clientId as string | undefined
+const clientId = route.meta.accountId as string | undefined
 const clientPageLink = useBankRoute()
 
 // Transform transactions for DataTable
@@ -58,13 +58,13 @@ const transformedTransactions = computed(() => {
     direction: getDirection(ownBic, transaction),
     debtorBic: transaction.debtor.bic,
     debtorName: transaction.debtor.name,
-    debtorClientId: transaction.debtor.clientId,
+    debtorClientId: transaction.debtor.accountId,
     debtorAmount:
       typeof transaction.debtor.amount === 'string' ? parseFloat(transaction.debtor.amount) : transaction.debtor.amount,
     debtorCurrency: transaction.debtor.currency,
     creditorBic: transaction.creditor.bic,
     creditorName: transaction.creditor.name,
-    creditorClientId: transaction.creditor.clientId,
+    creditorClientId: transaction.creditor.accountId,
     creditorAmount:
       typeof transaction.creditor.amount === 'string'
         ? parseFloat(transaction.creditor.amount)

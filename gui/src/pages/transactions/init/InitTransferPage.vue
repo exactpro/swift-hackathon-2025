@@ -14,7 +14,7 @@ interface TransferForm {
   debtorCurrency: string
   debtorAmount: number | null
   creditorBank: string
-  creditorClientId: string
+  creditorAccountId: string
   creditorName: string
   creditorCurrency: string
   creditorAmount: number | null
@@ -31,7 +31,7 @@ const form = reactive<TransferForm>({
   debtorCurrency: '',
   debtorAmount: null,
   creditorBank: '',
-  creditorClientId: '',
+  creditorAccountId: '',
   creditorName: '',
   creditorCurrency: '',
   creditorAmount: null
@@ -124,7 +124,7 @@ const isFormComplete = computed(() => {
     form.debtorCurrency &&
     form.debtorAmount !== null &&
     form.creditorBank &&
-    form.creditorClientId &&
+    form.creditorAccountId &&
     form.creditorCurrency &&
     form.creditorAmount !== null &&
     form.creditorName
@@ -157,14 +157,14 @@ async function startTransaction() {
   await newTransaction({
     debtor: {
       bic: ownBic,
-      clientId: debtorClientId,
+      accountId: debtorClientId,
       name: debtorName,
       currency: form.debtorCurrency as Currency,
       amount: form.debtorAmount!
     },
     creditor: {
       bic: form.creditorBank,
-      clientId: form.creditorClientId,
+      accountId: form.creditorAccountId,
       name: form.creditorName,
       currency: form.creditorCurrency as Currency,
       amount: form.creditorAmount!
@@ -253,9 +253,9 @@ async function startTransaction() {
           <!-- Client ID -->
           <div class="form-control mb-4">
             <label class="label">
-              <span class="label-text font-medium">Client ID</span>
+              <span class="label-text font-medium">Account ID</span>
             </label>
-            <input v-model="form.creditorClientId" type="text" placeholder="XXX" class="input input-bordered w-full" />
+            <input v-model="form.creditorAccountId" type="text" placeholder="XXX" class="input input-bordered w-full" />
           </div>
 
           <div class="form-control mb-4">

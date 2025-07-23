@@ -2,8 +2,6 @@
 import { useAsyncState } from '@vueuse/core'
 import { fetchTransactionDetails } from '../../services/transactions'
 import { useRoute } from 'vue-router'
-import TransactionsTableHeader from '../../components/TransactionsTable/TransactionsTableHeader.vue'
-import TransactionsTableRow from '../../components/TransactionsTable/TransactionsTableRow.vue'
 import MessageBlock from '../../components/TransactionStatus/MessageBlock.vue'
 import { Icon } from '@iconify/vue'
 
@@ -39,14 +37,6 @@ async function refresh() {
       <div class="card bg-base-200 shadow-xl">
         <div class="card-body">
           <h2 class="card-title text-xl mb-6">Transaction Overview</h2>
-          <div class="overflow-x-auto">
-            <table class="table table-zebra">
-              <TransactionsTableHeader />
-              <tbody>
-                <TransactionsTableRow :transaction="transactionDetails.transaction" />
-              </tbody>
-            </table>
-          </div>
 
           <div class="card-actions justify-end mt-4">
             <button @click="refresh" class="btn btn-primary btn-sm">

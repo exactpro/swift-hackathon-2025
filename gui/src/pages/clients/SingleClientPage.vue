@@ -6,7 +6,6 @@ import { computed } from 'vue'
 import { formatNumber } from '../../utils/formatNumber'
 import type { Account } from '../../services/mock-backend/types'
 import { RouterLink } from 'vue-router'
-import TransactionsTable from '../../components/TransactionsTable/TransactionsTable.vue'
 import { Icon } from '@iconify/vue'
 import { useBankRoute } from '../../composables/useBankRoute'
 
@@ -85,13 +84,6 @@ function transferCurrencyUrl(currency: string) {
           <RouterLink class="btn btn-primary btn-sm" :to="transferCurrencyUrl(account.currency)"> Transfer </RouterLink>
         </div>
       </div>
-    </section>
-    <section v-if="client">
-      <TransactionsTable
-        :transactions="client.transactions"
-        @transaction-accepted="refresh"
-        @transaction-rejected="refresh"
-      />
     </section>
   </div>
 </template>

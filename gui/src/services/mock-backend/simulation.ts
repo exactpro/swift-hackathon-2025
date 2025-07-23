@@ -41,14 +41,14 @@ export function simulate(emitter: BackendUpdates) {
           debtor: {
             name: client.fullName,
             bic: client.bic,
-            clientId: client.id,
+            accountId: account.id,
             amount: faker.number.int({ min: 10, max: 500 }),
             currency
           },
           creditor: {
             name: faker.person.fullName(),
             bic: faker.finance.bic(),
-            clientId: faker.string.uuid(),
+            accountId: faker.finance.accountNumber(),
             amount: faker.number.int({ min: 10, max: 500 }),
             currency
           },
@@ -83,10 +83,8 @@ export function simulate(emitter: BackendUpdates) {
       transaction.status = 'completed'
       transaction.updatedAt = new Date()
       console.log(`Transaction ${transaction.uetr} status changed to completed`, transaction)
-      if ([config.bankA.client.id, config.bankB.client.id].includes(transaction.creditor.clientId)) {
-        const account = state.accounts.find(
-          (a) => a.ownerId === transaction.debtor.clientId && a.currency === transaction.debtor.currency
-        )
+      if ([config.bankA.bic, config.bankB.bic].includes(transaction.creditor.bic)) {
+        const account = state.accounts.find((a) => a.id === transaction.debtor.accountId)
         if (account) {
           account.balance += transaction.debtor.amount
           console.log(`Debtor account ${account.id} balance updated: ${account.balance}`)
@@ -100,6 +98,14 @@ export function simulate(emitter: BackendUpdates) {
 
   setInterval(() => {
     const recipient = faker.helpers.arrayElement(state.clients)
+    const currency = faker.helpers.arrayElement(currencies)
+    const recipientAccount = state.accounts.find(
+      (account) => account.ownerId === recipient.id && account.currency === currency
+    )
+    if (!recipientAccount) {
+      console.error(`No account found for recipient ${recipient.fullName} with currency ${currency}`)
+      return
+    }
     const incomingTransaction: Transaction = {
       uetr: faker.string.uuid(),
       status: 'pending',
@@ -107,14 +113,14 @@ export function simulate(emitter: BackendUpdates) {
       debtor: {
         name: faker.person.fullName(),
         bic: faker.finance.bic(),
-        clientId: faker.string.uuid(),
+        accountId: faker.finance.accountNumber(),
         amount: faker.number.int({ min: 10, max: 500 }),
         currency: faker.helpers.arrayElement(currencies)
       },
       creditor: {
         name: recipient.fullName,
         bic: recipient.bic,
-        clientId: recipient.id,
+        accountId: recipientAccount.id,
         amount: faker.number.int({ min: 10, max: 500 }),
         currency: faker.helpers.arrayElement(currencies)
       },

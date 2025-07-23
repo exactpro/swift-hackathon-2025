@@ -31,12 +31,7 @@ export function getClientData(clientId: string) {
 
   return deepCopy({
     ...client,
-    accounts: state.accounts.filter((account) => account.ownerId === client.id),
-    transactions: state.transactions
-      .filter((transaction) => transaction.debtor.clientId === client.id || transaction.creditor.clientId === client.id)
-      .sort((a, b) => {
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      })
+    accounts: state.accounts.filter((account) => account.ownerId === client.id)
   })
 }
 
@@ -64,9 +59,7 @@ export function newTransaction(
   }
 
   // Update debtor account balance
-  const account = state.accounts.find(
-    (a) => a.ownerId === newTransaction.debtor.clientId && a.currency === newTransaction.debtor.currency
-  )
+  const account = state.accounts.find((a) => a.id === newTransaction.debtor.accountId)
   if (!account) {
     console.error('Debtor account not found:', newTransaction.debtor)
     return null
