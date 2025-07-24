@@ -2,7 +2,7 @@
 
 root = false
 
-[*.{js,ts,vue}]
+[*.{js,ts,vue,json}]
 charset = utf-8
 indent_style = space
 indent_size = 2

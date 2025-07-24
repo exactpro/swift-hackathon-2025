@@ -14,18 +14,35 @@ node {
 }
 
 tasks {
+    val npmCiTask = register<NpmTask>("npmCi") {
+        args = listOf("ci")
+    }
+
     val npmBuildTask = register<NpmTask>("npmBuild") {
         args = listOf("run", "build")
-        dependsOn(npmInstall)
+        dependsOn(npmCiTask)
     }
 
     val runTask = register<NpmTask>("run") {
         args = listOf("run", "preview")
-        dependsOn(npmInstall)
+        dependsOn(npmCiTask)
+    }
+
+    val zipTask = register<Zip>("zip") {
+        dependsOn(npmBuildTask)
+
+        from(project.layout.projectDirectory.dir("dist")) {
+            into("/")
+        }
+
+        archiveFileName.set("ui-dist.zip")
+
+        destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
     }
 
     build {
         dependsOn(npmBuildTask)
+        dependsOn(zipTask)
     }
 
     clean {

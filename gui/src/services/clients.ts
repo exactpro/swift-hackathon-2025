@@ -1,41 +1,24 @@
 import config from '../../config.js'
-import type {
-  Client,
-  JSONify,
-  Account,
-  Transaction,
-  Currency
-} from './mock-backend/types.js'
+import type { Client, JSONify, Account, Currency, Transaction } from './mock-backend/types.js'
 
-interface AllClientsResponseItem extends JSONify<Client> {
-  accounts: {
-    EUR?: JSONify<Account>
-    USD?: JSONify<Account>
-    SUSDC?: JSONify<Account>
-  }
-}
-
-export async function fetchAllClients(): Promise<AllClientsResponseItem[]> {
-  if (config.useMock) {
-    const { getClients } = await import('./mock-backend/api.js')
-    return getClients()
-  }
-  return []
-}
-
-interface ClientDataResponse extends JSONify<Client> {
+export interface ClientDataResponse extends JSONify<Client> {
   accounts: JSONify<Account>[]
-  transactions: JSONify<Transaction>[]
 }
 
-export async function fetchClientData(
-  clientId: string
-): Promise<ClientDataResponse | null> {
+export async function fetchClientData(clientId: string): Promise<ClientDataResponse | null> {
   if (config.useMock) {
     const { getClientData } = await import('./mock-backend/api.js')
     return getClientData(clientId)
   }
   return null
+}
+
+export async function fetchClientTransactions(clientId: string): Promise<JSONify<Transaction>[]> {
+  if (config.useMock) {
+    const { getClientTransactions } = await import('./mock-backend/api.js')
+    return getClientTransactions(clientId)
+  }
+  return []
 }
 
 export async function exchangeCurrency(

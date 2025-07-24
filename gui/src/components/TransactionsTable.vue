@@ -1,361 +1,429 @@
 <script setup lang="ts">
-import SortBtn from './SortBtn.vue'
-import { isRef, toRef, ref, watch } from 'vue'
-import { type MaybeRef } from '@vueuse/core'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Button from 'primevue/button'
+import Tag from 'primevue/tag'
+import InputText from 'primevue/inputtext'
+import MultiSelect from 'primevue/multiselect'
+import { Icon } from '@iconify/vue'
+
+import type { JSONify, Transaction } from '../services/mock-backend/types.js'
+import { getDirection } from '../utils/transactions.js'
+
+// Type for transformed transaction data used in DataTable
+type TransformedTransaction = JSONify<Transaction> & {
+  direction: string
+  debtorBic: string
+  debtorName: string
+  debtorAmount: number
+  debtorCurrency: string
+  debtorAccountId: string
+  creditorBic: string
+  creditorName: string
+  creditorAccountId: string
+  creditorAmount: number
+  creditorCurrency: string
+  createdAtDate: Date
+  updatedAtDate: Date
+}
 
 import UUID from './UUID.vue'
-import RelDate from './RelDate.vue'
-import { usePagination } from '../composables/usePagination.js'
-import PaginationNav from './PaginationNav.vue'
-import config from '../../config.js'
-import type { SortItem } from './SortBtn.vue'
-import type {
-  JSONify,
-  Transaction,
-  TransactionParty
-} from '../services/mock-backend/types.js'
 import TransactionActions from './TransactionActions.vue'
 
 const props = defineProps<{
   transactions: JSONify<Transaction>[]
+  clientMode?: boolean
 }>()
 
-const localTransactions = ref(props.transactions)
+const route = useRoute()
+const ownBic = route.meta.bic as string
 
-const sortQueue: SortItem[] = []
+// Transform transactions for DataTable
+const transformedTransactions = computed<TransformedTransaction[]>(() => {
+  return props.transactions.map((transaction) => ({
+    ...transaction,
+    direction: getDirection(ownBic, transaction),
+    debtorBic: transaction.debtor.bic,
+    debtorName: transaction.debtor.name,
+    debtorAccountId: transaction.debtor.accountId,
+    debtorAmount:
+      typeof transaction.debtor.amount === 'string' ? parseFloat(transaction.debtor.amount) : transaction.debtor.amount,
+    debtorCurrency: transaction.debtor.currency,
+    creditorBic: transaction.creditor.bic,
+    creditorName: transaction.creditor.name,
+    creditorAccountId: transaction.creditor.accountId,
+    creditorAmount:
+      typeof transaction.creditor.amount === 'string'
+        ? parseFloat(transaction.creditor.amount)
+        : transaction.creditor.amount,
+    creditorCurrency: transaction.creditor.currency,
+    createdAtDate: new Date(transaction.createdAt),
+    updatedAtDate: new Date(transaction.updatedAt)
+  }))
+})
 
-function sortBy(
-  items: MaybeRef<JSONify<Transaction>[]>,
-  { label: _, getProp, direction = 'asc' }: SortItem
-) {
-  function sortCallback(a: JSONify<Transaction>, b: JSONify<Transaction>) {
-    const aValue = getProp(a)
-    const bValue = getProp(b)
-
-    if (aValue < bValue) return direction === 'asc' ? -1 : 1
-    if (aValue > bValue) return direction === 'asc' ? 1 : -1
-    return 0
-  }
-  if (isRef(items)) {
-    // Pagination computed does not detect sorting of a ref array
-    items.value = items.value.slice().sort(sortCallback)
-    return
-  }
-  // If items is not a ref, we assume it's a plain array
-  items.sort(sortCallback)
-}
-
-function sortFromTable(sortItem: SortItem) {
-  sortBy(localTransactions, sortItem)
-  // Delete new sort item if it already exists
-  const existingIndex = sortQueue.findIndex(
-    (item) => item.label === sortItem.label
-  )
-  if (existingIndex !== -1) {
-    sortQueue.splice(existingIndex, 1)
-  }
-  sortQueue.push(sortItem)
-}
-
-watch(
-  toRef(props, 'transactions'),
-  (newTransactions) => {
-    localTransactions.value = newTransactions
-    for (const sortItem of sortQueue) {
-      sortBy(localTransactions, sortItem)
-    }
+// Filters configuration for menu-based filtering
+const filters = ref({
+  global: { value: null, matchMode: 'contains' },
+  type: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
   },
-  { immediate: true }
-)
-
-function getDirection(item: JSONify<Transaction>) {
-  if (item.debtor.bic === config.ownBic) {
-    return 'out'
-  } else if (item.creditor.bic === config.ownBic) {
-    return 'in'
+  direction: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
+  },
+  status: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
+  },
+  uetr: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  },
+  debtorBic: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  },
+  debtorName: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  },
+  debtorAccountId: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  },
+  debtorCurrency: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
+  },
+  debtorAmount: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'equals' }]
+  },
+  creditorBic: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  },
+  creditorName: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  },
+  creditorAccountId: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'contains' }]
+  },
+  creditorCurrency: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'in' }]
+  },
+  creditorAmount: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'equals' }]
+  },
+  createdAtDate: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'dateIs' }]
+  },
+  updatedAtDate: {
+    operator: 'and',
+    constraints: [{ value: null, matchMode: 'dateIs' }]
   }
-  return 'N/A'
-}
+})
 
-function getClientPageLink(party: TransactionParty): string {
-  return `/clients/${party.clientId}`
-}
+// Options for dropdown filters
+// const typeOptions = ref(['transfer', 'cancel'])
+const directionOptions = ref(['in', 'out', 'N/A'])
+const statusOptions = ref(['completed', 'pending', 'cancelled', 'rejected'])
+const currencyOptions = computed(() => {
+  const currencies = new Set([
+    ...props.transactions.map((t) => t.debtor.currency),
+    ...props.transactions.map((t) => t.creditor.currency)
+  ])
+  return Array.from(currencies)
+})
 
-const {
-  currentPageItems: displayedTransactions,
-  beforeButtons,
-  currentPage,
-  afterButtons
-} = usePagination(localTransactions, {})
+// Pagination
+const first = ref(0)
+const rows = ref(10)
 
-const emit = defineEmits<{
-  (
-    e: 'transactionAccepted',
-    acceptedTransaction: JSONify<Transaction> | null
-  ): void
-  (
-    e: 'transactionRejected',
-    rejectedTransaction: JSONify<Transaction> | null
-  ): void
+// Selected rows
+const selectedTransactions = ref([])
+
+defineEmits<{
+  (e: 'transactionAccepted', acceptedTransaction: JSONify<Transaction> | null): void
+  (e: 'transactionRejected', rejectedTransaction: JSONify<Transaction> | null): void
 }>()
+
+// Status severity mapping for PrimeVue Tag
+const getStatusSeverity = (status: string) => {
+  switch (status) {
+    case 'completed':
+      return 'success'
+    case 'pending':
+      return 'warn'
+    case 'cancelled':
+      return 'info'
+    case 'rejected':
+      return 'danger'
+    default:
+      return 'secondary'
+  }
+}
+
+// Direction severity mapping
+const getDirectionSeverity = (direction: string) => {
+  switch (direction) {
+    case 'out':
+      return 'info'
+    case 'in':
+      return 'success'
+    case 'N/A':
+      return 'secondary'
+    default:
+      return 'secondary'
+  }
+}
+
+// Check if BIC belongs to current bank
+const isOwnBic = (bic: string) => bic === ownBic
+
+// Clear all filters
+const clearFilter = () => {
+  filters.value = {
+    global: { value: null, matchMode: 'contains' },
+    type: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    direction: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    status: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    uetr: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    debtorBic: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    debtorName: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    debtorAccountId: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    debtorCurrency: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    debtorAmount: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'equals' }]
+    },
+    creditorBic: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    creditorName: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    creditorAccountId: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'contains' }]
+    },
+    creditorCurrency: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'in' }]
+    },
+    creditorAmount: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'equals' }]
+    },
+    createdAtDate: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'dateIs' }]
+    },
+    updatedAtDate: {
+      operator: 'and',
+      constraints: [{ value: null, matchMode: 'dateIs' }]
+    }
+  }
+}
 </script>
 
 <template>
-  <div>
-    <div class="mb-4 flex justify-center">
-      <PaginationNav
-        :currentPage="currentPage"
-        :beforeButtons="beforeButtons"
-        :afterButtons="afterButtons"
-      />
-    </div>
-    <div class="overflow-x-auto">
-      <table class="table table-xs">
-        <thead>
-          <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th colspan="4" class="border-l-2 border-base-content">Debtor</th>
-            <th colspan="4" class="border-x-2 border-base-content">Creditor</th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-          <tr>
-            <th>
-              Type
-              <SortBtn
-                label="Type"
-                :getProp="(item) => item.type"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              Dir
-              <SortBtn
-                label="Direction"
-                :getProp="getDirection"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              Status
-              <SortBtn
-                label="Status"
-                :getProp="(item) => item.status"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              UETR
-              <SortBtn
-                label="UETR"
-                :getProp="(item) => item.uetr"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th class="border-l-2 border-base-content">
-              BIC
-              <SortBtn
-                label="Debtor BIC"
-                :getProp="(item) => item.debtor.bic"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              Client
-              <SortBtn
-                label="Debtor Client"
-                :getProp="(item) => item.debtor.name"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              Amount
-              <SortBtn
-                label="Debtor Amount"
-                :getProp="(item) => parseFloat(item.debtor.amount)"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              Currency
-              <SortBtn
-                label="Debtor Currency"
-                :getProp="(item) => item.debtor.currency"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th class="border-l-2 border-base-content">
-              BIC
-              <SortBtn
-                label="Creditor BIC"
-                :getProp="(item) => item.creditor.bic"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              Client
-              <SortBtn
-                label="Creditor Client"
-                :getProp="(item) => item.creditor.name"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              Amount
-              <SortBtn
-                label="Creditor Amount"
-                :getProp="(item) => parseFloat(item.creditor.amount)"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th class="border-r-2 border-base-content">
-              Currency
-              <SortBtn
-                label="Creditor Currency"
-                :getProp="(item) => item.creditor.currency"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              Created
-              <SortBtn
-                label="Created"
-                :getProp="(item) => new Date(item.createdAt)"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>
-              Updated
-              <SortBtn
-                label="Updated"
-                :getProp="(item) => new Date(item.updatedAt)"
-                @sort="sortFromTable"
-              />
-            </th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody v-if="displayedTransactions">
-          <tr
-            v-for="transaction in displayedTransactions"
-            :key="transaction.uetr"
-          >
-            <td>
-              <span
-                class="badge badge-xs"
-                :class="{
-                  'badge-primary': transaction.type === 'transfer',
-                  'badge-accent': transaction.type === 'cancel'
-                }"
-              >
-                {{ transaction.type }}
-              </span>
-            </td>
-            <td>
-              <span
-                class="badge badge-xs"
-                :class="{
-                  'badge-info': getDirection(transaction) === 'out',
-                  'badge-success': getDirection(transaction) === 'in',
-                  'badge-ghost': getDirection(transaction) === 'N/A'
-                }"
-              >
-                {{ getDirection(transaction) }}
-              </span>
-            </td>
-            <td>
-              <span
-                class="badge badge-xs"
-                :class="{
-                  'badge-success': transaction.status === 'completed',
-                  'badge-warning': transaction.status === 'pending',
-                  'badge-info': transaction.status === 'cancelled',
-                  'badge-error': transaction.status === 'rejected'
-                }"
-              >
-                {{ transaction.status }}
-              </span>
-            </td>
-            <td><UUID :uuid="transaction.uetr" /></td>
-            <td
-              class="border-l-2 border-base-content"
-              :class="{
-                'text-accent': transaction.debtor.bic === config.ownBic
-              }"
-            >
-              {{ transaction.debtor.bic }}
-            </td>
-            <td>
-              <div v-if="transaction.debtor.bic !== config.ownBic">
-                {{ transaction.debtor.name }}
-              </div>
-              <div v-else>
-                <RouterLink
-                  class="link"
-                  :to="getClientPageLink(transaction.debtor)"
-                >
-                  {{ transaction.debtor.name }}</RouterLink
-                >
-              </div>
+  <div class="card">
+    <DataTable
+      size="small"
+      :value="transformedTransactions"
+      v-model:filters="filters"
+      v-model:selection="selectedTransactions"
+      :paginator="true"
+      :rows="rows"
+      :first="first"
+      :rowsPerPageOptions="[5, 10, 25, 50]"
+      filterDisplay="menu"
+      :globalFilterFields="[
+        'type',
+        'direction',
+        'status',
+        'uetr',
+        'debtorBic',
+        'debtorName',
+        'debtorAccountId',
+        'creditorBic',
+        'creditorName',
+        'creditorAccountId'
+      ]"
+      sortMode="multiple"
+      removableSort
+      :loading="false"
+      dataKey="uetr"
+      stripedRows
+      showGridlines
+    >
+      <template #header>
+        <div class="flex justify-end items-center">
+          <Button type="button" label="Clear" outlined @click="clearFilter()">
+            <template #icon>
+              <Icon icon="mdi:filter-off" />
+            </template>
+          </Button>
+        </div>
+      </template>
 
-              <UUID :uuid="transaction.debtor.clientId" />
-            </td>
-            <td>{{ transaction.debtor.amount }}</td>
-            <td>{{ transaction.debtor.currency }}</td>
-            <td
-              class="border-l-2 border-base-content"
-              :class="{
-                'text-accent': transaction.creditor.bic === config.ownBic
-              }"
-            >
-              {{ transaction.creditor.bic }}
-            </td>
-            <td>
-              <div v-if="transaction.creditor.bic !== config.ownBic">
-                {{ transaction.creditor.name }}
-              </div>
-              <div v-else>
-                <RouterLink
-                  class="link"
-                  creditor
-                  :to="getClientPageLink(transaction.creditor)"
-                >
-                  {{ transaction.creditor.name }}</RouterLink
-                >
-              </div>
-              <UUID :uuid="transaction.creditor.clientId" />
-            </td>
-            <td>{{ transaction.creditor.amount }}</td>
-            <td class="border-r-2 border-base-content">
-              {{ transaction.creditor.currency }}
-            </td>
-            <td>
-              <RelDate class="badge-success" :date="transaction.createdAt" />
-            </td>
-            <td>
-              <RelDate class="badge-info" :date="transaction.updatedAt" />
-            </td>
-            <td>
-              <TransactionActions
-                :transaction="transaction"
-                @transactionAccepted="emit('transactionAccepted', $event)"
-                @transactionRejected="emit('transactionRejected', $event)"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mt-4 flex justify-center">
-      <PaginationNav
-        :currentPage="currentPage"
-        :beforeButtons="beforeButtons"
-        :afterButtons="afterButtons"
-      />
-    </div>
+      <!-- Direction Column -->
+      <Column field="direction" header="Dir" sortable>
+        <template #body="{ data }: { data: TransformedTransaction }">
+          <Tag :value="data.direction" :severity="getDirectionSeverity(data.direction)" />
+        </template>
+        <template #filter="{ filterModel }">
+          <MultiSelect v-model="filterModel.value" :options="directionOptions" placeholder="Any" />
+        </template>
+      </Column>
+
+      <!-- Status Column -->
+      <Column field="status" header="Status" sortable>
+        <template #body="{ data }: { data: TransformedTransaction }">
+          <Tag :value="data.status" :severity="getStatusSeverity(data.status)" />
+        </template>
+        <template #filter="{ filterModel }">
+          <MultiSelect v-model="filterModel.value" :options="statusOptions" placeholder="Any" />
+        </template>
+      </Column>
+
+      <!-- UETR Column -->
+      <Column field="uetr" header="UETR" sortable>
+        <template #body="{ data }: { data: TransformedTransaction }">
+          <UUID :uuid="data.uetr" />
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Search by UETR" />
+        </template>
+      </Column>
+
+      <!-- Debtor BIC Column -->
+      <Column field="debtorBic" header="Debtor BIC" sortable>
+        <template #body="{ data }: { data: TransformedTransaction }">
+          <span
+            :style="{
+              fontWeight: isOwnBic(data.debtorBic) ? 'bold' : 'normal',
+              color: isOwnBic(data.debtorBic) ? 'var(--primary-color)' : 'inherit'
+            }"
+          >
+            {{ data.debtorBic }}
+          </span>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Search by BIC" />
+        </template>
+      </Column>
+
+      <!-- Debtor Client ID Column -->
+      <Column field="debtorAccountId" header="Debtor Account ID" sortable>
+        <template #body="{ data }: { data: TransformedTransaction }">
+          {{ data.debtorAccountId }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Search by account ID" />
+        </template>
+      </Column>
+
+      <!-- Creditor BIC Column -->
+      <Column field="creditorBic" header="Creditor BIC" sortable>
+        <template #body="{ data }: { data: TransformedTransaction }">
+          <span
+            :style="{
+              fontWeight: isOwnBic(data.creditorBic) ? 'bold' : 'normal',
+              color: isOwnBic(data.creditorBic) ? 'var(--primary-color)' : 'inherit'
+            }"
+          >
+            {{ data.creditorBic }}
+          </span>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Search by BIC" />
+        </template>
+      </Column>
+
+      <!-- Creditor Client ID Column -->
+      <Column field="creditorAccountId" header="Creditor Account ID" sortable>
+        <template #body="{ data }: { data: TransformedTransaction }">
+          {{ data.creditorAccountId }}
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="text" placeholder="Search by account ID" />
+        </template>
+      </Column>
+
+      <!-- Creditor Amount Column -->
+      <Column field="creditorAmount" header="Amount" sortable dataType="numeric">
+        <template #body="{ data }: { data: TransformedTransaction }">
+          <span>{{ data.creditorAmount.toFixed(2) }}</span>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText v-model="filterModel.value" type="number" placeholder="Amount" />
+        </template>
+      </Column>
+
+      <!-- Creditor Currency Column -->
+      <Column field="creditorCurrency" header="Currency" sortable>
+        <template #body="{ data }: { data: TransformedTransaction }">
+          <Tag :value="data.creditorCurrency" severity="secondary" />
+        </template>
+        <template #filter="{ filterModel }">
+          <MultiSelect v-model="filterModel.value" :options="currencyOptions" placeholder="Any" />
+        </template>
+      </Column>
+
+      <!-- Actions Column -->
+      <Column v-if="!clientMode" header="Actions" :exportable="false">
+        <template #body="{ data }: { data: TransformedTransaction }">
+          <TransactionActions :transaction="data" />
+        </template>
+      </Column>
+
+      <!-- Empty state -->
+      <template #empty>
+        <div>
+          <Icon icon="mdi:inbox" />
+          <p>No transactions found.</p>
+        </div>
+      </template>
+
+      <!-- Loading state -->
+      <template #loading> Loading transactions data. Please wait... </template>
+    </DataTable>
   </div>
 </template>

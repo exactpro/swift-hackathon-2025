@@ -14,11 +14,7 @@ export function calculateExchangeValue(
   const fromValue = exchangeValues[CURRENCY_KEYS[fromCurrency]]
   const toValue = exchangeValues[CURRENCY_KEYS[toCurrency]]
   if (!fromValue || !toValue) {
-    console.error(
-      'Exchange values not available for currencies:',
-      fromCurrency,
-      toCurrency
-    )
+    console.error('Exchange values not available for currencies:', fromCurrency, toCurrency)
     return amount
   }
   const exchangedEmount = (amount * fromValue) / toValue

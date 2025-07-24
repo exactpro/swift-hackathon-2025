@@ -43,4 +43,14 @@ tasks {
     getByName<JavaExec>("run") {
         jvmArgs("-Djava.net.preferIPv4Stack=true")
     }
+
+//    jar {
+//        manifest.attributes["Main-Class"] = "com.example.MyMainClass"
+//        val dependencies = configurations
+//            .runtimeClasspath
+//            .get()
+//            .map(::zipTree) // OR .map { zipTree(it) }
+//        from(dependencies)
+//        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//    }
 }

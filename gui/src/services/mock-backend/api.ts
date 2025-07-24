@@ -1,20 +1,17 @@
 import { simulate } from './simulation'
-import type { Transaction, JSONify, Currency } from './types'
+import type { Transaction, JSONify, Currency, TransactionMessageStatus } from './types'
 import { BackendUpdates, deepCopy } from './utils'
-import config from '../../../config.js'
 import { faker } from '@faker-js/faker'
 
 const emitter = new BackendUpdates()
 
-const state = simulate(config.ownBic, emitter)
+const state = simulate(emitter)
 
 export function getTransactions() {
   return deepCopy(state.transactions)
 }
 
-export function subscribeToTransactionsUpdates(
-  callback: (transactions: JSONify<Transaction>[]) => void
-) {
+export function subscribeToTransactionsUpdates(callback: (transactions: JSONify<Transaction>[]) => void) {
   function callbackWrapper(event: CustomEvent) {
     callback(deepCopy(event.detail))
   }
@@ -26,23 +23,6 @@ export function subscribeToTransactionsUpdates(
   }
 }
 
-export function getClients() {
-  const clients = deepCopy(state.clients)
-  return clients.map((client) => {
-    const accounts = deepCopy(
-      state.accounts.filter((account) => account.ownerId === client.id)
-    )
-    return {
-      ...client,
-      accounts: {
-        EUR: accounts.find((account) => account.currency === 'EUR'),
-        USD: accounts.find((account) => account.currency === 'USD'),
-        SUSDC: accounts.find((account) => account.currency === 'S-USDC')
-      }
-    }
-  })
-}
-
 export function getClientData(clientId: string) {
   const client = state.clients.find((c) => c.id === clientId)
   if (!client) {
@@ -51,17 +31,21 @@ export function getClientData(clientId: string) {
 
   return deepCopy({
     ...client,
-    accounts: state.accounts.filter((account) => account.ownerId === client.id),
-    transactions: state.transactions
-      .filter(
-        (transaction) =>
-          transaction.debtor.clientId === client.id ||
-          transaction.creditor.clientId === client.id
-      )
-      .sort((a, b) => {
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      })
+    accounts: state.accounts.filter((account) => account.ownerId === client.id)
   })
+}
+
+export function getClientTransactions(clientId: string): JSONify<Transaction>[] {
+  const accountsToSearch = state.accounts.filter((account) => account.ownerId === clientId)
+  if (accountsToSearch.length === 0) {
+    return []
+  }
+  const accountIds = accountsToSearch.map((account) => account.id)
+  return deepCopy(
+    state.transactions.filter(
+      (t) => accountIds.includes(t.debtor.accountId) || accountIds.includes(t.creditor.accountId)
+    )
+  )
 }
 
 export function getTransactionFormData() {
@@ -87,22 +71,29 @@ export function newTransaction(
     updatedAt: new Date()
   }
 
-  if (newTransaction.debtor.bic === config.ownBic) {
-    const account = state.accounts.find(
-      (a) =>
-        a.ownerId === newTransaction.debtor.clientId &&
-        a.currency === newTransaction.debtor.currency
-    )
-    if (!account) {
-      console.error('Debtor account not found:', newTransaction.debtor)
-      return null
-    }
-    if (account.balance < newTransaction.debtor.amount) {
-      console.error('Insufficient funds in debtor account:', account)
-      return null
-    }
-    account.balance -= newTransaction.debtor.amount
+  const creditorAccount = state.accounts.find((a) => a.id === newTransaction.creditor.accountId)
+  if (!creditorAccount) {
+    console.error('Creditor account not found:', newTransaction.creditor.accountId)
+    return null
   }
+  const creditor = state.clients.find((c) => c.id === creditorAccount.ownerId)
+  if (!creditor) {
+    console.error('Creditor client not found:', creditorAccount.ownerId)
+    return null
+  }
+  transaction.creditor.name = creditor.fullName
+
+  // Update debtor account balance
+  const account = state.accounts.find((a) => a.id === newTransaction.debtor.accountId)
+  if (!account) {
+    console.error('Debtor account not found:', newTransaction.debtor)
+    return null
+  }
+  if (account.balance < newTransaction.debtor.amount) {
+    console.error('Insufficient funds in debtor account:', account)
+    return null
+  }
+  account.balance -= newTransaction.debtor.amount
 
   state.transactions.unshift(newTransaction)
   emitter.updateTransactions(state.transactions)
@@ -130,9 +121,7 @@ export function exchange(props: ExchangeProps): boolean {
     return false
   }
 
-  const account = state.accounts.find(
-    (a) => a.ownerId === clientId && a.currency === fromCurrency
-  )
+  const account = state.accounts.find((a) => a.ownerId === clientId && a.currency === fromCurrency)
   if (!account || account.balance < amount) {
     console.error('Insufficient funds in account:', account)
     return false
@@ -143,18 +132,12 @@ export function exchange(props: ExchangeProps): boolean {
   const fromValue = exchangeValues[CURRENCY_KEYS[fromCurrency]]
   const toValue = exchangeValues[CURRENCY_KEYS[toCurrency]]
   if (!fromValue || !toValue) {
-    console.error(
-      'Exchange values not available for currencies:',
-      fromCurrency,
-      toCurrency
-    )
+    console.error('Exchange values not available for currencies:', fromCurrency, toCurrency)
     return false
   }
 
   const exchangedAmount = (amount * fromValue) / toValue
-  const toAccount = state.accounts.find(
-    (a) => a.ownerId === clientId && a.currency === toCurrency
-  )
+  const toAccount = state.accounts.find((a) => a.ownerId === clientId && a.currency === toCurrency)
   if (!toAccount) {
     console.error('Target account not found:', toCurrency)
     return false
@@ -171,51 +154,44 @@ export function exchange(props: ExchangeProps): boolean {
   return true
 }
 
-export function acceptTransaction(uetr: string): JSONify<Transaction> | null {
+export function getTransactionDetails(uetr: string): JSONify<{
+  transaction: Transaction
+  messages: TransactionMessageStatus[]
+}> | null {
   const transaction = state.transactions.find((t) => t.uetr === uetr)
-  if (!transaction || transaction.status !== 'pending') {
-    console.error('Transaction not found or not pending:', uetr)
+  if (!transaction) {
     return null
   }
 
-  transaction.status = 'completed'
-  transaction.updatedAt = new Date()
+  const isCompleted = transaction.status === 'completed'
 
-  if (transaction.creditor.bic === config.ownBic) {
-    const account = state.accounts.find(
-      (a) =>
-        a.ownerId === transaction.creditor.clientId &&
-        a.currency === transaction.creditor.currency
-    )
-    if (account) {
-      account.balance += transaction.creditor.amount
-    }
+  const now = new Date()
+
+  const details: TransactionMessageStatus[] = []
+  details.push({
+    type: 'SWIFT',
+    title: 'pacs.008',
+    summary: {
+      debtor: transaction.debtor.name,
+      creditor: transaction.creditor.name,
+      currency: transaction.creditor.currency,
+      amount: transaction.creditor.amount
+    },
+    timestamp: new Date(Number(now) - 1000 * 60)
+  })
+  if (isCompleted) {
+    details.push({
+      type: 'DLT',
+      title: 'DLT Confirmation',
+      summary: {
+        status: 'Confirmed'
+      },
+      timestamp: new Date(Number(now) - 1000 * 30)
+    })
   }
 
-  emitter.updateTransactions(state.transactions)
-  return deepCopy(transaction)
-}
-
-export function rejectTransaction(uetr: string): JSONify<Transaction> | null {
-  const transaction = state.transactions.find((t) => t.uetr === uetr)
-  if (!transaction || transaction.status !== 'pending') {
-    console.error('Transaction not found or not pending:', uetr)
-    return null
+  return {
+    transaction: deepCopy(transaction),
+    messages: deepCopy(details)
   }
-
-  transaction.status = 'rejected'
-  transaction.updatedAt = new Date()
-
-  if (transaction.debtor.bic === config.ownBic) {
-    const account = state.accounts.find(
-      (a) =>
-        a.ownerId === transaction.debtor.clientId &&
-        a.currency === transaction.debtor.currency
-    )
-    if (account) {
-      account.balance += transaction.debtor.amount
-    }
-  }
-  emitter.updateTransactions(state.transactions)
-  return deepCopy(transaction)
 }

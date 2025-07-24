@@ -4,18 +4,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
 import { fetchTransactionFormData } from '../../services/transactions'
 import type { Currency } from '../../services/mock-backend/types'
-import {
-  calculateExchangeValue,
-  CURRENCY_KEYS
-} from '../../utils/calculateExchangeValue'
+import { calculateExchangeValue, CURRENCY_KEYS } from '../../utils/calculateExchangeValue'
 import { exchangeCurrency } from '../../services/clients'
 import Breadcrumbs from '../../components/Breadcrumbs.vue'
+import { useBankRoute } from '../../composables/useBankRoute'
 
 const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
 
 interface ExchangeForm {
-  clientId: string
-  clientName: string
   fromCurrency: string
   fromAmount: number | null
   toCurrency: string
@@ -25,9 +21,10 @@ interface ExchangeForm {
 const route = useRoute()
 const router = useRouter()
 
+const clientId = route.meta.clientId as string
+const clientName = route.meta.clientName as string
+
 const form = reactive<ExchangeForm>({
-  clientId: '',
-  clientName: '',
   fromCurrency: '',
   fromAmount: null,
   toCurrency: '',
@@ -117,8 +114,6 @@ watch(
 
 const isFormComplete = computed(() => {
   return (
-    form.clientId &&
-    form.clientName &&
     form.fromCurrency &&
     form.fromAmount !== null &&
     form.toCurrency &&
@@ -129,12 +124,6 @@ const isFormComplete = computed(() => {
 
 onMounted(() => {
   // Auto-fill from query parameters
-  if (route.query.client_id) {
-    form.clientId = route.query.client_id as string
-  }
-  if (route.query.client_name) {
-    form.clientName = route.query.client_name as string
-  }
   if (route.query.from_currency) {
     form.fromCurrency = route.query.from_currency as string
   }
@@ -162,6 +151,14 @@ function getExchangeRate(fromCurrency: string, toCurrency: string): string {
   return rate.toFixed(4)
 }
 
+const homeLink = useBankRoute()
+const exchangeLink = useBankRoute('exchange')
+
+const breadcrumbs = computed(() => [
+  { title: 'Home', link: homeLink.value },
+  { title: 'Exchange', link: exchangeLink.value }
+])
+
 async function startExchange() {
   if (!isFormComplete.value) {
     console.warn('Form is not complete, cannot start exchange')
@@ -169,24 +166,19 @@ async function startExchange() {
   }
   isExchanging.value = true
   await exchangeCurrency(
-    form.clientId,
+    clientId,
     form.fromCurrency as Currency,
     form.toCurrency as Currency,
     form.fromAmount as number
   )
   isExchanging.value = false
-  router.push(`/clients/${form.clientId}`)
+  router.push(homeLink.value)
 }
 </script>
 
 <template>
   <div class="container mx-auto p-6 max-w-4xl">
-    <Breadcrumbs
-      :items="[
-        { title: 'Clients', link: '/clients' },
-        { title: 'Exchange', link: '/exchange' }
-      ]"
-    />
+    <Breadcrumbs :items="breadcrumbs" />
     <h1 class="text-2xl font-bold mb-8">Currency Exchange</h1>
 
     <form v-if="utils" @submit.prevent="startExchange" class="space-y-8">
@@ -200,7 +192,7 @@ async function startExchange() {
             <label class="label">
               <span class="label-text font-medium">Client ID</span>
             </label>
-            <input v-model="form.clientId" type="text" placeholder="XXX" />
+            <input :value="clientId" type="text" disabled />
           </div>
 
           <!-- Client Name -->
@@ -208,11 +200,7 @@ async function startExchange() {
             <label class="label">
               <span class="label-text font-medium">Client Name</span>
             </label>
-            <input
-              v-model="form.clientName"
-              type="text"
-              placeholder="John Doe"
-            />
+            <input :value="clientName" type="text" disabled />
           </div>
         </div>
       </section>
@@ -230,16 +218,9 @@ async function startExchange() {
                 <span class="label-text font-medium">Currency</span>
               </label>
               <div class="relative">
-                <select
-                  v-model="form.fromCurrency"
-                  class="select select-bordered w-full"
-                >
+                <select v-model="form.fromCurrency" class="select select-bordered w-full">
                   <option value="" disabled>Select currency</option>
-                  <option
-                    v-for="currency in utils.currencies"
-                    :key="currency"
-                    :value="currency"
-                  >
+                  <option v-for="currency in utils.currencies" :key="currency" :value="currency">
                     {{ currency }}
                   </option>
                 </select>
@@ -276,16 +257,9 @@ async function startExchange() {
                 <span class="label-text font-medium">Currency</span>
               </label>
               <div class="relative">
-                <select
-                  v-model="form.toCurrency"
-                  class="select select-bordered w-full"
-                >
+                <select v-model="form.toCurrency" class="select select-bordered w-full">
                   <option value="" disabled>Select currency</option>
-                  <option
-                    v-for="currency in utils.currencies"
-                    :key="currency"
-                    :value="currency"
-                  >
+                  <option v-for="currency in utils.currencies" :key="currency" :value="currency">
                     {{ currency }}
                   </option>
                 </select>
@@ -316,11 +290,7 @@ async function startExchange() {
       <div class="card bg-base-200 shadow">
         <div class="card-body text-center">
           <p
-            v-if="
-              form.fromCurrency &&
-              form.toCurrency &&
-              form.fromCurrency !== form.toCurrency
-            "
+            v-if="form.fromCurrency && form.toCurrency && form.fromCurrency !== form.toCurrency"
             class="text-sm text-gray-600"
           >
             Exchange Rate: 1 {{ form.fromCurrency }} =
