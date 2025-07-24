@@ -13,18 +13,26 @@ java {
 }
 
 dependencies {
-    implementation(platform("org.springframework:spring-framework-bom:6.2.3"))
+    implementation(platform("io.projectreactor:reactor-bom:2024.0.8"))
+    implementation(platform("org.apache.logging.log4j:log4j-bom:2.25.1"))
+    implementation(platform("org.springframework:spring-framework-bom:6.2.9"))
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
-    implementation("io.projectreactor.netty:reactor-netty:1.2.6")
-    implementation("org.apache.logging.log4j:log4j-api:2.24.3")
+    implementation("io.projectreactor.kafka:reactor-kafka")
+    implementation("io.projectreactor.netty:reactor-netty")
+    implementation("org.apache.logging.log4j:log4j-api")
+    implementation("org.apache.logging.log4j:log4j-core")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-webflux")
 
     runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2")
-    runtimeOnly("org.apache.logging.log4j:log4j-core:2.24.3")
 
     testImplementation(platform("org.junit:junit-bom:5.12.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+application {
+    mainClass.set("com.exactpro.blockchain.Application")
 }
 
 tasks {
