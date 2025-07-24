@@ -7,8 +7,6 @@ import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import InputText from 'primevue/inputtext'
 import MultiSelect from 'primevue/multiselect'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
 import { Icon } from '@iconify/vue'
 
 import type { JSONify, Transaction } from '../services/mock-backend/types.js'
@@ -296,18 +294,12 @@ const clearFilter = () => {
       showGridlines
     >
       <template #header>
-        <div class="flex justify-between items-center">
+        <div class="flex justify-end items-center">
           <Button type="button" label="Clear" outlined @click="clearFilter()">
             <template #icon>
               <Icon icon="mdi:filter-off" />
             </template>
           </Button>
-          <IconField iconPosition="left">
-            <InputIcon>
-              <Icon icon="mdi:magnify" />
-            </InputIcon>
-            <InputText v-model="filters.global.value" placeholder="Keyword Search" />
-          </IconField>
         </div>
       </template>
 
