@@ -37,31 +37,38 @@ import { RouterLink } from 'vue-router'
 
     <h2>Application Navigation</h2>
 
-    <h3>Banking Applications</h3>
+    <h3>Bank A</h3>
     <ul>
       <li>
-        <strong>Client Banking Interfaces:</strong>
+        <strong>Client Banking Interface:</strong>
         <ul>
-          <li><RouterLink to="/banka">Bank A - Client Dashboard</RouterLink></li>
-          <li><RouterLink to="/bankb">Bank B - Client Dashboard</RouterLink></li>
-          <li><RouterLink to="/banka/exchange">Bank A - Exchange</RouterLink></li>
-          <li><RouterLink to="/bankb/exchange">Bank B - Exchange</RouterLink></li>
+          <li><RouterLink to="/banka">Client Dashboard</RouterLink></li>
+          <li><RouterLink to="/banka/transfer">Transfer Form</RouterLink></li>
+          <li><RouterLink to="/banka/exchange">Exchange</RouterLink></li>
+        </ul>
+      </li>
+      <li>
+        <strong>Administrative Interface:</strong>
+        <ul>
+          <li><RouterLink to="/banka/admin">Admin Dashboard</RouterLink></li>
         </ul>
       </li>
     </ul>
 
-    <h3>Core Banking & Administration</h3>
+    <h3>Bank B</h3>
     <ul>
       <li>
-        <strong>Administrative Interfaces:</strong>
+        <strong>Client Banking Interface:</strong>
         <ul>
-          <li>
-            Admin Dashboard:
-            <ul>
-              <li><RouterLink to="/banka/admin">Bank A - Admin Dashboard</RouterLink></li>
-              <li><RouterLink to="/bankb/admin">Bank B - Admin Dashboard</RouterLink></li>
-            </ul>
-          </li>
+          <li><RouterLink to="/bankb">Client Dashboard</RouterLink></li>
+          <li><RouterLink to="/bankb/transfer">Transfer Form</RouterLink></li>
+          <li><RouterLink to="/bankb/exchange">Exchange</RouterLink></li>
+        </ul>
+      </li>
+      <li>
+        <strong>Administrative Interface:</strong>
+        <ul>
+          <li><RouterLink to="/bankb/admin">Admin Dashboard</RouterLink></li>
         </ul>
       </li>
     </ul>
