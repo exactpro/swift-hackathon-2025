@@ -2,6 +2,7 @@
 @plugin "@tailwindcss/typography";
 @plugin "daisyui" {
     themes:
-        lemonade --default,
-        forest --prefersdark;
+        emerald --default,
+        dim,
+        pastel;
 }

@@ -200,3 +200,14 @@ async function startTransaction() {
     </section>
   </form>
 </template>
+
+<style scoped>
+@reference '../style.css';
+.label {
+  margin-bottom: 0.5rem;
+}
+input,
+select {
+  @apply text-base-content;
+}
+</style>

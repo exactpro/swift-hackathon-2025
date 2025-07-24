@@ -22,7 +22,10 @@ createApp(App)
   .use(router)
   .use(PrimeVue, {
     theme: {
-      preset: Aura
+      preset: Aura,
+      options: {
+        darkModeSelector: '[data-theme="dim"]'
+      }
     }
   })
   .directive('tooltip', Tooltip)

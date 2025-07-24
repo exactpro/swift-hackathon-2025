@@ -1,6 +1,25 @@
 <script setup lang="ts">
-import { RouterView, RouterLink } from 'vue-router'
+import { RouterView, RouterLink, useRoute } from 'vue-router'
 import config from '../config'
+import { watch } from 'vue'
+
+const bankATheme = 'pastel'
+const bankBTheme = 'dim'
+
+const route = useRoute()
+
+watch(
+  () => route.meta.bankName,
+  (newBankName) => {
+    if (newBankName === config.bankA.name) {
+      document.documentElement.setAttribute('data-theme', bankATheme)
+    } else if (newBankName === config.bankB.name) {
+      document.documentElement.setAttribute('data-theme', bankBTheme)
+    } else {
+      document.documentElement.removeAttribute('data-theme')
+    }
+  }
+)
 </script>
 
 <template>
