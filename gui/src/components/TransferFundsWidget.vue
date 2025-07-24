@@ -191,7 +191,7 @@ async function startTransaction() {
           :disabled="!isFormComplete || isSending"
           :class="{ 'btn-disabled': !isFormComplete || isSending }"
         >
-          <template v-if="!isSending"> Start Transaction </template>
+          <template v-if="!isSending"> Send Transfer </template>
           <template v-else>
             <span class="loading loading-spinner loading-sm"></span>
           </template>

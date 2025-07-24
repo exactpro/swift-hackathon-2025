@@ -35,6 +35,19 @@ export function getClientData(clientId: string) {
   })
 }
 
+export function getClientTransactions(clientId: string): JSONify<Transaction>[] {
+  const accountsToSearch = state.accounts.filter((account) => account.ownerId === clientId)
+  if (accountsToSearch.length === 0) {
+    return []
+  }
+  const accountIds = accountsToSearch.map((account) => account.id)
+  return deepCopy(
+    state.transactions.filter(
+      (t) => accountIds.includes(t.debtor.accountId) || accountIds.includes(t.creditor.accountId)
+    )
+  )
+}
+
 export function getTransactionFormData() {
   const currencies: Currency[] = ['EUR', 'USD', 'S-USDC']
   return {
