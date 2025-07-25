@@ -31,7 +31,7 @@ const homeLink = useBankRoute()
 <template>
   <div>
     <Breadcrumbs :items="[{ title: 'Home', link: homeLink }]" />
-    <ClientInfoWidget :client="client" :isLoading="isLoading" :refresh="refresh" />
+    <ClientInfoWidget :client="client" :isLoading="isLoading" :refresh="refresh" show-accounts />
     <TransactionsTable :transactions="transactions" :isLoading="isLoadingTransactions" client-mode />
   </div>
 </template>
