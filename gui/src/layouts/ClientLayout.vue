@@ -26,7 +26,7 @@ const exchangeLink = useBankRoute('exchange')
         <summary class="btn btn-sm btn-neutral rounded-full">
           {{ clientName }} <Icon icon="mdi:account" class="inline-block ml-1" />
         </summary>
-        <ul class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+        <ul class="menu dropdown-content bg-base-100 text-base-content rounded-box z-1 w-52 p-2 shadow-sm">
           <li>{{ bankName }}</li>
           <li>BIC: {{ bic }}</li>
           <li>
