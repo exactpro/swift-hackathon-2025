@@ -111,7 +111,7 @@ async function startTransaction() {
           <div>
             <select v-model="chosenAccount" placeholder="Select account" class="select select-bordered w-full">
               <option v-for="account in props.debtorAccounts" :key="account.id" :value="account">
-                {{ account.currency }} Token Account
+                {{ account.currency }} Token Account — {{ formatAccountBalance(account.currency, account.balance) }}
               </option>
             </select>
           </div>
