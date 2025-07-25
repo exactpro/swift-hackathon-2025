@@ -1,4 +1,4 @@
-package com.exactpro.blockchain.api;
+package com.exactpro.blockchain.api.client;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,10 +9,10 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
-public class ApiRouter {
+public class ClientRouter {
 
     @Bean
-    public RouterFunction<ServerResponse> apiRoutes(ApiHandler apiHandler) {
-        return route(GET("/api"), apiHandler::foobar);
+    public RouterFunction<ServerResponse> clientRoutes(ClientHandler clientHandler) {
+        return route(GET("/api/client/{clientId}/account"), clientHandler::getAccountsByClientId);
     }
 }

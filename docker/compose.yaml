@@ -1,4 +1,16 @@
 services:
+  postgres:
+    image: postgres:13
+    hostname: postgres
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: swift
+      POSTGRES_USER: swift
+      POSTGRES_PASSWORD: swift
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
   kafka:
     image: apache/kafka:latest
     hostname: kafka
@@ -108,5 +120,7 @@ configs:
         }
       }
 volumes:
+  postgres-data:
+    driver: local
   besu-data:
     driver: local
