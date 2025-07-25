@@ -67,23 +67,19 @@ function transferUrlWithDetails(currency: Currency) {
         </button>
       </div>
     </div>
-    <section v-if="client">
-      <div
-        v-for="account in client.accounts"
-        :key="account.id"
-        class="bg-base-200 p-4 mb-4 rounded-lg text-sm grid gap-2 grid-cols-[2fr_1fr]"
-      >
-        <div>
-          <div class="font-bold">{{ account.currency }} Token Account</div>
+    <section class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4" v-if="client">
+      <div v-for="account in client.accounts" :key="account.id" class="card card-xs bg-base-200">
+        <div class="card-body">
+          <div class="card-title">{{ account.currency }} Token Account</div>
           <div class="text-gray-500">Account ID: {{ account.id }}</div>
           <div class="text-accent">Balance: {{ formatAccountBalance(account.currency, account.balance) }}</div>
-        </div>
-        <div class="flex justify-end items-center">
-          <slot name="transfer-button" :account="account">
-            <RouterLink class="btn btn-primary btn-sm" :to="transferUrlWithDetails(account.currency)"
-              >Transfer</RouterLink
-            >
-          </slot>
+          <div class="justify-end card-actions">
+            <slot name="transfer-button" :account="account">
+              <RouterLink class="btn btn-primary btn-sm" :to="transferUrlWithDetails(account.currency)"
+                >Transfer</RouterLink
+              >
+            </slot>
+          </div>
         </div>
       </div>
     </section>
