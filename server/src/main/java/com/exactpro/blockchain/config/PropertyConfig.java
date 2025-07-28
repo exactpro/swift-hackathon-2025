@@ -14,10 +14,10 @@ public class PropertyConfig {
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
 
-         configurer.setLocations(
+        configurer.setLocations(
              new ClassPathResource("application.properties"), // src/main/resources
              new FileSystemResource("config/config.properties")
-         );
+        );
 
         configurer.setIgnoreUnresolvablePlaceholders(true);
         return configurer;
