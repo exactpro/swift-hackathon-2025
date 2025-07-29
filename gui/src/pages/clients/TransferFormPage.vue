@@ -6,13 +6,14 @@ import ClientInfoWidget from '../../components/ClientInfoWidget.vue'
 import { useClientInfo } from '../../composables/useClientInfo'
 import { useRoute, useRouter } from 'vue-router'
 import { useBankRoute } from '../../composables/useBankRoute'
-import Breadcrumbs from '../../components/Breadcrumbs.vue'
+import { useFakeSocket } from '../../composables/useFakeSocket'
 
 const router = useRouter()
 const route = useRoute()
 const { client, isLoading, refresh } = useClientInfo()
-const transferFormRef = ref<InstanceType<typeof TransferFundsWidget> | null>(null)
 const accountToTransferFrom = ref<Account | null>(null)
+
+useFakeSocket(refresh)
 
 const homeLink = useBankRoute()
 
@@ -22,8 +23,8 @@ watch(
     const fromCurrency = route.query.from_currency as string | undefined
     if (fromCurrency && newClient) {
       const chosenAccount = newClient.accounts.find((account) => account.currency === fromCurrency)
-      if (chosenAccount) {
-        chooseTransferAccount(chosenAccount)
+      if (!accountToTransferFrom.value && chosenAccount) {
+        accountToTransferFrom.value = chosenAccount
       }
     }
     if (newClient && newClient.accounts.length > 0) {
@@ -38,34 +39,12 @@ watch(
 function onCompleted() {
   router.push(homeLink.value)
 }
-
-function chooseTransferAccount(account: Account) {
-  accountToTransferFrom.value = account
-  if (transferFormRef.value) {
-    transferFormRef.value.$el.scrollIntoView({
-      behavior: 'smooth'
-    })
-  }
-}
-
-const transferLink = useBankRoute('transfer')
 </script>
 <template>
   <div>
-    <Breadcrumbs
-      :items="[
-        { title: 'Home', link: homeLink },
-        { title: 'Transfer', link: transferLink }
-      ]"
-    />
-    <ClientInfoWidget :client="client" :isLoading="isLoading" :refresh="refresh">
-      <template #transfer-button="{ account }">
-        <button class="btn btn-primary btn-sm" @click="chooseTransferAccount(account)">Transfer</button>
-      </template>
-    </ClientInfoWidget>
+    <ClientInfoWidget :client="client" :isLoading="isLoading" />
     <TransferFundsWidget
       id="transfer-form"
-      ref="transferFormRef"
       v-if="client && accountToTransferFrom"
       v-model:account="accountToTransferFrom"
       @completed="onCompleted"

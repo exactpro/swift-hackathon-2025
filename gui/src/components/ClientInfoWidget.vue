@@ -16,7 +16,6 @@ const props = defineProps<{
 }>()
 
 const route = useRoute()
-const bankName = route.meta.bankName as string
 const bic = route.meta.bic as string
 const clientId = route.meta.clientId as string
 
@@ -74,9 +73,9 @@ function transferUrlWithDetails(currency: Currency) {
         </button>
       </div>
     </div>
-    <section>
+    <section v-if="showAccounts && client">
       <h2 class="section-title max-w-6xl mx-auto">Account Balance</h2>
-      <div class="balance-container--scroll mb-4 max-w-6xl mx-auto" v-if="showAccounts && client">
+      <div class="balance-container--scroll mb-4 max-w-6xl mx-auto">
         <div v-for="account in client.accounts" :key="account.id" class="card card-sm bg-base-200 shadow-md">
           <div class="card-body">
             <div class="card-title font-bold">{{ account.currency }}</div>
