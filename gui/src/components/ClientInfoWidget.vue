@@ -81,7 +81,7 @@ function transferUrlWithDetails(currency: Currency) {
             <div class="card-actions mt-2">
               <slot name="transfer-button" :account="account">
                 <RouterLink
-                  class="btn btn-primary btn-sm rounded-md shadow-md"
+                  class="btn btn-primary btn-sm shadow-md/40 shadow-primary"
                   :to="transferUrlWithDetails(account.currency)"
                 >
                   Transfer <Icon icon="mdi:arrow-right" class="inline-block" />
@@ -99,11 +99,11 @@ function transferUrlWithDetails(currency: Currency) {
 @reference "../style.css";
 
 .balance-container--scroll {
-  @apply flex gap-4 overflow-x-auto p-4 rounded-md shadow-lg bg-base-300;
+  @apply flex gap-4 overflow-x-auto snap-x p-4 rounded-md shadow-lg bg-base-300;
 }
 
 .balance-container--scroll > .card {
-  @apply flex-shrink-0 w-52;
+  @apply flex-shrink-0 w-52 scroll-m-4 snap-start;
 }
 
 .balance-container--grid {
