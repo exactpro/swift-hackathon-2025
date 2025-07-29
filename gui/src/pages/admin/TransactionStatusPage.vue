@@ -209,7 +209,7 @@ useFakeSocket(refresh)
                     <div
                       v-for="[key, value] in Object.entries(message.summary)"
                       :key="key"
-                      class="flex justify-between items-center p-2 bg-base-300 rounded gap-3"
+                      class="flex justify-between items-center p-2 bg-base-300 text-base-content rounded gap-3"
                     >
                       <span class="font-medium text-sm">{{ key }}:</span>
                       <span class="text-sm font-mono">{{ value }}</span>
