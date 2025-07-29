@@ -12,7 +12,7 @@ const props = defineProps<{
   client?: ClientDataResponse | null
   isLoading?: boolean
   showAccounts?: boolean
-  refresh: () => void
+  refresh?: () => void
 }>()
 
 const route = useRoute()
@@ -24,7 +24,15 @@ const displayTitle = computed(() => {
   return props.client ? props.client.fullName : clientId
 })
 
-const exchangeUrl = useBankRoute('exchange')
+const avatarPlaceholder = computed(() => {
+  if (!props.client) return 'C'
+  return props.client.fullName
+    .split(' ')
+    .map((name) => name[0])
+    .join('')
+    .toUpperCase()
+})
+
 const transferUrl = useBankRoute('transfer')
 
 function transferUrlWithDetails(currency: Currency) {
@@ -35,26 +43,24 @@ function transferUrlWithDetails(currency: Currency) {
   <div>
     <div class="grid grid-cols-1 md:grid-cols-2 my-4 items-center gap-4 max-w-6xl mx-auto">
       <div>
-        <div class="flex flex-wrap gap-2 items-center">
-          <h1 class="text-lg font-bold inline-block">
-            <Icon icon="mdi:account" class="inline-block" /> {{ displayTitle }}
-          </h1>
-          <span v-if="client" class="text-sm text-gray-500">
-            {{ client.id }}
-          </span>
-        </div>
-        <div class="flex flex-wrap gap-2 items-center">
-          <div class="text-lg font-bold inline-block"><Icon icon="mdi:bank" class="inline-block" /> {{ bankName }}</div>
-          <span v-if="client" class="text-sm text-gray-500">
-            {{ bic }}
-          </span>
+        <div class="flex gap-2 items-start">
+          <figure class="avatar avatar-placeholder">
+            <div class="bg-primary text-primary-content w-14 md:w-16 rounded-full">
+              <span class="text-xl md:text-2xl">{{ avatarPlaceholder }}</span>
+            </div>
+          </figure>
+          <div>
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold">
+              {{ displayTitle }}
+            </h1>
+            <div v-if="client" class="text-sm text-gray-500">
+              {{ bic }}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="flex flex-wrap md:justify-end items-center gap-2">
-        <RouterLink v-if="client" class="btn btn-primary btn-sm" :to="exchangeUrl">
-          Exchange <Icon icon="mdi:swap-horizontal" class="inline-block" />
-        </RouterLink>
+      <div v-if="refresh" class="flex flex-wrap md:justify-end items-center gap-2">
         <button
           @click="refresh"
           :disabled="isLoading"

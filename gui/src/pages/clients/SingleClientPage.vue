@@ -5,8 +5,7 @@ import { useClientInfo } from '../../composables/useClientInfo'
 import { useAsyncState } from '@vueuse/core'
 import { fetchClientTransactions } from '../../services/clients'
 import { useRoute } from 'vue-router'
-import Breadcrumbs from '../../components/Breadcrumbs.vue'
-import { useBankRoute } from '../../composables/useBankRoute'
+import { useFakeSocket } from '../../composables/useFakeSocket'
 
 const route = useRoute()
 const clientId = route.meta.clientId as string
@@ -26,12 +25,11 @@ async function refresh() {
   await Promise.all([refreshClientInfo(), refreshTransactions()])
 }
 
-const homeLink = useBankRoute()
+useFakeSocket(refresh)
 </script>
 <template>
   <div>
-    <Breadcrumbs :items="[{ title: 'Home', link: homeLink }]" />
-    <ClientInfoWidget :client="client" :isLoading="isLoading" :refresh="refresh" show-accounts />
+    <ClientInfoWidget :client="client" :isLoading="isLoading" show-accounts />
     <section class="mt-10">
       <h2 class="section-title max-w-6xl mx-auto">Transaction Table</h2>
       <TransactionsTable :transactions="transactions" :isLoading="isLoadingTransactions" client-mode />
