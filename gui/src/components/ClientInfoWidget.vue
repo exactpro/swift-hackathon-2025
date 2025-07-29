@@ -2,7 +2,7 @@
 import { useRoute } from 'vue-router'
 import { type ClientDataResponse } from '../services/clients'
 import { computed } from 'vue'
-import { formatAccountBalance } from '../utils/formatNumber'
+import { formatAccountBalance, formatNumber } from '../utils/formatNumber'
 import { RouterLink } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useBankRoute } from '../composables/useBankRoute'
@@ -68,24 +68,45 @@ function transferUrlWithDetails(currency: Currency) {
         </button>
       </div>
     </div>
-    <section
-      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4 max-w-6xl mx-auto"
-      v-if="showAccounts && client"
-    >
-      <div v-for="account in client.accounts" :key="account.id" class="card card-xs bg-base-200">
-        <div class="card-body">
-          <div class="card-title">{{ account.currency }} Token Account</div>
-          <div class="text-gray-500">Account ID: {{ account.id }}</div>
-          <div class="text-accent">Balance: {{ formatAccountBalance(account.currency, account.balance) }}</div>
-          <div class="justify-end card-actions">
-            <slot name="transfer-button" :account="account">
-              <RouterLink class="btn btn-primary btn-sm" :to="transferUrlWithDetails(account.currency)">
-                Transfer
-              </RouterLink>
-            </slot>
+    <section>
+      <h2 class="section-title">Account Balance</h2>
+      <div class="balance-container--scroll mb-4 max-w-6xl mx-auto" v-if="showAccounts && client">
+        <div v-for="account in client.accounts" :key="account.id" class="card card-sm bg-base-200 shadow-md">
+          <div class="card-body">
+            <div class="card-title">{{ account.currency }}</div>
+            <div>
+              <div class="card-title text-success-content">{{ formatNumber(account.balance) }}</div>
+              <div class="text-gray-500 text-xs">Account ID: {{ account.id }}</div>
+            </div>
+            <div class="card-actions mt-2">
+              <slot name="transfer-button" :account="account">
+                <RouterLink
+                  class="btn btn-primary btn-sm rounded-md shadow-md"
+                  :to="transferUrlWithDetails(account.currency)"
+                >
+                  Transfer <Icon icon="mdi:arrow-right" class="inline-block" />
+                </RouterLink>
+              </slot>
+            </div>
           </div>
         </div>
       </div>
     </section>
   </div>
 </template>
+
+<style scoped>
+@reference "../style.css";
+
+.balance-container--scroll {
+  @apply flex gap-4 overflow-x-auto p-4 rounded-md shadow-lg bg-base-300;
+}
+
+.balance-container--scroll > .card {
+  @apply flex-shrink-0 w-52;
+}
+
+.balance-container--grid {
+  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4;
+}
+</style>
