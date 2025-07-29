@@ -3,7 +3,7 @@ import { RouterView, RouterLink, useRoute } from 'vue-router'
 import config from '../config'
 import { watch } from 'vue'
 
-const bankATheme = 'pastel'
+const bankATheme = 'banka'
 const bankBTheme = 'dim'
 
 const route = useRoute()

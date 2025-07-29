@@ -1,8 +1,45 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+@plugin "daisyui/theme" {
+    name: "banka";
+    default: true; /* set as default */
+    prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+    color-scheme: light; /* color of browser-provided UI */
+
+    --color-primary: #3f969e;
+    --color-secondary: #f8f8f7;
+    --color-accent: #00cfef;
+    --color-success: #00995f33;
+    --color-error: #c5160033;
+    --radius-box: 0.25rem;
+    --size-field: 0.25rem;
+    --color-base-100: #f9f9f9;
+    --color-base-200: #ffffff;
+    --color-base-300: #e7e7e7;
+    --color-base-content: #18181b;
+    --color-primary-content: #f6f8fa;
+    --color-secondary-content: #123452;
+    --color-accent-content: #ffffff;
+    --color-neutral: #002833;
+    --color-neutral-content: #c6e1ef;
+    --color-info: #b2b2b2;
+    --color-info-content: #50545f;
+    --color-warning: #ffc107;
+    --color-success-content: #00995f;
+    --color-warning-content: #c51700;
+    --color-error-content: #5a0d1b;
+    --color-content: #17171a;
+}
+
 @plugin "daisyui" {
     themes:
         emerald --default,
         dim,
-        pastel;
+        pastel,
+        banka;
+}
+
+.section-title {
+    @apply text-2xl font-bold mb-4;
 }
