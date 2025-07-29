@@ -69,7 +69,7 @@ function transferUrlWithDetails(currency: Currency) {
       </div>
     </div>
     <section>
-      <h2 class="section-title">Account Balance</h2>
+      <h2 class="section-title max-w-6xl mx-auto">Account Balance</h2>
       <div class="balance-container--scroll mb-4 max-w-6xl mx-auto" v-if="showAccounts && client">
         <div v-for="account in client.accounts" :key="account.id" class="card card-sm bg-base-200 shadow-md">
           <div class="card-body">

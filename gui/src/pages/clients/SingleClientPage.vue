@@ -33,7 +33,7 @@ const homeLink = useBankRoute()
     <Breadcrumbs :items="[{ title: 'Home', link: homeLink }]" />
     <ClientInfoWidget :client="client" :isLoading="isLoading" :refresh="refresh" show-accounts />
     <section class="mt-10">
-      <h2 class="section-title">Transaction Table</h2>
+      <h2 class="section-title max-w-6xl mx-auto">Transaction Table</h2>
       <TransactionsTable :transactions="transactions" :isLoading="isLoadingTransactions" client-mode />
     </section>
   </div>
