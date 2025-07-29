@@ -2,7 +2,7 @@
 import { useRoute } from 'vue-router'
 import { type ClientDataResponse } from '../services/clients'
 import { computed } from 'vue'
-import { formatAccountBalance, formatNumber } from '../utils/formatNumber'
+import { formatNumber } from '../utils/formatNumber'
 import { RouterLink } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useBankRoute } from '../composables/useBankRoute'
@@ -73,9 +73,9 @@ function transferUrlWithDetails(currency: Currency) {
       <div class="balance-container--scroll mb-4 max-w-6xl mx-auto" v-if="showAccounts && client">
         <div v-for="account in client.accounts" :key="account.id" class="card card-sm bg-base-200 shadow-md">
           <div class="card-body">
-            <div class="card-title">{{ account.currency }}</div>
+            <div class="card-title font-bold">{{ account.currency }}</div>
             <div>
-              <div class="card-title text-success-content">{{ formatNumber(account.balance) }}</div>
+              <div class="card-title text-success-content font-bold">{{ formatNumber(account.balance) }}</div>
               <div class="text-gray-500 text-xs">Account ID: {{ account.id }}</div>
             </div>
             <div class="card-actions mt-2">
