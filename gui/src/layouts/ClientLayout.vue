@@ -10,7 +10,6 @@ const bankName = route.meta.bankName as string
 
 const homeLink = useBankRoute()
 const transferLink = useBankRoute('transfer')
-const exchangeLink = useBankRoute('exchange')
 </script>
 
 <template>
@@ -21,9 +20,23 @@ const exchangeLink = useBankRoute('exchange')
         {{ bankName }} Client
       </RouterLink>
     </div>
-    <div class="flex-none">
+    <div class="flex-none flex items-center">
+      <ul class="menu menu-horizontal menu-lg px-1 gap-1">
+        <li>
+          <RouterLink :to="transferLink" active-class="menu-active">
+            <Icon icon="mdi:transfer" class="inline-block" />
+            Transfer
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink :to="homeLink" exact-active-class="menu-active">
+            <Icon icon="mdi:view-dashboard" class="inline-block" />
+            Dashboard
+          </RouterLink>
+        </li>
+      </ul>
       <details class="dropdown dropdown-end">
-        <summary class="btn btn-sm btn-neutral rounded-full">
+        <summary class="btn btn-sm btn-primary">
           {{ clientName }} <Icon icon="mdi:account" class="inline-block ml-1" />
         </summary>
         <ul class="menu dropdown-content bg-base-100 text-base-content rounded-box z-1 w-52 p-2 shadow-sm">
@@ -31,20 +44,14 @@ const exchangeLink = useBankRoute('exchange')
           <li>BIC: {{ bic }}</li>
           <li>
             <RouterLink :to="homeLink" exact-active-class="menu-active">
-              <Icon icon="mdi:home" class="inline-block" />
-              Home
+              <Icon icon="mdi:view-dashboard" class="inline-block" />
+              Dashboard
             </RouterLink>
           </li>
           <li>
             <RouterLink :to="transferLink" active-class="menu-active">
               <Icon icon="mdi:transfer" class="inline-block" />
               Transfer
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink :to="exchangeLink" active-class="menu-active">
-              <Icon icon="mdi:swap-horizontal" class="inline-block" />
-              Exchange
             </RouterLink>
           </li>
         </ul>
