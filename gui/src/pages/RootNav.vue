@@ -34,8 +34,8 @@ import { RouterLink } from 'vue-router'
       and end-to-end traceability for the use case flow and further process mapping, reconciliation, streamlined
       internal audits and regulatory reporting.
     </p>
-    
-    <p>Should you have any follow-up queries or feedback, please reach out to Exactpro team at info@exactpro.com</p>
+
+    <p>Should you have any follow-up queries or feedback, please reach out to Exactpro team at info@exactpro.com.</p>
 
     <h2>Application Navigation</h2>
 
