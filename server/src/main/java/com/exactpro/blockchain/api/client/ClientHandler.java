@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class ClientHandler {
-
     private final AccountRepository accountRepository;
 
     public ClientHandler(AccountRepository accountRepository) {
@@ -16,7 +15,7 @@ public class ClientHandler {
     }
 
     public Mono<ServerResponse> getAccountsByClientId(ServerRequest request) {
-        Integer clientId = Integer.parseInt(request.pathVariable("clientId"));
+        int clientId = Integer.parseInt(request.pathVariable("clientId"));
         return ServerResponse.ok().body(accountRepository.findByClientId(clientId), com.exactpro.blockchain.entity.Account.class);
     }
 }

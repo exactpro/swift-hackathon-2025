@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.13">
+    <FIToFICstmrCdtTrf>
+        <GrpHdr>
+            <MsgId>MSG0001</MsgId>
+            <CreDtTm>2025-07-27T16:45:00Z</CreDtTm>
+            <NbOfTxs>1</NbOfTxs>
+            <CtrlSum>2500.00</CtrlSum>
+            <SttlmInf>
+                <SttlmMtd>CLRG</SttlmMtd>
+            </SttlmInf>
+        </GrpHdr>
+
+        <CdtTrfTxInf>
+            <PmtId>
+                <InstrId>INSTR12345</InstrId>
+                <EndToEndId>E2E123456789</EndToEndId>
+            </PmtId>
+
+            <IntrBkSttlmAmt Ccy="USD">2500.00</IntrBkSttlmAmt>
+            <IntrBkSttlmDt>2025-07-28</IntrBkSttlmDt>
+
+            <ChrgBr>SLEV</ChrgBr>
+
+            <Dbtr>
+                <Nm>John Doe</Nm>
+            </Dbtr>
+            <DbtrAcct>
+                <Id>
+                    <IBAN>US123456789012345678901234</IBAN>
+                </Id>
+            </DbtrAcct>
+            <DbtrAgt>
+                <FinInstnId>
+                    <BICFI>BANKUS33</BICFI>
+                </FinInstnId>
+            </DbtrAgt>
+
+            <CdtrAgt>
+                <FinInstnId>
+                    <BICFI>DEUTDEFF</BICFI>
+                </FinInstnId>
+            </CdtrAgt>
+            <Cdtr>
+                <Nm>Jane Smith</Nm>
+            </Cdtr>
+            <CdtrAcct>
+                <Id>
+                    <IBAN>DE89370400440532013000</IBAN>
+                </Id>
+            </CdtrAcct>
+
+            <Purp>
+                <Cd>GDDS</Cd>
+            </Purp>
+            <RmtInf>
+                <Ustrd>Invoice 2025-07</Ustrd>
+            </RmtInf>
+        </CdtTrfTxInf>
+    </FIToFICstmrCdtTrf>
+</Document>
