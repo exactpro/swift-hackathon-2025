@@ -1,15 +1,19 @@
 package com.exactpro.iso20022;
 
+import com.exactpro.iso20022.jaxb.LocalDateAdapter;
+
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
-@XmlType(propOrder = {"endToEndId", "currency", "amount", "debtor", "creditor", "remittanceInfo"})
+@XmlType(propOrder = {"endToEndId", "currency", "amount", "settlementDate", "debtor", "creditor", "remittanceInfo"})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TransactionInfo {
     @XmlElement(name = "EndToEndId")
@@ -20,6 +24,10 @@ public class TransactionInfo {
 
     @XmlElement(name = "IntrBkSttlmAmt")
     private @NonNull BigDecimal amount;
+
+    @XmlElement(name = "IntrBkSttlmDt")
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private @NonNull LocalDate settlementDate;
 
     @XmlElement(name = "Dbtr")
     private @NonNull Participant debtor;
