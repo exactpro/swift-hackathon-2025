@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
 import { formatAccountBalance } from '../../utils/formatNumber'
+import { useFakeSocket } from '../../composables/useFakeSocket'
 
 const route = useRoute()
 const uetr = route.params.uetr as string
@@ -39,18 +40,16 @@ async function refresh() {
   transactionDetails.value = await fetchTransactionDetails(uetr)
   isLoading.value = false
 }
+
+useFakeSocket(refresh)
 </script>
 
 <template>
   <div class="container mx-auto p-6 max-w-6xl">
     <!-- Header Section -->
     <div class="mb-8">
-      <div class="flex justify-between items-center mb-4">
+      <div class="mb-4">
         <h1 class="text-3xl font-bold">Transaction Status</h1>
-        <button class="btn btn-outline btn-sm" @click="refresh" :disabled="isLoading">
-          <Icon icon="mdi:refresh" :class="{ 'animate-spin': isLoading }" />
-          Refresh
-        </button>
       </div>
       <p class="text-base-content/70" v-if="uetr">
         Tracking transaction: <code class="badge badge-neutral font-mono">{{ uetr }}</code>
@@ -58,7 +57,7 @@ async function refresh() {
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex justify-center items-center py-12">
+    <div v-if="!transactionDetails && isLoading" class="flex justify-center items-center py-12">
       <span class="loading loading-spinner loading-lg"></span>
     </div>
 
@@ -210,7 +209,7 @@ async function refresh() {
                     <div
                       v-for="[key, value] in Object.entries(message.summary)"
                       :key="key"
-                      class="flex justify-between items-center p-2 bg-base-300 rounded gap-3"
+                      class="flex justify-between items-center p-2 bg-base-300 text-base-content rounded gap-3"
                     >
                       <span class="font-medium text-sm">{{ key }}:</span>
                       <span class="text-sm font-mono">{{ value }}</span>

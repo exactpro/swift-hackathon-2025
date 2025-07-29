@@ -99,19 +99,19 @@ async function startTransaction() {
 <template>
   <form v-if="utils" @submit.prevent="startTransaction" class="container mx-auto max-w-2xl">
     <!-- Debtor Section -->
-    <section class="card bg-neutral text-neutral-content shadow-lg">
-      <div class="card-body">
-        <h2 class="card-title text-xl mb-6">Transfer Details</h2>
+    <section>
+      <h2 class="section-title">Transfer Details</h2>
 
+      <div class="p-5 bg-base-200 rounded-lg shadow-lg mb-6">
         <!-- Currency -->
-        <div class="form-control mb-4">
+        <div class="mb-4">
           <label class="label">
             <span class="label-text font-medium">From Account</span>
           </label>
           <div>
             <select v-model="chosenAccount" placeholder="Select account" class="select select-bordered w-full">
               <option v-for="account in props.debtorAccounts" :key="account.id" :value="account">
-                {{ account.currency }} Token Account — {{ formatAccountBalance(account.currency, account.balance) }}
+                {{ account.currency }} Account — {{ formatAccountBalance(account.currency, account.balance) }}
               </option>
             </select>
           </div>
@@ -121,7 +121,7 @@ async function startTransaction() {
         <h2 class="card-title text-xl mb-6">Recipient</h2>
 
         <!-- Bank -->
-        <div class="form-control mb-4">
+        <div class="mb-4">
           <label class="label">
             <span class="label-text font-medium">Creditor BIC</span>
           </label>
@@ -131,7 +131,7 @@ async function startTransaction() {
         </div>
 
         <!-- Client ID -->
-        <div class="form-control mb-4">
+        <div class="mb-4">
           <label class="label">
             <span class="label-text font-medium">Creditor Account (IBAN)</span>
           </label>
@@ -144,7 +144,7 @@ async function startTransaction() {
         </div>
 
         <!-- Currency -->
-        <div class="form-control mb-4">
+        <div class="mb-4">
           <label class="label">
             <span class="label-text font-medium">Currency</span>
           </label>
@@ -158,7 +158,7 @@ async function startTransaction() {
         </div>
 
         <!-- Amount -->
-        <div class="form-control mb-6">
+        <div class="mb-6">
           <label class="label">
             <span class="label-text font-medium">Amount</span>
           </label>
@@ -174,7 +174,7 @@ async function startTransaction() {
           </div>
         </div>
 
-        <div class="alert alert-soft flex flex-col">
+        <div v-if="chosenAccount.currency !== form.currency" class="alert alert-soft flex flex-col mb-2">
           <div v-if="convertedAmount && chosenAccount">
             Converted Amount: {{ formatAccountBalance(chosenAccount.currency, convertedAmount) }}
           </div>
@@ -187,7 +187,7 @@ async function startTransaction() {
         <!-- Start Transaction Button -->
         <button
           type="submit"
-          class="btn btn-primary btn-lg w-full"
+          class="btn btn-primary btn-lg w-full shadow-lg/40 shadow-primary"
           :disabled="!isFormComplete || isSending"
           :class="{ 'btn-disabled': !isFormComplete || isSending }"
         >

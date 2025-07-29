@@ -57,13 +57,13 @@ tasks {
         jvmArgs("-Djava.net.preferIPv4Stack=true")
     }
 
-//    jar {
-//        manifest.attributes["Main-Class"] = "com.example.MyMainClass"
-//        val dependencies = configurations
-//            .runtimeClasspath
-//            .get()
-//            .map(::zipTree) // OR .map { zipTree(it) }
-//        from(dependencies)
-//        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//    }
+    jar {
+        manifest.attributes["Main-Class"] = "com.exactpro.blockchain.Application"
+        val dependencies = configurations
+            .runtimeClasspath
+            .get()
+            .map(::zipTree)
+        from(dependencies)
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
 }

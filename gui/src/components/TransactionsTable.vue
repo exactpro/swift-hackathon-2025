@@ -427,3 +427,19 @@ const clearFilter = () => {
     </DataTable>
   </div>
 </template>
+<style scoped>
+@reference '../style.css';
+
+:deep(.p-datatable) {
+  @apply rounded-md shadow-lg;
+}
+
+:deep(.p-datatable-header) {
+  @apply rounded-t-md;
+}
+
+:deep(.p-datatable-paginator-bottom),
+:deep(.p-datatable-paginator-bottom > .p-paginator) {
+  @apply rounded-b-md rounded-t-none;
+}
+</style>

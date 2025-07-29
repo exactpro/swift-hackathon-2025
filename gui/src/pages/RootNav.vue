@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router'
 
 <template>
   <article class="prose dark:prose-invert max-w-4xl mx-auto p-6">
-    <h1>Exactpro DLT-based Platform Sync-USDC</h1>
+    <h1>Exactpro DLT-based Platform Coincento</h1>
 
     <p>
       <a href="https://exactpro.com/" target="_blank" rel="noopener noreferrer">Exactpro</a>
@@ -14,7 +14,7 @@ import { RouterLink } from 'vue-router'
     </p>
 
     <p>
-      The current solution is a DLT-based platform <strong>Sync-USDC</strong>. While addressing the required challenge
+      The current solution is a DLT-based platform <strong>Coincento</strong>. While addressing the required challenge
       objectives – real-time accuracy, transparency, interoperability and operational efficiency – the proposed solution
       enables seamless integration with the banking infrastructure based on ISO 20022, capitalising on and requiring
       minimal modifications to the existing banking platforms.
@@ -34,6 +34,8 @@ import { RouterLink } from 'vue-router'
       and end-to-end traceability for the use case flow and further process mapping, reconciliation, streamlined
       internal audits and regulatory reporting.
     </p>
+
+    <p>Should you have any follow-up queries or feedback, please reach out to Exactpro team at info@exactpro.com.</p>
 
     <h2>Application Navigation</h2>
 
