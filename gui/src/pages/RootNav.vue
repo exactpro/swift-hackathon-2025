@@ -35,9 +35,7 @@ import { RouterLink } from 'vue-router'
       internal audits and regulatory reporting.
     </p>
     
-    <p> 
-      Should you have any follow-up queries or feedback, please reach out to Exactpro team at info@exactpro.com
-    </p>
+    <p>Should you have any follow-up queries or feedback, please reach out to Exactpro team at info@exactpro.com</p>
 
     <h2>Application Navigation</h2>
 
