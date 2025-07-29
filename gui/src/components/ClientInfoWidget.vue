@@ -99,7 +99,7 @@ function transferUrlWithDetails(currency: Currency) {
 @reference "../style.css";
 
 .balance-container--scroll {
-  @apply flex gap-4 overflow-x-auto snap-x p-4 rounded-md shadow-lg bg-base-300;
+  @apply flex gap-4 overflow-x-auto snap-x py-4 pl-4 pr-12 rounded-md shadow-lg bg-base-300;
 }
 
 .balance-container--scroll > .card {
