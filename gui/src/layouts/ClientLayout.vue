@@ -21,7 +21,7 @@ const transferLink = useBankRoute('transfer')
       </RouterLink>
     </div>
     <div class="flex-none flex items-center">
-      <ul class="menu menu-horizontal md:menu-lg px-1 gap-1">
+      <ul class="menu menu-horizontal menu-sm md:menu-md px-1 gap-1">
         <li class="hidden sm:block">
           <RouterLink :to="transferLink" active-class="menu-active">
             <Icon icon="mdi:transfer" class="inline-block" />
