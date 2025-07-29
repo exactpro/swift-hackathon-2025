@@ -15,20 +15,20 @@ const transferLink = useBankRoute('transfer')
 <template>
   <nav class="navbar bg-primary text-primary-content shadow-sm">
     <div class="flex-1">
-      <RouterLink :to="homeLink" class="btn btn-ghost text-xl">
+      <RouterLink :to="homeLink" class="btn btn-ghost sm:text-lg md:text-xl">
         <Icon icon="mdi:bank" class="inline-block mr-2" />
         {{ bankName }} Client
       </RouterLink>
     </div>
     <div class="flex-none flex items-center">
-      <ul class="menu menu-horizontal menu-lg px-1 gap-1">
-        <li>
+      <ul class="menu menu-horizontal md:menu-lg px-1 gap-1">
+        <li class="hidden sm:block">
           <RouterLink :to="transferLink" active-class="menu-active">
             <Icon icon="mdi:transfer" class="inline-block" />
             Transfer
           </RouterLink>
         </li>
-        <li>
+        <li class="hidden sm:block">
           <RouterLink :to="homeLink" exact-active-class="menu-active">
             <Icon icon="mdi:view-dashboard" class="inline-block" />
             Dashboard
