@@ -25,9 +25,9 @@ useHead({
       The main components of the platform are: Bank’s Client App for its clients, Core Banking Application (please see
       links in the main Root Navigation panel) and an EVM blockchain with customised smart contracts. This architecture
       allows clients and banking operators to follow their workflows, including management of the transactions and their
-      reporting. The creation and execution of smart contracts within the Ethereum Mainnet Network is realised
-      via <strong>Coincento’s smart contract</strong> - an ERC-1155 smart token that is flexible and customised
-      to support multiple types of base tokens.
+      reporting. The creation and execution of smart contracts within the Ethereum Mainnet Network is realised via
+      <strong>Coincento’s smart contract</strong> - an ERC-1155 smart token that is flexible and customised to support
+      multiple types of base tokens.
     </p>
 
     <p>
