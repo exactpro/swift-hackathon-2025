@@ -105,7 +105,7 @@ async function startTransaction() {
     <section>
       <h2 class="section-title">Transfer Details</h2>
 
-      <div class="p-5 bg-base-200 rounded-lg shadow-lg mb-6 flex flex-col gap-2">
+      <div class="p-5 bg-base-200 rounded-lg shadow-lg mb-6 flex flex-col gap-4">
         <!-- Currency -->
         <label class="form-control w-full">
           <div class="label">
@@ -227,6 +227,21 @@ async function startTransaction() {
     </section>
   </form>
 </template>
+
+<style>
+.validator-hint {
+  display: none;
+}
+.validator {
+  &:user-invalid,
+  &:has(:user-invalid),
+  &[aria-invalid]:not([aria-invalid='false']) {
+    & ~ .validator-hint {
+      display: block;
+    }
+  }
+}
+</style>
 
 <style scoped>
 @reference '../style.css';
