@@ -2,11 +2,14 @@
 import { RouterView, RouterLink, useRoute } from 'vue-router'
 import config from '../config'
 import { watch } from 'vue'
+import ToastMessage from './components/ToastMessage.vue'
+import { useToasts } from './composables/useToasts'
 
 const bankATheme = 'banka'
 const bankBTheme = 'dim'
 
 const route = useRoute()
+const { toasts } = useToasts()
 
 watch(
   () => route.meta.bankName,
@@ -37,6 +40,9 @@ watch(
         </span>
       </aside>
     </footer>
+  </div>
+  <div class="toast">
+    <ToastMessage v-for="toast in toasts" :key="toast.id" :toast="toast" />
   </div>
 </template>
 

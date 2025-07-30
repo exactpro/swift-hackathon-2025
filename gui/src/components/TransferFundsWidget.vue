@@ -6,8 +6,11 @@ import { formatAccountBalance } from '../utils/formatNumber'
 import { fetchTransactionFormData, newTransaction } from '../services/transactions'
 import type { Account, Currency } from '../services/mock-backend/types'
 import { calculateExchangeValue } from '../utils/calculateExchangeValue'
+import { useToasts } from '../composables/useToasts'
 
 const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
+
+const { addToast } = useToasts()
 
 const props = defineProps<{
   debtorAccounts: Account[]
@@ -67,28 +70,35 @@ const isSending = ref(false)
 
 async function startTransaction() {
   if (!isFormComplete.value || isSending.value) {
-    console.warn('Form is not complete, cannot start transaction')
+    addToast('Form is not complete, cannot start transaction', 'error')
     return
   }
   isSending.value = true
-  await newTransaction({
-    debtor: {
-      bic: ownBic,
-      accountId: chosenAccount.value.id,
-      name: debtorName,
-      currency: chosenAccount.value.currency,
-      amount: convertedAmount.value!
-    },
-    creditor: {
-      bic: form.creditorBic,
-      accountId: form.creditorAccountId,
-      name: '',
-      currency: form.currency!,
-      amount: form.amount!
-    },
-    type: 'transfer',
-    comment: form.comment || null
-  })
+  try {
+    await newTransaction({
+      debtor: {
+        bic: ownBic,
+        accountId: chosenAccount.value.id,
+        name: debtorName,
+        currency: chosenAccount.value.currency,
+        amount: convertedAmount.value!
+      },
+      creditor: {
+        bic: form.creditorBic,
+        accountId: form.creditorAccountId,
+        name: '',
+        currency: form.currency!,
+        amount: form.amount!
+      },
+      type: 'transfer',
+      comment: form.comment || null
+    })
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    addToast(`Failed to initiate transfer: ${errorMessage}`, 'error')
+    isSending.value = false
+    return
+  }
   isSending.value = false
   chosenAccount.value = props.debtorAccounts[0]
   form.creditorBic = ''
@@ -96,6 +106,7 @@ async function startTransaction() {
   form.amount = 0
   form.currency = props.debtorAccounts[0].currency
   emit('completed')
+  addToast('Transfer initiated successfully', 'success')
 }
 </script>
 
