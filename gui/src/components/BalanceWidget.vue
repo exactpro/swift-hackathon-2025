@@ -17,8 +17,12 @@ function transferUrlWithDetails(currency: Currency) {
 }
 </script>
 <template>
-  <div class="balance-container--scroll mb-4 max-w-6xl mx-auto">
-    <div v-for="account in accounts" :key="account.id" class="card card-sm bg-base-200 shadow-md">
+  <div class="balance-container--scroll">
+    <div
+      v-for="account in [...accounts, ...accounts, ...accounts]"
+      :key="account.id"
+      class="card card-sm bg-base-200 shadow-md"
+    >
       <div class="card-body">
         <div class="card-title font-bold">{{ account.currency }}</div>
         <div>
@@ -44,11 +48,11 @@ function transferUrlWithDetails(currency: Currency) {
 @reference "../style.css";
 
 .balance-container--scroll {
-  @apply flex gap-4 overflow-x-auto snap-x py-4 pl-4 pr-12 rounded-md shadow-lg bg-base-300;
+  @apply flex gap-4 overflow-x-auto snap-x py-4 pr-12;
 }
 
 .balance-container--scroll > .card {
-  @apply flex-shrink-0 w-52 scroll-m-4 snap-start;
+  @apply flex-shrink-0 w-52 scroll-m-7 md:scroll-m-10 lg:scroll-m-14 snap-start;
 }
 
 .balance-container--grid {
