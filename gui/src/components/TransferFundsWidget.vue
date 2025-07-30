@@ -105,7 +105,7 @@ async function startTransaction() {
     <section>
       <h2 class="section-title">Transfer Details</h2>
 
-      <div class="p-5 bg-base-200 rounded-lg shadow-lg mb-6">
+      <div class="p-5 bg-base-200 rounded-lg shadow-lg mb-6 flex flex-col gap-2">
         <!-- Currency -->
         <label class="form-control w-full">
           <div class="label">
@@ -121,7 +121,7 @@ async function startTransaction() {
         </label>
 
         <!-- Creditor Section -->
-        <h3 class="card-title text-xl mb-6">Recipient</h3>
+        <h3 class="card-title text-xl">Recipient</h3>
 
         <!-- Bank -->
         <label class="form-control w-full">
