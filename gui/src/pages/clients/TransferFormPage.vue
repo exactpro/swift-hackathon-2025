@@ -2,7 +2,6 @@
 import { ref, watch } from 'vue'
 import TransferFundsWidget from '../../components/TransferFundsWidget.vue'
 import type { Account } from '../../services/mock-backend/types'
-import ClientInfoWidget from '../../components/ClientInfoWidget.vue'
 import { useClientInfo } from '../../composables/useClientInfo'
 import { useRoute, useRouter } from 'vue-router'
 import { useBankRoute } from '../../composables/useBankRoute'
@@ -10,7 +9,7 @@ import { useFakeSocket } from '../../composables/useFakeSocket'
 
 const router = useRouter()
 const route = useRoute()
-const { client, isLoading, refresh } = useClientInfo()
+const { client, refresh } = useClientInfo()
 const accountToTransferFrom = ref<Account | null>(null)
 
 useFakeSocket(refresh)
@@ -42,7 +41,6 @@ function onCompleted() {
 </script>
 <template>
   <div>
-    <ClientInfoWidget :client="client" :isLoading="isLoading" />
     <TransferFundsWidget
       id="transfer-form"
       v-if="client && accountToTransferFrom"
