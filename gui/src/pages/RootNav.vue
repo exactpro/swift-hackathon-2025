@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { useHead } from '@unhead/vue'
 import { RouterLink } from 'vue-router'
+useHead({
+  title: 'About Us'
+})
 </script>
 
 <template>

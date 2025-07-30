@@ -13,8 +13,8 @@ createApp(App)
     createHead({
       init: [
         {
-          title: 'Exactpro Swift Hackathon 2025',
-          titleTemplate: '%s | Exactpro Swift 2025'
+          title: 'Complient Crypto Transfers',
+          titleTemplate: '%s | Coincento'
         }
       ]
     })

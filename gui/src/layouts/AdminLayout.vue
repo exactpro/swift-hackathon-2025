@@ -1,16 +1,26 @@
 <script setup lang="ts">
-import { RouterView, RouterLink } from 'vue-router'
+import { RouterView, RouterLink, useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useBankRoute } from '../composables/useBankRoute'
 import Logo from '../components/Logo.vue'
+import { computed } from 'vue'
+import { useHead } from '@unhead/vue'
 
 const bankRoute = useBankRoute('admin')
+const route = useRoute()
+const bankName = route.meta.bankName as string
+
+const titleTemplate = computed(() => {
+  return `%s | ${bankName} - Coincento`
+})
+
+useHead({ titleTemplate })
 </script>
 
 <template>
   <nav class="navbar bg-primary text-primary-content shadow-sm">
     <div class="flex-1">
-      <RouterLink :to="bankRoute" class="btn text-xl">
+      <RouterLink :to="bankRoute" class="btn btn-primary text-xl">
         <Logo />
       </RouterLink>
     </div>

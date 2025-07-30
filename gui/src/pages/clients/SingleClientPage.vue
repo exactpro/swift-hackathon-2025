@@ -7,6 +7,8 @@ import { fetchClientTransactions } from '../../services/clients'
 import { useRoute } from 'vue-router'
 import { useFakeSocket } from '../../composables/useFakeSocket'
 import BalanceWidget from '../../components/BalanceWidget.vue'
+import { computed } from 'vue'
+import { useHead } from '@unhead/vue'
 
 const route = useRoute()
 const clientId = route.meta.clientId as string
@@ -15,6 +17,12 @@ const { state: transactions, isLoading: isLoadingTransactions } = useAsyncState(
   () => fetchClientTransactions(clientId),
   []
 )
+
+const title = computed(() => {
+  return client.value ? `${client.value.fullName}'s Dashboard` : 'Client Dashboard'
+})
+
+useHead({ title })
 
 async function refreshTransactions() {
   isLoadingTransactions.value = true

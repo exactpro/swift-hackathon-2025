@@ -3,11 +3,18 @@ import { RouterView, RouterLink, useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useBankRoute } from '../composables/useBankRoute.js'
 import Logo from '../components/Logo.vue'
+import { computed } from 'vue'
+import { useHead } from '@unhead/vue'
 
 const route = useRoute()
 const clientName = route.meta.clientName as string
-const bic = route.meta.bic as string
 const bankName = route.meta.bankName as string
+
+const titleTemplate = computed(() => {
+  return `%s | ${bankName} - Coincento`
+})
+
+useHead({ titleTemplate })
 
 const homeLink = useBankRoute()
 const transferLink = useBankRoute('transfer')
