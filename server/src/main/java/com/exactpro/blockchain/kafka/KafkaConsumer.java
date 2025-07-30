@@ -27,7 +27,11 @@ public class KafkaConsumer {
     private String bootstrapServers;
 
     @Value("${client.bic}")
-    private String topic;
+    private String bic;
+
+    private String getTopic() {
+        return bic.toUpperCase() + "_IN";
+    }
 
     @EventListener(ContextRefreshedEvent.class)
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
@@ -35,7 +39,6 @@ public class KafkaConsumer {
         // which is a good place to start the Kafka consumer.
         logger.info("Starting Kafka consumer");
         try {
-            topic = topic.toUpperCase() + "_IN";
             createTopicIfNeeded();
             startConsumer();
         } catch (Exception e) {
@@ -48,6 +51,7 @@ public class KafkaConsumer {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
         try (AdminClient adminClient = AdminClient.create(props)) {
+            String topic = getTopic();
             if (!adminClient.listTopics().names().get().contains(topic)) {
                 logger.info("Topic '{}' does not exist, creating it.", topic);
                 adminClient.createTopics(Collections.singleton(new NewTopic(topic, 1, (short) 1))).all().get();
@@ -63,6 +67,7 @@ public class KafkaConsumer {
             ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer"
         );
 
+        String topic = getTopic();
         ReceiverOptions<String, String> receiverOptions = ReceiverOptions.<String, String>create(consumerProps)
             .subscription(Collections.singleton(topic));
 

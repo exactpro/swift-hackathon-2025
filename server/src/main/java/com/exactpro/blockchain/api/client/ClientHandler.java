@@ -1,6 +1,5 @@
 package com.exactpro.blockchain.api.client;
 
-import com.exactpro.blockchain.entity.Account;
 import com.exactpro.blockchain.entity.Client;
 import com.exactpro.blockchain.entity.TransferDetails;
 import com.exactpro.blockchain.kafka.KafkaPublisher;
@@ -51,26 +50,24 @@ public class ClientHandler {
     public Mono<ServerResponse> transfer(ServerRequest request) {
         int clientId = Integer.parseInt(request.pathVariable("clientId"));
         return Mono.zip(request.bodyToMono(TransferDetails.class),
-                accountRepository.findByClientId(clientId).singleOrEmpty(),
                 clientRepository.findByClientId(clientId).singleOrEmpty())
             .flatMap(data -> {
 
                 TransferDetails transferDetails = data.getT1();
-                Account clientAccount = data.getT2();
-                Client client = data.getT3();
+                Client client = data.getT2();
 
                 GroupHeader groupHeader = GroupHeader.builder().messageId("").timestamp(Instant.now()).build();
 
                 Participant debtor = Participant.builder()
                     .fullName(client.getFullName())
-                    .iban(clientAccount.getIban())
+                    .iban(transferDetails.getSelfIban()) // TODO Check that account belongs to the client
                     .bic(clientBic)
                     .build();
 
                 Participant creditor = Participant.builder()
-                    .fullName(transferDetails.getFullName())
-                    .iban(transferDetails.getIban())
-                    .bic(transferDetails.getBic())
+                    .fullName(transferDetails.getTargetFullName())
+                    .iban(transferDetails.getTargetIban())
+                    .bic(transferDetails.getTargetBic())
                     .build();
 
                 TransactionInfo transactionInfo = TransactionInfo.builder()
@@ -95,7 +92,7 @@ public class ClientHandler {
                     throw new RuntimeException(e);
                 }
 
-                return kafkaPublisher.publishMessage(transferDetails.getBic(), encodedTransfer)
+                return kafkaPublisher.publishMessage(transferDetails.getTargetBic(), encodedTransfer)
                     .then(ServerResponse.accepted()
                         .bodyValue("Transfer successful for client " + clientId + ". Details: " + transferDetails));
             })

@@ -35,10 +35,10 @@ public class KafkaPublisher {
         return KafkaSender.create(senderOptions);
     }
 
-    public Mono<Void> publishMessage(String topic, String message, String key) {
-        topic = topic.toUpperCase() + "_IN";
+    public Mono<Void> publishMessage(String targetBankBic, String message, String key) {
+        targetBankBic = targetBankBic.toUpperCase() + "_IN";
         SenderRecord<String, String, String> senderRecord =
-            SenderRecord.create(new ProducerRecord<>(topic, key, message), key);
+            SenderRecord.create(new ProducerRecord<>(targetBankBic, key, message), key);
 
         return sender.send(Mono.just(senderRecord))
             .doOnNext(result -> {

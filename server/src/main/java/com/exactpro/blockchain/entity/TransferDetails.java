@@ -4,20 +4,28 @@ import java.math.BigDecimal;
 
 public class TransferDetails {
     private String accountID;
-    private String fullName;
-    private String bic;
-    private String iban;
+    private String selfIban;
+    private String targetFullName;
+    private String targetBic;
+    private String targetIban;
     private String currency;
     private BigDecimal amount;
 
     public TransferDetails() {
     }
 
-    public TransferDetails(String accountID, String fullName, String bic, String iban, String currency, BigDecimal amount) {
+    public TransferDetails(String accountID,
+                           String selfIban,
+                           String targetFullName,
+                           String targetBic,
+                           String targetIban,
+                           String currency,
+                           BigDecimal amount) {
         this.accountID = accountID;
-        this.fullName = fullName;
-        this.bic = bic;
-        this.iban = iban;
+        this.selfIban = selfIban;
+        this.targetFullName = targetFullName;
+        this.targetBic = targetBic;
+        this.targetIban = targetIban;
         this.currency = currency;
         this.amount = amount;
     }
@@ -30,28 +38,36 @@ public class TransferDetails {
         this.accountID = accountID;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getSelfIban() {
+        return selfIban;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setSelfIban(String selfIban) {
+        this.selfIban = selfIban;
     }
 
-    public String getBic() {
-        return bic;
+    public String getTargetFullName() {
+        return targetFullName;
     }
 
-    public void setBic(String bic) {
-        this.bic = bic;
+    public void setTargetFullName(String targetFullName) {
+        this.targetFullName = targetFullName;
     }
 
-    public String getIban() {
-        return iban;
+    public String getTargetBic() {
+        return targetBic;
     }
 
-    public void setIban(String iban) {
-        this.iban = iban;
+    public void setTargetBic(String targetBic) {
+        this.targetBic = targetBic;
+    }
+
+    public String getTargetIban() {
+        return targetIban;
+    }
+
+    public void setTargetIban(String targetIban) {
+        this.targetIban = targetIban;
     }
 
     public String getCurrency() {
