@@ -50,7 +50,6 @@ useHead({
         <ul>
           <li><RouterLink to="/banka">Client Dashboard</RouterLink></li>
           <li><RouterLink to="/banka/transfer">Transfer Form</RouterLink></li>
-          <li><RouterLink to="/banka/exchange">Exchange</RouterLink></li>
         </ul>
       </li>
       <li>
@@ -68,7 +67,6 @@ useHead({
         <ul>
           <li><RouterLink to="/bankb">Client Dashboard</RouterLink></li>
           <li><RouterLink to="/bankb/transfer">Transfer Form</RouterLink></li>
-          <li><RouterLink to="/bankb/exchange">Exchange</RouterLink></li>
         </ul>
       </li>
       <li>

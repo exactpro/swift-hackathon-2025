@@ -31,10 +31,6 @@ const clientRoutes: RouteRecordRaw[] = [
   {
     path: 'transfer',
     component: () => import('./pages/clients/TransferFormPage.vue')
-  },
-  {
-    path: 'exchange',
-    component: () => import('./pages/clients/ExchangePage.vue')
   }
 ]
 
