@@ -43,7 +43,7 @@
                 <xsl:attribute name="Ccy"><xsl:value-of select="IntrBkSttlmCcy"/></xsl:attribute>
                 <xsl:value-of select="IntrBkSttlmAmt"/>
             </iso:IntrBkSttlmAmt>
-            <iso:IntrBkSttlmDt>2025-07-28</iso:IntrBkSttlmDt>
+            <xsl:apply-templates select="IntrBkSttlmDt"/>
             <iso:ChrgBr>SLEV</iso:ChrgBr>
             <iso:Dbtr>
                 <xsl:apply-templates select="Dbtr/Nm"/>
