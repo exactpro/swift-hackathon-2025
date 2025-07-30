@@ -108,59 +108,51 @@ async function startTransaction() {
       <div class="p-5 bg-base-200 rounded-lg shadow-lg mb-6">
         <!-- Currency -->
         <div class="mb-4">
-          <label class="label">
-            <span class="label-text font-medium">From Account</span>
-          </label>
-          <div>
-            <select v-model="chosenAccount" placeholder="Select account" class="select select-bordered w-full">
+          <label>
+            <div>From Account</div>
+            <select v-model="chosenAccount" placeholder="Select account" class="select w-full">
               <option v-for="account in props.debtorAccounts" :key="account.id" :value="account">
                 {{ account.currency }} Account — {{ formatAccountBalance(account.currency, account.balance) }}
               </option>
             </select>
-          </div>
+          </label>
         </div>
 
         <!-- Creditor Section -->
-        <h2 class="card-title text-xl mb-6">Recipient</h2>
+        <h3 class="card-title text-xl mb-6">Recipient</h3>
 
         <!-- Bank -->
         <div class="mb-4">
-          <label class="label">
-            <span class="label-text font-medium">Creditor BIC</span>
-          </label>
-          <div>
+          <label>
+            <div>Creditor BIC</div>
             <input v-model="form.creditorBic" placeholder="Enter BIC/SWIFT code" class="input w-full" />
-          </div>
+          </label>
         </div>
 
         <!-- Client ID -->
         <div class="mb-4">
-          <label class="label">
-            <span class="label-text font-medium">Creditor Account (IBAN)</span>
+          <label>
+            <div>Creditor Account (IBAN)</div>
+            <input v-model="form.creditorAccountId" type="text" placeholder="Enter IBAN" class="input w-full" />
           </label>
-          <input v-model="form.creditorAccountId" type="text" placeholder="Enter IBAN" class="input w-full" />
         </div>
 
         <!-- Currency -->
         <div class="mb-4">
-          <label class="label">
-            <span class="label-text font-medium">Currency</span>
-          </label>
-          <div class="relative">
-            <select v-model="form.currency" placeholder="Select currency" class="select select-bordered w-full">
+          <label>
+            <div>Currency</div>
+            <select v-model="form.currency" placeholder="Select currency" class="select w-full">
               <option v-for="currency in utils.currencies" :key="currency" :value="currency">
                 {{ currency }}
               </option>
             </select>
-          </div>
+          </label>
         </div>
 
         <!-- Amount -->
         <div class="mb-6">
-          <label class="label">
-            <span class="label-text font-medium">Amount</span>
-          </label>
-          <div class="relative">
+          <label>
+            <div>Amount</div>
             <input
               v-model.number="form.amount"
               type="number"
@@ -169,20 +161,18 @@ async function startTransaction() {
               step="0.01"
               min="0"
             />
-          </div>
+          </label>
         </div>
 
         <div class="mb-6">
-          <label class="label">
-            <span class="label-text font-medium">Comment (Optional)</span>
-          </label>
-          <div class="relative">
+          <label>
+            <div>Comment (Optional)</div>
             <textarea
               v-model="form.comment"
               class="textarea w-full"
               placeholder="Add payment details or reference"
             ></textarea>
-          </div>
+          </label>
         </div>
 
         <div v-if="chosenAccount.currency !== form.currency" class="alert alert-soft flex flex-col mb-2">
@@ -214,8 +204,9 @@ async function startTransaction() {
 
 <style scoped>
 @reference '../style.css';
-.label {
-  margin-bottom: 0.5rem;
+
+label > div:nth-child(1) {
+  @apply mb-2 text-secondary-content text-sm;
 }
 input,
 select {
