@@ -24,6 +24,7 @@ interface TransferForm {
   creditorAccountId: string
   amount: number | null
   currency: Currency | null
+  comment: string | null
 }
 
 const route = useRoute()
@@ -35,7 +36,8 @@ const form = reactive<TransferForm>({
   creditorBic: '',
   creditorAccountId: '',
   amount: 0,
-  currency: props.debtorAccounts[0].currency
+  currency: props.debtorAccounts[0].currency,
+  comment: ''
 })
 
 const convertedAmount = computed(() => {
@@ -84,7 +86,8 @@ async function startTransaction() {
       currency: form.currency!,
       amount: form.amount!
     },
-    type: 'transfer'
+    type: 'transfer',
+    comment: form.comment || null
   })
   isSending.value = false
   chosenAccount.value = props.debtorAccounts[0]
@@ -126,7 +129,7 @@ async function startTransaction() {
             <span class="label-text font-medium">Creditor BIC</span>
           </label>
           <div>
-            <input v-model="form.creditorBic" placeholder="Enter BIC/SWIFT code" class="input input-bordered w-full" />
+            <input v-model="form.creditorBic" placeholder="Enter BIC/SWIFT code" class="input w-full" />
           </div>
         </div>
 
@@ -135,12 +138,7 @@ async function startTransaction() {
           <label class="label">
             <span class="label-text font-medium">Creditor Account (IBAN)</span>
           </label>
-          <input
-            v-model="form.creditorAccountId"
-            type="text"
-            placeholder="Enter IBAN"
-            class="input input-bordered w-full"
-          />
+          <input v-model="form.creditorAccountId" type="text" placeholder="Enter IBAN" class="input w-full" />
         </div>
 
         <!-- Currency -->
@@ -167,10 +165,23 @@ async function startTransaction() {
               v-model.number="form.amount"
               type="number"
               placeholder="250"
-              class="input input-bordered w-full pr-12"
+              class="input w-full pr-12"
               step="0.01"
               min="0"
             />
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="label">
+            <span class="label-text font-medium">Comment (Optional)</span>
+          </label>
+          <div class="relative">
+            <textarea
+              v-model="form.comment"
+              class="textarea w-full"
+              placeholder="Add payment details or reference"
+            ></textarea>
           </div>
         </div>
 

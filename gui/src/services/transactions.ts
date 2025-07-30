@@ -33,7 +33,9 @@ export async function fetchTransactionFormData() {
 }
 
 export async function newTransaction(
-  transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'>
+  transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & {
+    comment: string | null
+  }
 ): Promise<JSONify<Transaction> | null> {
   if (config.useMock) {
     const { newTransaction } = await import('./mock-backend/api.js')
