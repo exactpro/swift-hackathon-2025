@@ -36,20 +36,6 @@ useHead({
       internal audits and regulatory reporting.
     </p>
 
-    <p>
-      Should you have any follow-up queries or feedback, please reach out to the Exactpro team at
-      <strong>info@exactpro.com</strong>.
-    </p>
-
-    <h2>About Exactpro</h2>
-
-    <p>
-      <a href="https://exactpro.com/" target="_blank" rel="noopener noreferrer">Exactpro</a>
-      has been building testing and development expertise in the DLT/ Blockchain space since 2018. Since then, we have
-      implemented multiple regulatory-grade testing and development projects with leading technology providers and
-      digital exchanges disrupting traditional finance. Visit our website at https://exactpro.com/ to learn more.
-    </p>
-
     <h2>Application Navigation</h2>
 
     <h3>Bank A</h3>
@@ -115,5 +101,19 @@ useHead({
         </ul>
       </li>
     </ul>
+
+    <h3>About Exactpro</h3>
+
+    <p>
+      <a href="https://exactpro.com/" target="_blank" rel="noopener noreferrer">Exactpro</a>
+      has been building testing and development expertise in the DLT/ Blockchain space since 2018. Since then, we have
+      implemented multiple regulatory-grade testing and development projects with leading technology providers and
+      digital exchanges disrupting traditional finance. Visit our website at https://exactpro.com/ to learn more.
+    </p>
+
+    <p>
+      Should you have any follow-up queries or feedback, please reach out to the Exactpro team at
+      <strong>info@exactpro.com</strong>.
+    </p>
   </article>
 </template>
