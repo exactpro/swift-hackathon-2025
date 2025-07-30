@@ -7,12 +7,14 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
 public class ClientRouter {
     @Bean
     public @NonNull RouterFunction<ServerResponse> clientRoutes(@NonNull ClientHandler clientHandler) {
-        return route(GET("/api/client/{clientId}/account"), clientHandler::getAccountsByClientId);
+        return route(GET("/api/client/{clientId}/account"), clientHandler::getAccountsByClientId)
+            .andRoute(POST("/api/client/{clientId}/transfer"), clientHandler::transfer);
     }
 }

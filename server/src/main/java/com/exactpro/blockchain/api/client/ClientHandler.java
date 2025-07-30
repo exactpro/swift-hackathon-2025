@@ -1,21 +1,87 @@
 package com.exactpro.blockchain.api.client;
 
+import com.exactpro.blockchain.entity.TransferDetails;
+import com.exactpro.blockchain.kafka.KafkaPublisher;
 import com.exactpro.blockchain.repository.AccountRepository;
+import com.exactpro.iso20022.CustomerCreditTransfer;
+import com.exactpro.iso20022.GroupHeader;
+import com.exactpro.iso20022.Participant;
+import com.exactpro.iso20022.TransactionInfo;
+import com.exactpro.iso20022.XmlCodec;
+import jakarta.xml.bind.JAXBException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import javax.xml.transform.TransformerException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Collections;
+
 @Component
 public class ClientHandler {
     private final AccountRepository accountRepository;
+    private final XmlCodec xmlCodec;
+    private final KafkaPublisher kafkaPublisher;
 
-    public ClientHandler(AccountRepository accountRepository) {
+    public ClientHandler(AccountRepository accountRepository, XmlCodec xmlCodec, KafkaPublisher kafkaPublisher) {
         this.accountRepository = accountRepository;
+        this.xmlCodec = xmlCodec;
+        this.kafkaPublisher = kafkaPublisher;
     }
 
     public Mono<ServerResponse> getAccountsByClientId(ServerRequest request) {
         int clientId = Integer.parseInt(request.pathVariable("clientId"));
         return ServerResponse.ok().body(accountRepository.findByClientId(clientId), com.exactpro.blockchain.entity.Account.class);
+    }
+
+    public Mono<ServerResponse> transfer(ServerRequest request) {
+        int clientId = Integer.parseInt(request.pathVariable("clientId"));
+        return request.bodyToMono(TransferDetails.class)
+            .flatMap(transferDetails -> {
+
+                GroupHeader groupHeader = GroupHeader.builder().messageId("").timestamp(Instant.now()).build();
+
+                Participant debtor = Participant.builder()
+                    .fullName("DebtorFullName")
+                    .iban("DebtorIBAN")
+                    .bic("DebtorBIC")
+                    .build();
+
+                Participant creditor = Participant.builder()
+                    .fullName("CreditorFullName")
+                    .iban("CreditorIBAN")
+                    .bic("CreditorBIC")
+                    .build();
+
+                TransactionInfo transactionInfo = TransactionInfo.builder()
+                    .endToEndId("")
+                    .currency(transferDetails.getCurrency())
+                    .amount(transferDetails.getAmount())
+                    .settlementDate(LocalDate.now())
+                    .debtor(debtor)
+                    .creditor(creditor)
+                    .remittanceInfo("")
+                    .build();
+
+                CustomerCreditTransfer customerCreditTransfer = new CustomerCreditTransfer(
+                    groupHeader,
+                    Collections.singletonList(transactionInfo)
+                );
+
+                String encodedTransfer;
+                try {
+                    encodedTransfer = xmlCodec.encode(customerCreditTransfer);
+                } catch (JAXBException | TransformerException e) {
+                    throw new RuntimeException(e);
+                }
+
+                return kafkaPublisher.publishMessage(transferDetails.getBic(), encodedTransfer)
+                    .then(ServerResponse.accepted()
+                        .bodyValue("Transfer successful for client " + clientId + ". Details: " + transferDetails));
+            })
+            .onErrorResume(RuntimeException.class, e -> ServerResponse.status(500).bodyValue("Internal Server Error"))
+            .switchIfEmpty(ServerResponse.badRequest().bodyValue("Invalid request"));
     }
 }
