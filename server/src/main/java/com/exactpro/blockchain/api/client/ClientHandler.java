@@ -51,8 +51,8 @@ public class ClientHandler {
 
                 Participant creditor = Participant.builder()
                     .fullName("CreditorFullName")
-                    .iban("CreditorIBAN")
-                    .bic("CreditorBIC")
+                    .iban(transferDetails.getIban())
+                    .bic(transferDetails.getBic())
                     .build();
 
                 TransactionInfo transactionInfo = TransactionInfo.builder()
