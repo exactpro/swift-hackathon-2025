@@ -19,6 +19,16 @@ public class CustomerCreditTransfer {
     @XmlElement(name = "CdtTrfTxInf")
     private @NonNull List<TransactionInfo> transactionInfos;
 
+    @NonNull
+    public GroupHeader getGroupHeader() {
+        return groupHeader;
+    }
+
+    @NonNull
+    public List<TransactionInfo> getTransactionInfos() {
+        return transactionInfos;
+    }
+
     public CustomerCreditTransfer() {
     }
 

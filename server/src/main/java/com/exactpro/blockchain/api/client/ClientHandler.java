@@ -1,10 +1,12 @@
 package com.exactpro.blockchain.api.client;
 
+import com.exactpro.blockchain.CustomerCreditTransferConverter;
 import com.exactpro.blockchain.entity.Client;
 import com.exactpro.blockchain.entity.TransferDetails;
 import com.exactpro.blockchain.kafka.KafkaPublisher;
 import com.exactpro.blockchain.repository.AccountRepository;
 import com.exactpro.blockchain.repository.ClientRepository;
+import com.exactpro.blockchain.repository.TransferRepository;
 import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.GroupHeader;
 import com.exactpro.iso20022.Participant;
@@ -28,17 +30,23 @@ public class ClientHandler {
     private final AccountRepository accountRepository;
     private final ClientRepository clientRepository;
     private final XmlCodec xmlCodec;
+    private final TransferRepository transferRepository;
+    private final CustomerCreditTransferConverter converter;
     private final KafkaPublisher kafkaPublisher;
 
     public ClientHandler(@Value("${client.bic}") String clientBic,
                          AccountRepository accountRepository,
                          ClientRepository clientRepository,
                          XmlCodec xmlCodec,
+                         TransferRepository transferRepository,
+                         CustomerCreditTransferConverter converter,
                          KafkaPublisher kafkaPublisher) {
         this.clientBic = clientBic;
         this.accountRepository = accountRepository;
         this.clientRepository = clientRepository;
         this.xmlCodec = xmlCodec;
+        this.transferRepository = transferRepository;
+        this.converter = converter;
         this.kafkaPublisher = kafkaPublisher;
     }
 

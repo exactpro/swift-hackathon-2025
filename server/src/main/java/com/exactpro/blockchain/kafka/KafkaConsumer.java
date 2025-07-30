@@ -1,5 +1,11 @@
 package com.exactpro.blockchain.kafka;
 
+import com.exactpro.blockchain.CustomerCreditTransferConverter;
+import com.exactpro.blockchain.entity.Transfer;
+import com.exactpro.blockchain.repository.TransferRepository;
+import com.exactpro.iso20022.CustomerCreditTransfer;
+import com.exactpro.iso20022.XmlCodec;
+import jakarta.xml.bind.JAXBException;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -10,11 +16,17 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.xml.sax.SAXException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.receiver.ReceiverRecord;
 
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -31,6 +43,18 @@ public class KafkaConsumer {
 
     private String getTopic() {
         return bic.toUpperCase() + "_IN";
+    }
+
+    private final XmlCodec xmlCodec;
+    private final CustomerCreditTransferConverter converter;
+    private final TransferRepository transferRepository;
+
+    public KafkaConsumer(XmlCodec xmlCodec,
+                         CustomerCreditTransferConverter converter,
+                         TransferRepository transferRepository) {
+        this.xmlCodec = xmlCodec;
+        this.converter = converter;
+        this.transferRepository = transferRepository;
     }
 
     @EventListener(ContextRefreshedEvent.class)
@@ -79,6 +103,26 @@ public class KafkaConsumer {
 
     private void processMessage(@NonNull ReceiverRecord<String, String> record) {
         logger.info("Received message: {}", record.value());
-        record.receiverOffset().acknowledge();
+
+        Mono.just(record.value())
+            .flatMapMany(message -> {
+                try {
+                    CustomerCreditTransfer creditTransfer = xmlCodec.decode(message);
+                    List<Transfer> transferEntities = converter.convert(creditTransfer, "Completed");
+
+                    if (transferEntities.isEmpty()) {
+                        return Flux.empty();
+                    }
+
+                    return Flux.fromIterable(transferEntities).flatMap(transferRepository::save);
+                } catch (IOException | TransformerException | SAXException | JAXBException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .then()
+            .subscribe(null,
+                error -> {},
+                () -> record.receiverOffset().acknowledge()
+            );
     }
 }

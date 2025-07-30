@@ -7,16 +7,16 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("Client")
 public class Client {
     @Id
-    private String clientId;
+    private Integer clientId;
 
     @Column("fullName")
     private String fullName;
 
-    public String getClientId() {
+    public Integer getClientId() {
         return clientId;
     }
 
-    public void setClientId(String clientId) {
+    public void setClientId(Integer clientId) {
         this.clientId = clientId;
     }
 
