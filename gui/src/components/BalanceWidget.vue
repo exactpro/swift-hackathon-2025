@@ -18,11 +18,7 @@ function transferUrlWithDetails(currency: Currency) {
 </script>
 <template>
   <div class="balance-container--scroll">
-    <div
-      v-for="account in [...accounts, ...accounts, ...accounts]"
-      :key="account.id"
-      class="card card-sm bg-base-200 shadow-md"
-    >
+    <div v-for="account in accounts" :key="account.id" class="card card-sm bg-base-200 shadow-md">
       <div class="card-body">
         <div class="card-title font-bold">{{ account.currency }}</div>
         <div>
