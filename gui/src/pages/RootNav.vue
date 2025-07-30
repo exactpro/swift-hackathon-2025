@@ -11,39 +11,43 @@ useHead({
     <h1>Coincento Solution Prototype</h1>
 
     <p>
-      <strong>Coincento</strong> is a DLT-based platform with a mission to harmonise fiat currencies and digital coins into
-      one well-functioning ecosystem, enabling regulation-compliant real-time cross-border payments and settlement.
+      <strong>Coincento</strong> is a DLT-based platform with a mission to harmonise fiat currencies and digital coins
+      into one well-functioning ecosystem, enabling regulation-compliant real-time cross-border payments and settlement.
     </p>
 
     <p>
       While addressing the objectives of real-time accuracy, transparency, interoperability and operational efficiency,
-      <strong>Coincento</strong> enables seamless integration with the ISO 20022-based banking infrastructure, capitalising on and
-      requiring minimal modifications to the existing banking platforms.
+      <strong>Coincento</strong> enables seamless integration with the ISO 20022-based banking infrastructure,
+      capitalising on and requiring minimal modifications to the existing banking platforms.
     </p>
 
     <p>
-      The main components of the platform are: Bank’s Client App for its clients, Core Banking Application
-      (please see links in the main Root Navigation panel) and an EVM blockchain with customised smart contracts.
-      This architecture allows clients and banking operators to follow their workflows, including management of
-      the transactions and their reporting. <strong>Coincento’s smart contract</strong> (customised ERC-1155 smart token) ​allows
-      the creation and execution of smart contracts within the Ethereum Mainnet Network.
+      The main components of the platform are: Bank’s Client App for its clients, Core Banking Application (please see
+      links in the main Root Navigation panel) and an EVM blockchain with customised smart contracts. This architecture
+      allows clients and banking operators to follow their workflows, including management of the transactions and their
+      reporting. <strong>Coincento’s smart contract</strong> (customised ERC-1155 smart token) ​allows the creation and
+      execution of smart contracts within the Ethereum Mainnet Network.
     </p>
 
     <p>
-      The solution is entity-, bank-, and technology-agnostic. It is integrated with a transactions dashboard for further analysis,
-      operational flow management and analytics. It enables transaction visibility across participants and end-to-end traceability
-      for the use case flow and further process mapping, reconciliation, streamlined internal audits and regulatory reporting.
+      The solution is entity-, bank-, and technology-agnostic. It is integrated with a transactions dashboard for
+      further analysis, operational flow management and analytics. It enables transaction visibility across participants
+      and end-to-end traceability for the use case flow and further process mapping, reconciliation, streamlined
+      internal audits and regulatory reporting.
     </p>
 
-    <p>Should you have any follow-up queries or feedback, please reach out to the Exactpro team at <strong>info@exactpro.com</strong>.</p>
+    <p>
+      Should you have any follow-up queries or feedback, please reach out to the Exactpro team at
+      <strong>info@exactpro.com</strong>.
+    </p>
 
     <h2>About Exactpro</h2>
 
     <p>
       <a href="https://exactpro.com/" target="_blank" rel="noopener noreferrer">Exactpro</a>
-      has been building testing and development expertise in the DLT/ Blockchain space since 2018. Since then,
-      we have implemented multiple regulatory-grade testing and development projects with leading technology
-      providers and digital exchanges disrupting traditional finance. Visit our website at https://exactpro.com/ to learn more.
+      has been building testing and development expertise in the DLT/ Blockchain space since 2018. Since then, we have
+      implemented multiple regulatory-grade testing and development projects with leading technology providers and
+      digital exchanges disrupting traditional finance. Visit our website at https://exactpro.com/ to learn more.
     </p>
 
     <h2>Application Navigation</h2>
