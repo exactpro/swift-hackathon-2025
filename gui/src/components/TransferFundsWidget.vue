@@ -107,73 +107,99 @@ async function startTransaction() {
 
       <div class="p-5 bg-base-200 rounded-lg shadow-lg mb-6">
         <!-- Currency -->
-        <div class="mb-4">
-          <label>
-            <div>From Account</div>
-            <select v-model="chosenAccount" placeholder="Select account" class="select w-full">
-              <option v-for="account in props.debtorAccounts" :key="account.id" :value="account">
-                {{ account.currency }} Account — {{ formatAccountBalance(account.currency, account.balance) }}
-              </option>
-            </select>
-          </label>
-        </div>
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">From Account</span>
+          </div>
+          <select v-model="chosenAccount" class="select w-full validator" required>
+            <option disabled value="">Select account</option>
+            <option v-for="account in props.debtorAccounts" :key="account.id" :value="account">
+              {{ account.currency }} Account — {{ formatAccountBalance(account.currency, account.balance) }}
+            </option>
+          </select>
+          <div class="validator-hint">Please select an account</div>
+        </label>
 
         <!-- Creditor Section -->
         <h3 class="card-title text-xl mb-6">Recipient</h3>
 
         <!-- Bank -->
-        <div class="mb-4">
-          <label>
-            <div>Creditor BIC</div>
-            <input v-model="form.creditorBic" placeholder="Enter BIC/SWIFT code" class="input w-full" />
-          </label>
-        </div>
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">Creditor BIC</span>
+          </div>
+          <input
+            v-model="form.creditorBic"
+            placeholder="Enter BIC/SWIFT code"
+            class="input w-full validator"
+            required
+            pattern="^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
+            title="BIC/SWIFT code must be 8 or 11 characters (e.g., DEUTDEFF)"
+          />
+          <div class="validator-hint">BIC/SWIFT code must be 8 or 11 characters</div>
+        </label>
 
         <!-- Client ID -->
-        <div class="mb-4">
-          <label>
-            <div>Creditor Account (IBAN)</div>
-            <input v-model="form.creditorAccountId" type="text" placeholder="Enter IBAN" class="input w-full" />
-          </label>
-        </div>
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">Creditor Account (IBAN)</span>
+          </div>
+          <input
+            v-model="form.creditorAccountId"
+            type="text"
+            placeholder="Enter IBAN"
+            class="input w-full validator"
+            required
+            pattern="^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$"
+            title="IBAN must start with 2 letters, followed by 2 digits, then up to 30 alphanumeric characters"
+          />
+          <div class="validator-hint">Valid IBAN required (e.g., DE89370400440532013000)</div>
+        </label>
 
         <!-- Currency -->
-        <div class="mb-4">
-          <label>
-            <div>Currency</div>
-            <select v-model="form.currency" placeholder="Select currency" class="select w-full">
-              <option v-for="currency in utils.currencies" :key="currency" :value="currency">
-                {{ currency }}
-              </option>
-            </select>
-          </label>
-        </div>
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">Currency</span>
+          </div>
+          <select v-model="form.currency" class="select w-full validator" required>
+            <option disabled value="">Select currency</option>
+            <option v-for="currency in utils.currencies" :key="currency" :value="currency">
+              {{ currency }}
+            </option>
+          </select>
+          <div class="validator-hint">Please select a currency</div>
+        </label>
 
         <!-- Amount -->
-        <div class="mb-6">
-          <label>
-            <div>Amount</div>
-            <input
-              v-model.number="form.amount"
-              type="number"
-              placeholder="250"
-              class="input w-full pr-12"
-              step="0.01"
-              min="0"
-            />
-          </label>
-        </div>
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">Amount</span>
+          </div>
+          <input
+            v-model.number="form.amount"
+            type="number"
+            placeholder="250"
+            class="input w-full pr-12 validator"
+            step="0.01"
+            min="0.01"
+            required
+            title="Amount must be greater than 0"
+          />
+          <div class="validator-hint">Amount must be greater than 0</div>
+        </label>
 
-        <div class="mb-6">
-          <label>
-            <div>Comment (Optional)</div>
-            <textarea
-              v-model="form.comment"
-              class="textarea w-full"
-              placeholder="Add payment details or reference"
-            ></textarea>
-          </label>
-        </div>
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">Comment (Optional)</span>
+          </div>
+          <textarea
+            v-model="form.comment"
+            class="textarea w-full"
+            placeholder="Add payment details or reference"
+            maxlength="255"
+          ></textarea>
+          <div class="validator-hint">Optional payment reference (max 255 characters)</div>
+        </label>
 
         <div v-if="chosenAccount.currency !== form.currency" class="alert alert-soft flex flex-col mb-2">
           <div v-if="convertedAmount && chosenAccount">
