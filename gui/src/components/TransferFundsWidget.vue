@@ -206,7 +206,7 @@ async function startTransaction() {
           <textarea
             v-model="form.comment"
             class="textarea w-full"
-            placeholder="Add payment details or reference"
+            placeholder="Additional payment details or reference"
             maxlength="255"
           ></textarea>
           <div class="validator-hint">Optional payment reference (max 255 characters)</div>
