@@ -36,7 +36,7 @@ watch(
           <span class="font-bold">Root Navigation</span>
         </RouterLink>
         <span class="text-sm" v-if="config.useMock">
-          You are using GUI with mock data. Pay attention, that data is syncronized only within the same browser tab.
+          This is a solution prototype developed exclusively for the purposes of the Swift Hackathon 2025 and the corresponding demo.
         </span>
       </aside>
     </footer>
