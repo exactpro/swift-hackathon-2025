@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import { RouterView, RouterLink, useRoute } from 'vue-router'
+import { RouterView, RouterLink } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useBankRoute } from '../composables/useBankRoute'
+import Logo from '../components/Logo.vue'
 
-const route = useRoute()
 const bankRoute = useBankRoute('admin')
-
-const bankName = route.meta.bankName as string
 </script>
 
 <template>
   <nav class="navbar bg-primary text-primary-content shadow-sm">
     <div class="flex-1">
-      <RouterLink :to="bankRoute" class="btn btn-ghost text-xl">
-        <Icon icon="mdi:bank" class="inline-block mr-2" />
-        {{ bankName }} Portal
+      <RouterLink :to="bankRoute" class="btn text-xl">
+        <Logo />
       </RouterLink>
     </div>
-    <div class="flex-none"></div>
+    <div class="flex-none">
+      <div class="badge badge-primary"><Icon icon="mdi:administrator" class="inline-block" /> Admin</div>
+    </div>
   </nav>
   <main class="p-3 lg:p-10 md:p-6">
     <RouterView />
