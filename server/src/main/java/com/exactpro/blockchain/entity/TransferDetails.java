@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class TransferDetails {
     private String accountID;
+    private String fullName;
     private String bic;
     private String iban;
     private String currency;
@@ -12,8 +13,9 @@ public class TransferDetails {
     public TransferDetails() {
     }
 
-    public TransferDetails(String accountID, String bic, String iban, String currency, BigDecimal amount) {
+    public TransferDetails(String accountID, String fullName, String bic, String iban, String currency, BigDecimal amount) {
         this.accountID = accountID;
+        this.fullName = fullName;
         this.bic = bic;
         this.iban = iban;
         this.currency = currency;
@@ -26,6 +28,14 @@ public class TransferDetails {
 
     public void setAccountID(String accountID) {
         this.accountID = accountID;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getBic() {

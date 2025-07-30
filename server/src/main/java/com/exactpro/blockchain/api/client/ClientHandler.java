@@ -1,14 +1,18 @@
 package com.exactpro.blockchain.api.client;
 
+import com.exactpro.blockchain.entity.Account;
+import com.exactpro.blockchain.entity.Client;
 import com.exactpro.blockchain.entity.TransferDetails;
 import com.exactpro.blockchain.kafka.KafkaPublisher;
 import com.exactpro.blockchain.repository.AccountRepository;
+import com.exactpro.blockchain.repository.ClientRepository;
 import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.GroupHeader;
 import com.exactpro.iso20022.Participant;
 import com.exactpro.iso20022.TransactionInfo;
 import com.exactpro.iso20022.XmlCodec;
 import jakarta.xml.bind.JAXBException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -21,12 +25,20 @@ import java.util.Collections;
 
 @Component
 public class ClientHandler {
+    private final String clientBic;
     private final AccountRepository accountRepository;
+    private final ClientRepository clientRepository;
     private final XmlCodec xmlCodec;
     private final KafkaPublisher kafkaPublisher;
 
-    public ClientHandler(AccountRepository accountRepository, XmlCodec xmlCodec, KafkaPublisher kafkaPublisher) {
+    public ClientHandler(@Value("${client.bic}") String clientBic,
+                         AccountRepository accountRepository,
+                         ClientRepository clientRepository,
+                         XmlCodec xmlCodec,
+                         KafkaPublisher kafkaPublisher) {
+        this.clientBic = clientBic;
         this.accountRepository = accountRepository;
+        this.clientRepository = clientRepository;
         this.xmlCodec = xmlCodec;
         this.kafkaPublisher = kafkaPublisher;
     }
@@ -38,19 +50,25 @@ public class ClientHandler {
 
     public Mono<ServerResponse> transfer(ServerRequest request) {
         int clientId = Integer.parseInt(request.pathVariable("clientId"));
-        return request.bodyToMono(TransferDetails.class)
-            .flatMap(transferDetails -> {
+        return Mono.zip(request.bodyToMono(TransferDetails.class),
+                accountRepository.findByClientId(clientId).singleOrEmpty(),
+                clientRepository.findByClientId(clientId).singleOrEmpty())
+            .flatMap(data -> {
+
+                TransferDetails transferDetails = data.getT1();
+                Account clientAccount = data.getT2();
+                Client client = data.getT3();
 
                 GroupHeader groupHeader = GroupHeader.builder().messageId("").timestamp(Instant.now()).build();
 
                 Participant debtor = Participant.builder()
-                    .fullName("DebtorFullName")
-                    .iban("DebtorIBAN")
-                    .bic("DebtorBIC")
+                    .fullName(client.getFullName())
+                    .iban(clientAccount.getIban())
+                    .bic(clientBic)
                     .build();
 
                 Participant creditor = Participant.builder()
-                    .fullName("CreditorFullName")
+                    .fullName(transferDetails.getFullName())
                     .iban(transferDetails.getIban())
                     .bic(transferDetails.getBic())
                     .build();

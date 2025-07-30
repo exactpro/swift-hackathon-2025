@@ -36,6 +36,7 @@ public class KafkaPublisher {
     }
 
     public Mono<Void> publishMessage(String topic, String message, String key) {
+        topic = topic.toUpperCase() + "_IN";
         SenderRecord<String, String, String> senderRecord =
             SenderRecord.create(new ProducerRecord<>(topic, key, message), key);
 

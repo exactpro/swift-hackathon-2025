@@ -26,7 +26,7 @@ public class KafkaConsumer {
     @Value("${kafka.bootstrap.servers}")
     private String bootstrapServers;
 
-    @Value("${kafka.topic}")
+    @Value("${client.bic}")
     private String topic;
 
     @EventListener(ContextRefreshedEvent.class)
@@ -35,6 +35,7 @@ public class KafkaConsumer {
         // which is a good place to start the Kafka consumer.
         logger.info("Starting Kafka consumer");
         try {
+            topic = topic.toUpperCase() + "_IN";
             createTopicIfNeeded();
             startConsumer();
         } catch (Exception e) {
