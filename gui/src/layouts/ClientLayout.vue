@@ -2,7 +2,7 @@
 import { RouterView, RouterLink, useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useBankRoute } from '../composables/useBankRoute.js'
-import Logo from '../components/Logo.vue'
+import Logo from '../components/header/CoincentoLogo.vue'
 import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
 

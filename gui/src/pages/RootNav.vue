@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue'
 import { RouterLink } from 'vue-router'
+import Header from '../components/header/Header.vue'
 useHead({
   title: 'About Us'
 })
 </script>
 
 <template>
+  <Header />
   <article class="prose dark:prose-invert max-w-4xl mx-auto p-6">
     <h1>Coincento Solution Prototype</h1>
 

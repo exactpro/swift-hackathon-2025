@@ -18,8 +18,6 @@
     --color-primary: #3f969e;
     --color-secondary: #f8f8f7;
     --color-accent: #00cfef;
-    --radius-box: 0.5rem;
-    --size-field: 0.25rem;
     --color-base-100: #f8f8f8;
     --color-base-200: #ffffff;
     --color-base-300: #8a8a8a;
@@ -29,6 +27,15 @@
     --color-accent-content: #ffffff;
     --color-neutral: #002833;
     --color-neutral-content: #c6e1ef;
+
+    --radius-selector: 1rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
 
     --color-grad-bg-1: #3f979f;
     --color-grad-bg-2: #3b5865;
@@ -67,8 +74,7 @@
 
 @plugin "daisyui" {
     themes:
-        emerald --default,
-        banka,
+        banka --default,
         bankb;
 }
 
