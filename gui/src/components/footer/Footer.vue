@@ -29,7 +29,7 @@ import ExactproDevise from './ExactproDevise.vue'
           </ul>
         </aside>
       </div>
-      <span class="text-sm mt-5" v-if="config.useMock">
+      <span class="text-sm mt-5 text-balance" v-if="config.useMock">
         This is a solution prototype developed exclusively for the purposes of the Swift Hackathon 2025 and the
         corresponding demo.
       </span>
