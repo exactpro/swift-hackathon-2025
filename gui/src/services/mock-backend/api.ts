@@ -1,3 +1,5 @@
+import type { BankName } from '../../../config'
+import config from '../../../config'
 import { simulate } from './simulation'
 import type { Transaction, JSONify, Currency, TransactionMessageStatus } from './types'
 import { BackendUpdates, deepCopy } from './utils'
@@ -48,15 +50,20 @@ export function getClientTransactions(clientId: string): JSONify<Transaction>[] 
   )
 }
 
-export function getTransactionFormData() {
-  const currencies: Currency[] = ['EUR', 'USD', 'S-USDC']
+export function getTransactionFormData(senderBank: BankName) {
+  const currencies: Currency[] = ['EUR', 'USD', 'USDC']
   return {
     currencies,
     exchangeValues: {
       EUR: 1.16,
       USD: 1,
-      SUSDC: 1.01
-    }
+      USDC: 1.01
+    },
+    bics: senderBank === 'Bank A' ? [config.bankB.bic] : [config.bankA.bic],
+    ibans:
+      senderBank === 'Bank A'
+        ? ['GB33BUKB20201555555555', 'GB33BUKB20201555555556']
+        : ['GE60NB0000000123456789', 'GE60NB0000000123456788']
   }
 }
 
@@ -107,12 +114,6 @@ export interface ExchangeProps {
   amount: number
 }
 
-const CURRENCY_KEYS: Record<Currency, 'EUR' | 'USD' | 'SUSDC'> = {
-  EUR: 'EUR',
-  USD: 'USD',
-  'S-USDC': 'SUSDC'
-}
-
 export function exchange(props: ExchangeProps): boolean {
   const { clientId, fromCurrency, toCurrency, amount } = props
   const client = state.clients.find((c) => c.id === clientId)
@@ -127,10 +128,10 @@ export function exchange(props: ExchangeProps): boolean {
     return false
   }
 
-  const exchangeValues = getTransactionFormData().exchangeValues
+  const exchangeValues = getTransactionFormData('Bank A').exchangeValues
 
-  const fromValue = exchangeValues[CURRENCY_KEYS[fromCurrency]]
-  const toValue = exchangeValues[CURRENCY_KEYS[toCurrency]]
+  const fromValue = exchangeValues[fromCurrency]
+  const toValue = exchangeValues[toCurrency]
   if (!fromValue || !toValue) {
     console.error('Exchange values not available for currencies:', fromCurrency, toCurrency)
     return false

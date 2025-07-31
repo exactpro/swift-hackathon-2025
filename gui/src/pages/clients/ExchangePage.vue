@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
 import { fetchTransactionFormData } from '../../services/transactions'
 import type { Currency } from '../../services/mock-backend/types'
-import { calculateExchangeValue, CURRENCY_KEYS } from '../../utils/calculateExchangeValue'
+import { calculateExchangeValue } from '../../utils/calculateExchangeValue'
 import { exchangeCurrency } from '../../services/clients'
 import Breadcrumbs from '../../components/Breadcrumbs.vue'
 import { useBankRoute } from '../../composables/useBankRoute'
@@ -137,13 +137,8 @@ const isExchanging = ref(false)
 function getExchangeRate(fromCurrency: string, toCurrency: string): string {
   if (!utils.value?.exchangeValues) return 'N/A'
 
-  const fromKey = CURRENCY_KEYS[fromCurrency as Currency]
-  const toKey = CURRENCY_KEYS[toCurrency as Currency]
-
-  if (!fromKey || !toKey) return 'N/A'
-
-  const fromValue = utils.value.exchangeValues[fromKey]
-  const toValue = utils.value.exchangeValues[toKey]
+  const fromValue = utils.value.exchangeValues[fromCurrency as Currency]
+  const toValue = utils.value.exchangeValues[toCurrency as Currency]
 
   if (!fromValue || !toValue) return 'N/A'
 

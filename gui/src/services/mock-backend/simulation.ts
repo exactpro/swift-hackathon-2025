@@ -11,7 +11,7 @@ import config from '../../../config.js'
 export function simulate(emitter: BackendUpdates) {
   // @ts-ignore
   window.mockState = state // For debugging purposes
-  const currencies: Currency[] = ['EUR', 'USD', 'S-USDC']
+  const currencies: Currency[] = ['EUR', 'USD', 'USDC']
   const statuses: TransactionStatus[] = ['pending', 'completed']
 
   function emitTransactionsUpdated() {
@@ -29,7 +29,7 @@ export function simulate(emitter: BackendUpdates) {
     for (let currency of currencies) {
       const account: Account = {
         ownerId: client.id,
-        id: faker.finance.accountNumber(),
+        id: faker.finance.iban(),
         balance: faker.number.int({ min: 1000, max: 100000 }),
         currency
       }
@@ -50,7 +50,7 @@ export function simulate(emitter: BackendUpdates) {
           creditor: {
             name: faker.person.fullName(),
             bic: faker.finance.bic(),
-            accountId: faker.finance.accountNumber(),
+            accountId: faker.finance.iban(),
             amount: faker.number.int({ min: 10, max: 500 }),
             currency
           },
@@ -115,7 +115,7 @@ export function simulate(emitter: BackendUpdates) {
       debtor: {
         name: faker.person.fullName(),
         bic: faker.finance.bic(),
-        accountId: faker.finance.accountNumber(),
+        accountId: faker.finance.iban(),
         amount: faker.number.int({ min: 10, max: 500 }),
         currency: faker.helpers.arrayElement(currencies)
       },

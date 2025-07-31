@@ -1,4 +1,5 @@
-import config from '../../config.js'
+import { useRoute } from 'vue-router'
+import config, { type BankName } from '../../config.js'
 import type { Transaction, JSONify, TransactionMessageStatus } from './mock-backend/types.js'
 
 export async function fetchTransactions(bic: string): Promise<JSONify<Transaction[]>> {
@@ -25,11 +26,10 @@ export async function subscribeToTransactionsUpdates(
 }
 
 export async function fetchTransactionFormData() {
-  if (config.useMock) {
-    const { getTransactionFormData } = await import('./mock-backend/api.js')
-    return getTransactionFormData()
-  }
-  return null
+  const route = useRoute()
+  const senderBank = route.meta.bankName as BankName
+  const { getTransactionFormData } = await import('./mock-backend/api.js')
+  return getTransactionFormData(senderBank)
 }
 
 export async function newTransaction(

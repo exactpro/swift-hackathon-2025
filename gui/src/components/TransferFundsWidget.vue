@@ -152,6 +152,9 @@ async function startTransaction() {
             title="BIC/SWIFT code must be 8 or 11 characters (e.g., DEUTDEFF)"
           />
           <div class="validator-hint">BIC/SWIFT code must be 8 or 11 characters</div>
+          <div class="transfer-hint alert-soft">
+            <span class="text-sm">BIC/SWIFT code is used to identify the bank of the recipient.</span>
+          </div>
         </label>
 
         <!-- Client ID -->
@@ -239,7 +242,7 @@ async function startTransaction() {
             Converted Amount: {{ formatAccountBalance(chosenAccount.currency, convertedAmount) }}
           </div>
           <div class="text-sm" v-if="exchangeRate && chosenAccount && form.currency">
-            Exchange Rate: {{ formatAccountBalance(chosenAccount.currency, 1) }} =
+            Exchange Rate: {{ formatAccountBalance(chosenAccount.currency, 1) }} ≈
             {{ formatAccountBalance(form.currency, exchangeRate) }}
           </div>
         </div>
@@ -278,6 +281,14 @@ async function startTransaction() {
 
 <style scoped>
 @reference '../style.css';
+
+.transfer-hint {
+  display: none;
+}
+label:hover .transfer-hint,
+label:has(:focus) .transfer-hint {
+  @apply alert alert-info mt-2;
+}
 
 label > div:nth-child(1) {
   @apply mb-2 text-secondary-content text-sm;
