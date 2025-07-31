@@ -2,6 +2,7 @@ package com.exactpro.blockchain.kafka;
 
 import com.exactpro.blockchain.CustomerCreditTransferConverter;
 import com.exactpro.blockchain.entity.Transfer;
+import com.exactpro.blockchain.entity.TransferStatus;
 import com.exactpro.blockchain.repository.TransferRepository;
 import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.XmlCodec;
@@ -108,7 +109,7 @@ public class KafkaConsumer {
             .flatMapMany(message -> {
                 try {
                     CustomerCreditTransfer creditTransfer = xmlCodec.decode(message);
-                    List<Transfer> transferEntities = converter.convert(creditTransfer, "Completed");
+                    List<Transfer> transferEntities = converter.convert(creditTransfer, TransferStatus.COMPLETED);
 
                     if (transferEntities.isEmpty()) {
                         return Flux.empty();

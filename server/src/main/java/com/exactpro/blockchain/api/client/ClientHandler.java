@@ -2,7 +2,9 @@ package com.exactpro.blockchain.api.client;
 
 import com.exactpro.blockchain.CustomerCreditTransferConverter;
 import com.exactpro.blockchain.entity.Client;
+import com.exactpro.blockchain.entity.Transfer;
 import com.exactpro.blockchain.entity.TransferDetails;
+import com.exactpro.blockchain.entity.TransferStatus;
 import com.exactpro.blockchain.kafka.KafkaPublisher;
 import com.exactpro.blockchain.repository.AccountRepository;
 import com.exactpro.blockchain.repository.ClientRepository;
@@ -93,16 +95,30 @@ public class ClientHandler {
                     Collections.singletonList(transactionInfo)
                 );
 
-                String encodedTransfer;
-                try {
-                    encodedTransfer = xmlCodec.encode(customerCreditTransfer);
-                } catch (JAXBException | TransformerException e) {
-                    throw new RuntimeException(e);
-                }
+                Transfer transferToSave = converter.convert(customerCreditTransfer, TransferStatus.PENDING).get(0);
 
-                return kafkaPublisher.publishMessage(transferDetails.getTargetBic(), encodedTransfer)
-                    .then(ServerResponse.accepted()
-                        .bodyValue("Transfer successful for client " + clientId + ". Details: " + transferDetails));
+                return transferRepository.save(transferToSave)
+                    .flatMap(transfer -> {
+                        String encodedTransfer;
+                        try {
+                            encodedTransfer = xmlCodec.encode(customerCreditTransfer);
+                        } catch (JAXBException | TransformerException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        return kafkaPublisher.publishMessage(transferDetails.getTargetBic(), encodedTransfer)
+                            .doOnSuccess(senderResult -> {
+                                transfer.setStatus(TransferStatus.COMPLETED);
+                                transferRepository.save(transfer).subscribe();
+                            })
+                            .onErrorResume(e -> {
+                                transfer.setStatus(TransferStatus.FAILED);
+                                transferRepository.save(transfer).subscribe();
+                                return Mono.error(new RuntimeException("Kafka send failed", e));
+                            })
+                            .then(ServerResponse.accepted()
+                                .bodyValue("Transfer successful for client " + clientId + ". Details: " + transferDetails));
+                });
             })
             .onErrorResume(RuntimeException.class, e -> ServerResponse.status(500).bodyValue("Internal Server Error"))
             .switchIfEmpty(ServerResponse.badRequest().bodyValue("Invalid request"));

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class Transfer {
     @Id
     private Integer transferId;
-    private String status;
+    private TransferStatus status;
     private String messageId;
     private Instant transferTimestamp;
     private String endToEndId;
@@ -34,11 +34,11 @@ public class Transfer {
         this.transferId = transferId;
     }
 
-    public String getStatus() {
+    public TransferStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TransferStatus status) {
         this.status = status;
     }
 
@@ -171,7 +171,7 @@ public class Transfer {
     }
 
     public static class Builder {
-        private String status;
+        private TransferStatus status;
         private String messageId;
         private Instant transferTimestamp;
         private String endToEndId;
@@ -186,7 +186,7 @@ public class Transfer {
         private String creditorBic;
         private String remittanceInfo;
 
-        public Builder status(String status) {
+        public Builder status(TransferStatus status) {
             this.status = status;
             return this;
         }
