@@ -23,7 +23,10 @@ function transferUrlWithDetails(currency: Currency) {
         <div class="card-title font-bold">{{ account.currency }}</div>
         <div>
           <div class="card-title text-success font-bold">{{ formatNumber(account.balance) }}</div>
-          <div class="text-gray-500 text-xs">{{ account.id }}</div>
+          <div class="text-gray-500 text-xs mt-0.5">
+            <div>Account ID:</div>
+            <div>{{ account.id }}</div>
+          </div>
         </div>
         <div class="card-actions mt-2">
           <slot name="transfer-button" :account="account">
@@ -48,7 +51,7 @@ function transferUrlWithDetails(currency: Currency) {
 }
 
 .balance-container--scroll > .card {
-  @apply flex-shrink-0 w-52 scroll-m-7 md:scroll-m-10 lg:scroll-m-14 snap-start;
+  @apply flex-shrink-0 min-w-64 scroll-m-7 md:scroll-m-10 lg:scroll-m-14 snap-start;
 }
 
 .balance-container--grid {
