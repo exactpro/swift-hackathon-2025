@@ -64,7 +64,7 @@ const transferLink = useBankRoute('transfer')
       </details>
     </div>
   </nav>
-  <main class="p-3 lg:p-10 md:p-6">
+  <main class="p-3 md:p-6 lg:p-10">
     <RouterView />
   </main>
 </template>

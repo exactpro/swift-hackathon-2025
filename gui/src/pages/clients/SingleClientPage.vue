@@ -41,7 +41,7 @@ useFakeSocket(refresh)
     <ClientInfoWidget :client="client" :isLoading="isLoading" />
     <section class="mt-10" v-if="client">
       <h2 class="section-title">Balance</h2>
-      <BalanceWidget :accounts="client.accounts" class="-mx-3 md:-mx-6 lg:-mx-10 pl-6 md:pl-10 lg:pl-14" />
+      <BalanceWidget :accounts="client.accounts" class="-mx-3 md:-mx-6 lg:-mx-10 pl-3 md:pl-6 lg:pl-10" />
     </section>
     <section class="mt-10">
       <h2 class="section-title">Transaction Table</h2>
