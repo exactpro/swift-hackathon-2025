@@ -2,6 +2,7 @@
 import { reactive, computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
+import { Icon } from '@iconify/vue'
 import { formatAccountBalance } from '../utils/formatNumber'
 import { fetchTransactionFormData, newTransaction } from '../services/transactions'
 import type { Account, Currency } from '../services/mock-backend/types'
@@ -144,16 +145,30 @@ async function startTransaction() {
             <span class="label-text">Creditor BIC</span>
           </div>
           <input
+            id="creditorBic"
             v-model="form.creditorBic"
             placeholder="Enter BIC/SWIFT code"
             class="input w-full validator"
             required
             pattern="^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
             title="BIC/SWIFT code must be 8 or 11 characters (e.g., DEUTDEFF)"
+            list="bicList"
           />
+          <datalist id="bicList">
+            <option v-for="bic in utils.bics" :key="bic" :value="bic">{{ bic }}</option>
+          </datalist>
           <div class="validator-hint">BIC/SWIFT code must be 8 or 11 characters</div>
           <div class="transfer-hint alert-soft">
-            <span class="text-sm">BIC/SWIFT code is used to identify the bank of the recipient.</span>
+            <Icon icon="mdi:information-variant" />
+            <div>
+              <p>
+                To perform a successful test payment transaction, please use the following mock BIC: {{ utils.bics[0] }}
+              </p>
+              <p>
+                You may also enter other BIC values for demonstration purposes, but transfers will fail or stay in
+                pending status by design to showcase error handling.
+              </p>
+            </div>
           </div>
         </label>
 
@@ -163,6 +178,8 @@ async function startTransaction() {
             <span class="label-text">Creditor Account (IBAN)</span>
           </div>
           <input
+            id="creditorIban"
+            list="ibanList"
             v-model="form.creditorAccountId"
             type="text"
             placeholder="Enter IBAN"
@@ -171,7 +188,23 @@ async function startTransaction() {
             pattern="^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$"
             title="IBAN must start with 2 letters, followed by 2 digits, then up to 30 alphanumeric characters"
           />
+          <datalist id="ibanList">
+            <option v-for="iban in utils.ibans" :key="iban" :value="iban">{{ iban }}</option>
+          </datalist>
           <div class="validator-hint">Valid IBAN required (e.g., DE89370400440532013000)</div>
+          <div class="transfer-hint alert-soft">
+            <Icon icon="mdi:information-variant" />
+            <div>
+              <p>To perform a successful test payment transaction, please use one of the following mock IBANs:</p>
+              <ul class="list-disc pl-5">
+                <li v-for="iban in utils.ibans" :key="iban">{{ iban }}</li>
+              </ul>
+              <p>
+                You may also enter other IBAN values for demonstration purposes, but transfers will fail or stay in
+                pending status by design to showcase error handling.
+              </p>
+            </div>
+          </div>
         </label>
 
         <!-- Creditor Name -->
