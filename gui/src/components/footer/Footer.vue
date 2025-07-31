@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { RouterLink } from 'vue-router'
 import config from '../../../config'
+import FooterLinks from './FooterLinks.vue'
 import FooterBgLogo from './FooterBgLogo.vue'
 import ExactproLogo from './ExactproLogo.vue'
 import ExactproDevise from './ExactproDevise.vue'
@@ -13,26 +13,21 @@ import ExactproDevise from './ExactproDevise.vue'
     <figure class="absolute flex justify-end inset-0 z-0 overflow-hidden">
       <FooterBgLogo class="footer__bg-logo" />
     </figure>
-    <div class="z-10">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
-        <aside class="flex flex-wrap gap-x-8 gap-y-4 items-center justify-center">
+    <div class="z-10 flex justify-between items-start gap-10">
+      <div class="flex flex-col gap-4 text-center sm:text-left">
+        <aside class="flex flex-wrap gap-x-8 gap-y-4 items-center justify-center sm:justify-start">
           <a href="https://exactpro.com" target="_blank" rel="noopener noreferrer">
             <ExactproLogo class="w-44" />
           </a>
           <ExactproDevise class="w-36" />
         </aside>
-        <aside class="text-left">
-          <ul class="list-disc">
-            <li>
-              <RouterLink to="/" class="link text-white"> About this solution </RouterLink>
-            </li>
-          </ul>
-        </aside>
+        <FooterLinks class="sm:hidden" />
+        <span class="text-sm text-balance" v-if="config.useMock">
+          This is a solution prototype developed exclusively for the purposes of the Swift Hackathon 2025 and the
+          corresponding demo.
+        </span>
       </div>
-      <span class="text-sm mt-5 text-balance" v-if="config.useMock">
-        This is a solution prototype developed exclusively for the purposes of the Swift Hackathon 2025 and the
-        corresponding demo.
-      </span>
+      <FooterLinks class="hidden sm:flex py-6" />
     </div>
   </footer>
 </template>
