@@ -25,6 +25,7 @@ const chosenAccount = defineModel<Account>('account', { required: true })
 interface TransferForm {
   creditorBic: string
   creditorAccountId: string
+  creditorName: string
   amount: number | null
   currency: Currency | null
   comment: string | null
@@ -38,6 +39,7 @@ const debtorName = route.meta.clientName as string
 const form = reactive<TransferForm>({
   creditorBic: '',
   creditorAccountId: '',
+  creditorName: '',
   amount: 0,
   currency: props.debtorAccounts[0].currency,
   comment: ''
@@ -62,7 +64,8 @@ const isFormComplete = computed(() => {
     form.currency !== null &&
     chosenAccount.value !== null &&
     form.creditorBic.trim() !== '' &&
-    form.creditorAccountId.trim() !== ''
+    form.creditorAccountId.trim() !== '' &&
+    form.creditorName.trim() !== ''
   )
 })
 
@@ -86,7 +89,7 @@ async function startTransaction() {
       creditor: {
         bic: form.creditorBic,
         accountId: form.creditorAccountId,
-        name: '',
+        name: form.creditorName,
         currency: form.currency!,
         amount: form.amount!
       },
@@ -103,6 +106,7 @@ async function startTransaction() {
   chosenAccount.value = props.debtorAccounts[0]
   form.creditorBic = ''
   form.creditorAccountId = ''
+  form.creditorName = ''
   form.amount = 0
   form.currency = props.debtorAccounts[0].currency
   emit('completed')
@@ -165,6 +169,24 @@ async function startTransaction() {
             title="IBAN must start with 2 letters, followed by 2 digits, then up to 30 alphanumeric characters"
           />
           <div class="validator-hint">Valid IBAN required (e.g., DE89370400440532013000)</div>
+        </label>
+
+        <!-- Creditor Name -->
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">Creditor Name</span>
+          </div>
+          <input
+            v-model="form.creditorName"
+            type="text"
+            placeholder="Enter recipient name"
+            class="input w-full validator"
+            required
+            minlength="2"
+            maxlength="100"
+            title="Creditor name is required"
+          />
+          <div class="validator-hint">Recipient name is required (2-100 characters)</div>
         </label>
 
         <!-- Currency -->
