@@ -22,17 +22,16 @@ import java.time.Duration;
 @Configuration
 @ComponentScan
 @EnableWebFlux
-@PropertySource("classpath:application.properties")
 public class Application {
     private final static Logger logger = LogManager.getLogger(Application.class);
 
-    @Value("#{systemProperties['qp.port'] ?: 8081}")
+    @Value("#{port:8081}")
     private int port;
 
-    @Value("#{systemProperties['qp.host'] ?: '0.0.0.0'}")
+    @Value("#{host:0.0.0.0}")
     private String host;
 
-    @Value("#{systemProperties['qp.compress'] ?: false}")
+    @Value("#{compress:false}")
     private boolean compress;
 
     public static void main(@NonNull String[] args) {

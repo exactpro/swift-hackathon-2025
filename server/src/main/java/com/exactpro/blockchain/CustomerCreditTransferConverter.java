@@ -1,6 +1,7 @@
 package com.exactpro.blockchain;
 
 import com.exactpro.blockchain.entity.Transfer;
+import com.exactpro.blockchain.entity.TransferStatus;
 import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.Participant;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class CustomerCreditTransferConverter {
-    public List<Transfer> convert(CustomerCreditTransfer customerCreditTransfer, String status) {
+    public List<Transfer> convert(CustomerCreditTransfer customerCreditTransfer, TransferStatus status) {
         if (customerCreditTransfer == null || customerCreditTransfer.getTransactionInfos().isEmpty()) {
             return Collections.emptyList();
         }
