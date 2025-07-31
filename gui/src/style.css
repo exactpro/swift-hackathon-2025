@@ -74,11 +74,11 @@
     --color-neutral: #002833;
     --color-neutral-content: #c6e1ef;
 
-    --color-grad-bg-1: #9f3f97;
-    --color-grad-bg-2: #653b58;
-    --color-grad-bg-logo-1: #bb6db0;
-    --color-grad-bg-logo-2: #863c7b;
-    --color-grad-bg-logo-3: #c278bb;
+    --color-grad-bg-1: #7c33af;
+    --color-grad-bg-2: #430064;
+    --color-grad-bg-logo-1: #9b4ad1;
+    --color-grad-bg-logo-2: #662c90;
+    --color-grad-bg-logo-3: #9f55d9;
 }
 
 @plugin "daisyui" {
