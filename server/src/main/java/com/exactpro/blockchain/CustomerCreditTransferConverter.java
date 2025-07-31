@@ -1,19 +1,56 @@
 package com.exactpro.blockchain;
 
+import com.exactpro.blockchain.entity.Client;
 import com.exactpro.blockchain.entity.Transfer;
+import com.exactpro.blockchain.entity.TransferDetails;
 import com.exactpro.blockchain.entity.TransferStatus;
 import com.exactpro.iso20022.CustomerCreditTransfer;
+import com.exactpro.iso20022.GroupHeader;
 import com.exactpro.iso20022.Participant;
+import com.exactpro.iso20022.TransactionInfo;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class CustomerCreditTransferConverter {
-    public List<Transfer> convert(CustomerCreditTransfer customerCreditTransfer, TransferStatus status) {
+
+    public CustomerCreditTransfer convertFromClientAndTransferDetails(Client client, String clientBic, TransferDetails transferDetails) {
+        GroupHeader groupHeader = GroupHeader.builder().messageId("").timestamp(Instant.now()).build();
+
+        Participant debtor = Participant.builder()
+            .fullName(client.getFullName())
+            .iban(transferDetails.getSelfIban()) // TODO Check that account belongs to the client
+            .bic(clientBic)
+            .build();
+
+        Participant creditor = Participant.builder()
+            .fullName(transferDetails.getTargetFullName())
+            .iban(transferDetails.getTargetIban())
+            .bic(transferDetails.getTargetBic())
+            .build();
+
+        TransactionInfo transactionInfo = TransactionInfo.builder()
+            .endToEndId("")
+            .currency(transferDetails.getCurrency())
+            .amount(transferDetails.getAmount())
+            .settlementDate(LocalDate.now())
+            .debtor(debtor)
+            .creditor(creditor)
+            .remittanceInfo("")
+            .build();
+
+        return new CustomerCreditTransfer(
+            groupHeader,
+            Collections.singletonList(transactionInfo)
+        );
+    }
+
+    public List<Transfer> convertToTransfer(CustomerCreditTransfer customerCreditTransfer, TransferStatus status) {
         if (customerCreditTransfer == null || customerCreditTransfer.getTransactionInfos().isEmpty()) {
             return Collections.emptyList();
         }
