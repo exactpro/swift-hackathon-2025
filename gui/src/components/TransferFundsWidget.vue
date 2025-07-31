@@ -151,17 +151,17 @@ async function startTransaction() {
             <input
               id="creditorBic"
               v-model="form.creditorBic"
-              placeholder="Enter BIC/SWIFT code"
+              placeholder="Enter BIC/Swift code"
               class="input w-full validator"
               required
               pattern="^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
-              title="BIC/SWIFT code must be 8 or 11 characters (e.g., DEUTDEFF)"
+              title="BIC/Swift code must be 8 or 11 characters (e.g., DEUTDEFF)"
               list="bicList"
             />
             <datalist id="bicList">
               <option v-for="bic in utils.bics" :key="bic" :value="bic">{{ bic }}</option>
             </datalist>
-            <div class="validator-hint">BIC/SWIFT code must be 8 or 11 characters</div>
+            <div class="validator-hint">BIC/Swift code must be 8 or 11 characters</div>
           </label>
 
           <!-- Client ID -->
