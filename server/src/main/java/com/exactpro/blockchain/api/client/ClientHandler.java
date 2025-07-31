@@ -1,6 +1,7 @@
 package com.exactpro.blockchain.api.client;
 
 import com.exactpro.blockchain.CustomerCreditTransferConverter;
+import com.exactpro.blockchain.entity.Account;
 import com.exactpro.blockchain.entity.Client;
 import com.exactpro.blockchain.entity.Transfer;
 import com.exactpro.blockchain.entity.TransferDetails;
@@ -10,11 +11,10 @@ import com.exactpro.blockchain.repository.AccountRepository;
 import com.exactpro.blockchain.repository.ClientRepository;
 import com.exactpro.blockchain.repository.TransferRepository;
 import com.exactpro.iso20022.CustomerCreditTransfer;
-import com.exactpro.iso20022.GroupHeader;
-import com.exactpro.iso20022.Participant;
-import com.exactpro.iso20022.TransactionInfo;
 import com.exactpro.iso20022.XmlCodec;
 import jakarta.xml.bind.JAXBException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -22,12 +22,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import javax.xml.transform.TransformerException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Collections;
+import java.text.MessageFormat;
 
 @Component
 public class ClientHandler {
+    private static final Logger logger = LogManager.getLogger(ClientHandler.class);
+
     private final String clientBic;
     private final AccountRepository accountRepository;
     private final ClientRepository clientRepository;
@@ -66,38 +66,11 @@ public class ClientHandler {
                 TransferDetails transferDetails = data.getT1();
                 Client client = data.getT2();
 
-                GroupHeader groupHeader = GroupHeader.builder().messageId("").timestamp(Instant.now()).build();
-
-                Participant debtor = Participant.builder()
-                    .fullName(client.getFullName())
-                    .iban(transferDetails.getSelfIban()) // TODO Check that account belongs to the client
-                    .bic(clientBic)
-                    .build();
-
-                Participant creditor = Participant.builder()
-                    .fullName(transferDetails.getTargetFullName())
-                    .iban(transferDetails.getTargetIban())
-                    .bic(transferDetails.getTargetBic())
-                    .build();
-
-                TransactionInfo transactionInfo = TransactionInfo.builder()
-                    .endToEndId("")
-                    .currency(transferDetails.getCurrency())
-                    .amount(transferDetails.getAmount())
-                    .settlementDate(LocalDate.now())
-                    .debtor(debtor)
-                    .creditor(creditor)
-                    .remittanceInfo("")
-                    .build();
-
-                CustomerCreditTransfer customerCreditTransfer = new CustomerCreditTransfer(
-                    groupHeader,
-                    Collections.singletonList(transactionInfo)
-                );
+                CustomerCreditTransfer customerCreditTransfer = converter.convertFromClientAndTransferDetails(client, clientBic, transferDetails);
 
                 Transfer transferToSave;
                 try {
-                    transferToSave = converter.convert(customerCreditTransfer, TransferStatus.PENDING).get(0);
+                    transferToSave = converter.convertToTransfer(customerCreditTransfer, TransferStatus.PENDING).get(0);
                 }
                 catch (IllegalArgumentException e) {
                     return Mono.error(new RuntimeException("Failed to convert CustomerCreditTransfer to Transfer", e));
@@ -123,10 +96,44 @@ public class ClientHandler {
                                 return Mono.error(new RuntimeException("Kafka send failed", e));
                             })
                             .then(ServerResponse.accepted()
-                                .bodyValue("Transfer successful for client " + clientId + ". Details: " + transferDetails));
+                                .bodyValue(MessageFormat.format("Transfer successful for client {0}. Details: {1}", clientId, transferDetails)));
                 });
             })
             .onErrorResume(RuntimeException.class, e -> ServerResponse.status(500).bodyValue("Internal Server Error"))
             .switchIfEmpty(ServerResponse.badRequest().bodyValue("Invalid request"));
+    }
+
+    private Mono<Account> subtractSelfBalanceMono(int clientId, TransferDetails transferDetails) {
+        return accountRepository.findByClientIdAndIban(clientId, transferDetails.getSelfIban())
+            .singleOrEmpty()
+            .switchIfEmpty(Mono.error(
+                new IllegalArgumentException(MessageFormat.format(
+                    "Debtor Account not found for client ID {0} and IBAN: {1}", clientId, transferDetails.getSelfIban()))))
+            .flatMap(account -> {
+                if (account.getBalance().compareTo(transferDetails.getAmount()) < 0) {
+                    return Mono.error(new IllegalArgumentException(MessageFormat.format(
+                        "Insufficient funds for account {0}. Current balance: {1}, requested: {2}",
+                        transferDetails.getSelfIban(), account.getBalance(), transferDetails.getAmount()
+                    )));
+                }
+                account.setBalance(account.getBalance().subtract(transferDetails.getAmount()));
+                return accountRepository.save(account);
+            })
+            .doOnSuccess(debitedAccount -> logger.info("Balance successfully debited for client ID {} (IBAN: {}). New balance: {}. Amount: {}",
+                clientId, debitedAccount.getIban(), debitedAccount.getBalance(), transferDetails.getAmount()));
+    }
+
+    private Mono<Account> addToRecipientBalanceMono(TransferDetails transferDetails) {
+        return accountRepository.findByIban(transferDetails.getTargetIban())
+            .singleOrEmpty()
+            .switchIfEmpty(Mono.error(
+                new IllegalArgumentException(MessageFormat.format(
+                    "Creditor Account not found for IBAN: {0}", transferDetails.getTargetIban()))))
+            .flatMap(creditorAccount -> {
+                creditorAccount.setBalance(creditorAccount.getBalance().add(transferDetails.getAmount()));
+                return accountRepository.save(creditorAccount);
+            })
+            .doOnSuccess(creditedAccount -> logger.info("Balance successfully credited to recipient account (IBAN: {}). New balance: {}. Amount: {}",
+                creditedAccount.getIban(), creditedAccount.getBalance(), transferDetails.getAmount()));
     }
 }

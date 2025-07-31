@@ -109,7 +109,7 @@ public class KafkaConsumer {
             .flatMapMany(message -> {
                 try {
                     CustomerCreditTransfer creditTransfer = xmlCodec.decode(message);
-                    List<Transfer> transferEntities = converter.convert(creditTransfer, TransferStatus.COMPLETED);
+                    List<Transfer> transferEntities = converter.convertToTransfer(creditTransfer, TransferStatus.COMPLETED);
 
                     if (transferEntities.isEmpty()) {
                         return Flux.empty();
