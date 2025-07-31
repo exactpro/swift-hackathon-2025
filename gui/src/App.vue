@@ -7,7 +7,7 @@ import ToastMessage from './components/ToastMessage.vue'
 import { useToasts } from './composables/useToasts'
 
 const bankATheme = 'banka'
-const bankBTheme = 'dim'
+const bankBTheme = 'bankb'
 
 const route = useRoute()
 const { toasts } = useToasts()

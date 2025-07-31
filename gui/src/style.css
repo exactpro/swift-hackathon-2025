@@ -29,14 +29,47 @@
     --color-accent-content: #ffffff;
     --color-neutral: #002833;
     --color-neutral-content: #c6e1ef;
+
+    --color-grad-bg-1: #3f979f;
+    --color-grad-bg-2: #3b5865;
+    --color-grad-bg-logo-1: #6dbbb9;
+    --color-grad-bg-logo-2: #3c7b86;
+    --color-grad-bg-logo-3: #78c3c2;
+}
+
+@plugin "daisyui/theme" {
+    name: "bankb";
+    default: false; /* set as default */
+    prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+    color-scheme: light; /* color of browser-provided UI */
+
+    --color-primary: #7c33af;
+    --color-secondary: #f8f8f7;
+    --color-accent: #00cfef;
+    --radius-box: 0.5rem;
+    --size-field: 0.25rem;
+    --color-base-100: #f8f8f8;
+    --color-base-200: #ffffff;
+    --color-base-300: #8a8a8a;
+    --color-base-content: #18181b;
+    --color-primary-content: #f7f9fa;
+    --color-secondary-content: #123452;
+    --color-accent-content: #ffffff;
+    --color-neutral: #002833;
+    --color-neutral-content: #c6e1ef;
+
+    --color-grad-bg-1: #9f3f97;
+    --color-grad-bg-2: #653b58;
+    --color-grad-bg-logo-1: #bb6db0;
+    --color-grad-bg-logo-2: #863c7b;
+    --color-grad-bg-logo-3: #c278bb;
 }
 
 @plugin "daisyui" {
     themes:
         emerald --default,
-        dim,
-        pastel,
-        banka;
+        banka,
+        bankb;
 }
 
 .section-title {
