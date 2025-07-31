@@ -22,7 +22,7 @@ function transferUrlWithDetails(currency: Currency) {
       <div class="card-body">
         <div class="card-title font-bold">{{ account.currency }}</div>
         <div>
-          <div class="card-title text-success-content font-bold">{{ formatNumber(account.balance) }}</div>
+          <div class="card-title text-success font-bold">{{ formatNumber(account.balance) }}</div>
           <div class="text-gray-500 text-xs">Account ID: {{ account.id }}</div>
         </div>
         <div class="card-actions mt-2">
