@@ -30,7 +30,10 @@ import java.text.MessageFormat;
 public class ClientHandler {
     private static final Logger logger = LogManager.getLogger(ClientHandler.class);
 
-    private final String clientBic;
+    @Value("${client.bic}")
+    private String clientBic;
+    @Value("${default.user}")
+    private Integer clientId;
     private final AccountRepository accountRepository;
     private final ClientRepository clientRepository;
     private final ConversionRateRepository conversionRateRepository;
@@ -39,15 +42,13 @@ public class ClientHandler {
     private final CustomerCreditTransferConverter converter;
     private final KafkaPublisher kafkaPublisher;
 
-    public ClientHandler(@Value("${client.bic}") String clientBic,
-                         AccountRepository accountRepository,
+    public ClientHandler(AccountRepository accountRepository,
                          ClientRepository clientRepository,
                          ConversionRateRepository conversionRateRepository,
                          XmlCodec xmlCodec,
                          TransferRepository transferRepository,
                          CustomerCreditTransferConverter converter,
                          KafkaPublisher kafkaPublisher) {
-        this.clientBic = clientBic;
         this.accountRepository = accountRepository;
         this.clientRepository = clientRepository;
         this.conversionRateRepository = conversionRateRepository;
@@ -58,12 +59,14 @@ public class ClientHandler {
     }
 
     public Mono<ServerResponse> getAccountsByClientId(ServerRequest request) {
-        int clientId = Integer.parseInt(request.pathVariable("clientId"));
-        return ServerResponse.ok().body(accountRepository.findByClientId(clientId), com.exactpro.blockchain.entity.Account.class);
+        return ServerResponse.ok().body(accountRepository.findByClientId(clientId), Account.class);
+    }
+
+    public Mono<ServerResponse> getTransfersByClientId(ServerRequest request) {
+        return ServerResponse.ok().body(transferRepository.findByClientId(clientId), Transfer.class);
     }
 
     public Mono<ServerResponse> transfer(ServerRequest request) {
-        int clientId = Integer.parseInt(request.pathVariable("clientId"));
         return Mono.zip(request.bodyToMono(TransferDetails.class),
                 clientRepository.findByClientId(clientId).singleOrEmpty())
             .flatMap(data -> {

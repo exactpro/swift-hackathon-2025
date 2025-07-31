@@ -24,6 +24,7 @@ CREATE TABLE Account (
 
 CREATE TABLE Transfer (
     transferId SERIAL PRIMARY KEY,
+    clientId INTEGER,
     status VARCHAR(255) NOT NULL,
     messageId VARCHAR(255) NOT NULL,
     transferTimestamp TIMESTAMPTZ NOT NULL,
@@ -37,7 +38,8 @@ CREATE TABLE Transfer (
     creditorFullName VARCHAR(255) NOT NULL,
     creditorIban VARCHAR(255) NOT NULL,
     creditorBic VARCHAR(255) NOT NULL,
-    remittanceInfo VARCHAR(255)
+    remittanceInfo VARCHAR(255),
+    FOREIGN KEY (clientId) REFERENCES Client(clientId),
 );
 
 CREATE TABLE ConversionRate (
