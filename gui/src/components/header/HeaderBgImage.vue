@@ -30,7 +30,7 @@
         gradientUnits="userSpaceOnUse"
       >
         <stop class="stop-color-3" />
-        <stop offset="1" class="stop-color-1" />
+        <stop offset="1" class="stop-color-2" />
       </linearGradient>
       <linearGradient
         id="paint1_linear_0_1"
@@ -41,7 +41,7 @@
         gradientUnits="userSpaceOnUse"
       >
         <stop class="stop-color-1" />
-        <stop offset="0.54735" class="stop-color-1" />
+        <stop offset="0.54735" class="stop-color-2" />
       </linearGradient>
       <linearGradient
         id="paint2_linear_0_1"
@@ -52,7 +52,7 @@
         gradientUnits="userSpaceOnUse"
       >
         <stop class="stop-color-3" />
-        <stop offset="1" class="stop-color-1" />
+        <stop offset="1" class="stop-color-2" />
       </linearGradient>
       <linearGradient
         id="paint3_linear_0_1"
@@ -63,7 +63,7 @@
         gradientUnits="userSpaceOnUse"
       >
         <stop class="stop-color-1" />
-        <stop offset="0.54735" class="stop-color-1" />
+        <stop offset="0.54735" class="stop-color-2" />
       </linearGradient>
     </defs>
   </svg>
@@ -72,6 +72,9 @@
 <style scoped>
 .stop-color-1 {
   stop-color: var(--color-grad-bg-logo-1);
+}
+.stop-color-2 {
+  stop-color: var(--color-grad-bg-logo-2);
 }
 .stop-color-3 {
   stop-color: var(--color-grad-bg-logo-3);

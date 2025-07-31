@@ -13,10 +13,13 @@ defineProps<{
     <figure class="absolute inset-0 z-0 overflow-hidden flex justify-end">
       <HeaderBgImage class="header-bg-image" />
     </figure>
-    <div class="relative z-10 flex items-center h-full pl-5">
+    <div class="relative z-10 flex items-center h-full px-5 justify-between">
       <RouterLink :to="homeLink || '/'">
-        <CoincentoLogo class="h-12 w-auto" />
+        <CoincentoLogo class="h-8 sm:h-12 w-auto" />
       </RouterLink>
+      <div class="flex-none flex items-center text-white">
+        <slot />
+      </div>
     </div>
   </header>
 </template>
