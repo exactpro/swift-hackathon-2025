@@ -1,7 +1,7 @@
 INSERT INTO CurrencyCode (code) VALUES
     ('USD'),
     ('EUR'),
-    ('USDT');
+    ('USDС');
 
 WITH new_client AS (
     INSERT INTO Client (fullName)
@@ -21,7 +21,7 @@ INSERT INTO Account (iban, clientId, currencyCode, balance)
 SELECT 'CH7889144788712476784', clientId, 'USD', 5000.00
 FROM new_client;
 
-INSERT INTO exchange_rates (baseCurrency, targetCurrency, rate) VALUES
+INSERT INTO ConversionRate (baseCurrency, targetCurrency, rate) VALUES
 ('USD', 'EUR', 0.88),
 ('EUR', 'USD', 1.14),
 ('USD', 'USDC', 1.00),

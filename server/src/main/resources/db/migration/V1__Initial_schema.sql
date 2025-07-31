@@ -45,4 +45,6 @@ CREATE TABLE ConversionRate (
     baseCurrency VARCHAR(3) NOT NULL,
     targetCurrency VARCHAR(3) NOT NULL,
     rate NUMERIC(10, 6) NOT NULL,
+    FOREIGN KEY (baseCurrency) REFERENCES CurrencyCode(code),
+    FOREIGN KEY (targetCurrency) REFERENCES CurrencyCode(code)
 );
