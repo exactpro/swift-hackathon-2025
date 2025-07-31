@@ -96,7 +96,7 @@ public class ClientHandler {
                                         return Mono.error(new RuntimeException("Failed to encode to XML", e));
                                     }
 
-                                    return kafkaPublisher.publishMessage(transferDetails.getTargetBic(), encodedTransfer)
+                                    return kafkaPublisher.publishMessage(transferDetails.getCreditorBic(), encodedTransfer)
                                         .doOnSuccess(senderResult -> {
                                             transfer.setStatus(TransferStatus.COMPLETED);
                                             transferRepository.save(transfer).subscribe();
@@ -116,14 +116,14 @@ public class ClientHandler {
     }
 
     private Mono<Account> subtractSelfBalanceMono(int clientId, TransferDetails transferDetails) {
-        return accountRepository.findByClientIdAndIban(clientId, transferDetails.getSelfIban())
+        return accountRepository.findByClientIdAndIban(clientId, transferDetails.getDebtorIban())
             .singleOrEmpty()
             .switchIfEmpty(Mono.error(
                 new IllegalArgumentException(MessageFormat.format(
-                    "Debtor Account not found for client ID {0} and IBAN: {1}", clientId, transferDetails.getSelfIban()))))
+                    "Debtor Account not found for client ID {0} and IBAN: {1}", clientId, transferDetails.getDebtorIban()))))
             .flatMap(account -> {
                 BigDecimal amountToDebit = transferDetails.getAmount();
-                String transferCurrency = transferDetails.getCurrency();
+                String transferCurrency = transferDetails.getCurrencyCode();
                 String accountCurrency = account.getCurrencyCode();
 
                 if (!accountCurrency.equals(transferCurrency)) {
@@ -157,14 +157,14 @@ public class ClientHandler {
     }
 
     private Mono<Account> addToRecipientBalanceMono(TransferDetails transferDetails) {
-        return accountRepository.findByIban(transferDetails.getTargetIban())
+        return accountRepository.findByIban(transferDetails.getCreditorIban())
             .singleOrEmpty()
             .switchIfEmpty(Mono.error(
                 new IllegalArgumentException(MessageFormat.format(
-                    "Creditor Account not found for IBAN: {0}", transferDetails.getTargetIban()))))
+                    "Creditor Account not found for IBAN: {0}", transferDetails.getCreditorIban()))))
             .flatMap(account -> {
                 BigDecimal amountToCredit = transferDetails.getAmount();
-                String transferCurrency = transferDetails.getCurrency();
+                String transferCurrency = transferDetails.getCurrencyCode();
                 String accountCurrency = account.getCurrencyCode();
 
                 if (!accountCurrency.equals(transferCurrency)) {
