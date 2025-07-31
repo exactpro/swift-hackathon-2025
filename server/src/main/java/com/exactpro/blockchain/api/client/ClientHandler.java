@@ -75,8 +75,7 @@ public class ClientHandler {
                 Client client = data.getT2();
 
                 return subtractSelfBalanceMono(clientId, transferDetails)
-                    .flatMap(debitedAccount -> addToRecipientBalanceMono(transferDetails)
-                        .flatMap(creditedAccount -> {
+                    .flatMap(debitedAccount -> {
 
                             CustomerCreditTransfer customerCreditTransfer = converter.convertFromClientAndTransferDetails(client, clientBic, transferDetails);
 
@@ -109,7 +108,7 @@ public class ClientHandler {
                                         .then(ServerResponse.accepted()
                                             .bodyValue(MessageFormat.format("Transfer successful for client {0}. Details: {1}", clientId, transferDetails)));
                                 });
-                        }));
+                        });
             })
             .onErrorResume(RuntimeException.class, e -> ServerResponse.status(500).bodyValue("Internal Server Error"))
             .switchIfEmpty(ServerResponse.badRequest().bodyValue("Invalid request"));
@@ -132,7 +131,7 @@ public class ClientHandler {
                         .switchIfEmpty(Mono.error(new IllegalArgumentException(MessageFormat.format(
                             "Conversion rate not found from {0} to {1}", transferCurrency, accountCurrency))))
                         .flatMap(rate -> {
-                            BigDecimal convertedAmount = transferDetails.getAmount().multiply(rate.getRate());
+                            BigDecimal convertedAmount = amountToDebit.multiply(rate.getRate());
                             logger.info("Converted amount for debit: {} {} (from {} {}) using rate {}",
                                 convertedAmount, accountCurrency, amountToDebit, transferCurrency, rate.getRate());
                             return performDebit(account, convertedAmount);
@@ -153,41 +152,6 @@ public class ClientHandler {
             )));
         }
         account.setBalance(account.getBalance().subtract(amountToDebit));
-        return accountRepository.save(account);
-    }
-
-    private Mono<Account> addToRecipientBalanceMono(TransferDetails transferDetails) {
-        return accountRepository.findByIban(transferDetails.getCreditorIban())
-            .singleOrEmpty()
-            .switchIfEmpty(Mono.error(
-                new IllegalArgumentException(MessageFormat.format(
-                    "Creditor Account not found for IBAN: {0}", transferDetails.getCreditorIban()))))
-            .flatMap(account -> {
-                BigDecimal amountToCredit = transferDetails.getAmount();
-                String transferCurrency = transferDetails.getCurrencyCode();
-                String accountCurrency = account.getCurrencyCode();
-
-                if (!accountCurrency.equals(transferCurrency)) {
-                    return conversionRateRepository.findByBaseCurrencyAndTargetCurrency(transferCurrency, accountCurrency)
-                        .singleOrEmpty()
-                        .switchIfEmpty(Mono.error(new IllegalArgumentException(MessageFormat.format(
-                            "Conversion rate not found from {0} to {1}", transferCurrency, accountCurrency))))
-                        .flatMap(rate -> {
-                            BigDecimal convertedAmount = transferDetails.getAmount().multiply(rate.getRate());
-                            logger.info("Converted amount for credit: {} {} (from {} {}) using rate {}",
-                                convertedAmount, accountCurrency, amountToCredit, transferCurrency, rate.getRate());
-                            return performCredit(account, convertedAmount);
-                        });
-                } else {
-                    return performCredit(account, amountToCredit);
-                }
-            })
-            .doOnSuccess(creditedAccount -> logger.info("Balance successfully credited to recipient account (IBAN: {}). New balance: {}. Amount: {}",
-                creditedAccount.getIban(), creditedAccount.getBalance(), transferDetails.getAmount()));
-    }
-
-    private Mono<Account> performCredit(Account account, BigDecimal amountToCredit) {
-        account.setBalance(account.getBalance().add(amountToCredit));
         return accountRepository.save(account);
     }
 }

@@ -1,8 +1,11 @@
 package com.exactpro.blockchain.kafka;
 
 import com.exactpro.blockchain.CustomerCreditTransferConverter;
+import com.exactpro.blockchain.entity.Account;
 import com.exactpro.blockchain.entity.Transfer;
 import com.exactpro.blockchain.entity.TransferStatus;
+import com.exactpro.blockchain.repository.AccountRepository;
+import com.exactpro.blockchain.repository.ConversionRateRepository;
 import com.exactpro.blockchain.repository.TransferRepository;
 import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.XmlCodec;
@@ -26,6 +29,8 @@ import reactor.kafka.receiver.ReceiverRecord;
 
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,13 +53,19 @@ public class KafkaConsumer {
 
     private final XmlCodec xmlCodec;
     private final CustomerCreditTransferConverter converter;
+    private final AccountRepository accountRepository;
+    private final ConversionRateRepository conversionRateRepository;
     private final TransferRepository transferRepository;
 
     public KafkaConsumer(XmlCodec xmlCodec,
                          CustomerCreditTransferConverter converter,
+                         AccountRepository accountRepository,
+                         ConversionRateRepository conversionRateRepository,
                          TransferRepository transferRepository) {
         this.xmlCodec = xmlCodec;
         this.converter = converter;
+        this.accountRepository = accountRepository;
+        this.conversionRateRepository = conversionRateRepository;
         this.transferRepository = transferRepository;
     }
 
@@ -106,24 +117,65 @@ public class KafkaConsumer {
         logger.info("Received message: {}", record.value());
 
         Mono.just(record.value())
-            .flatMapMany(message -> {
+            .flatMap(message -> {
                 try {
                     CustomerCreditTransfer creditTransfer = xmlCodec.decode(message);
                     List<Transfer> transferEntities = converter.convertToTransfer(creditTransfer, TransferStatus.COMPLETED);
 
-                    if (transferEntities.isEmpty()) {
-                        return Flux.empty();
-                    }
-
-                    return Flux.fromIterable(transferEntities).flatMap(transferRepository::save);
+                    return Flux.fromIterable(transferEntities)
+                        .flatMap(transfer ->
+                            addToRecipientBalanceMono(transfer)
+                                .flatMap(updatedAccount -> {
+                                    logger.info("Successfully credited recipient account {}.", transfer.getCreditorIban());
+                                    return transferRepository.save(transfer);
+                                })
+                                .onErrorResume(e -> {
+                                    logger.error("Failed to credit recipient balance for transfer {}: {}. Saving transfer with FAILED status.", transfer.getEndToEndId(), e.getMessage());
+                                    transfer.setStatus(TransferStatus.FAILED);
+                                    return transferRepository.save(transfer).then(Mono.error(new RuntimeException("Credit failed", e)));
+                                })
+                        )
+                        .then();
                 } catch (IOException | TransformerException | SAXException | JAXBException e) {
-                    throw new RuntimeException(e);
+                    logger.error("Failed to decode XML message: {}", e.getMessage(), e);
+                    return Mono.error(new RuntimeException("XML decoding failed", e));
+                }
+            });
+    }
+
+    private Mono<Account> addToRecipientBalanceMono(Transfer transfer) {
+        String creditorIban = transfer.getCreditorIban();
+        return accountRepository.findByIban(creditorIban)
+            .singleOrEmpty()
+            .switchIfEmpty(Mono.error(
+                new IllegalArgumentException(MessageFormat.format(
+                    "Creditor Account not found for IBAN: {0}", creditorIban))))
+            .flatMap(account -> {
+                BigDecimal amountToCredit = transfer.getAmount();
+                String transferCurrency = transfer.getCurrency();
+                String accountCurrency = account.getCurrencyCode();
+
+                if (!accountCurrency.equals(transferCurrency)) {
+                    return conversionRateRepository.findByBaseCurrencyAndTargetCurrency(transferCurrency, accountCurrency)
+                        .singleOrEmpty()
+                        .switchIfEmpty(Mono.error(new IllegalArgumentException(MessageFormat.format(
+                            "Conversion rate not found from {0} to {1}", transferCurrency, accountCurrency))))
+                        .flatMap(rate -> {
+                            BigDecimal convertedAmount = amountToCredit.multiply(rate.getRate());
+                            logger.info("Converted amount for credit: {} {} (from {} {}) using rate {}",
+                                convertedAmount, accountCurrency, amountToCredit, transferCurrency, rate.getRate());
+                            return performCredit(account, convertedAmount);
+                        });
+                } else {
+                    return performCredit(account, amountToCredit);
                 }
             })
-            .then()
-            .subscribe(null,
-                error -> {},
-                () -> record.receiverOffset().acknowledge()
-            );
+            .doOnSuccess(creditedAccount -> logger.info("Balance successfully credited to recipient account (IBAN: {}). New balance: {}. Amount: {}",
+                creditedAccount.getIban(), creditedAccount.getBalance(), transfer.getAmount()));
+    }
+
+    private Mono<Account> performCredit(Account account, BigDecimal amountToCredit) {
+        account.setBalance(account.getBalance().add(amountToCredit));
+        return accountRepository.save(account);
     }
 }
