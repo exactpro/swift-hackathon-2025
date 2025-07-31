@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { useAsyncState } from '@vueuse/core'
+import { useAsyncState, useClipboard } from '@vueuse/core'
 import { Icon } from '@iconify/vue'
 import { formatAccountBalance } from '../utils/formatNumber'
 import { fetchTransactionFormData, newTransaction } from '../services/transactions'
@@ -12,6 +12,8 @@ import { useToasts } from '../composables/useToasts'
 const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
 
 const { addToast } = useToasts()
+
+const { copy } = useClipboard()
 
 const props = defineProps<{
   debtorAccounts: Account[]
@@ -116,185 +118,190 @@ async function startTransaction() {
 </script>
 
 <template>
-  <form v-if="utils" @submit.prevent="startTransaction" class="container mx-auto max-w-2xl">
-    <!-- Debtor Section -->
-    <section>
-      <h2 class="section-title">Transfer Details</h2>
+  <div class="grid grid-cols-1 lg:grid-cols-[18rem_1fr_18rem] gap-6 items-start max-w-2xl lg:max-w-[unset] mx-auto">
+    <div class="order-3 lg:order-1"></div>
+    <form v-if="utils" @submit.prevent="startTransaction" class="order-2">
+      <!-- Debtor Section -->
+      <section>
+        <h2 class="section-title">Transfer Details</h2>
 
-      <div class="p-5 bg-base-200 rounded-lg shadow-lg mb-6 flex flex-col gap-4">
-        <!-- Currency -->
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">From Account</span>
-          </div>
-          <select v-model="chosenAccount" class="select w-full validator" required>
-            <option disabled value="">Select account</option>
-            <option v-for="account in props.debtorAccounts" :key="account.id" :value="account">
-              {{ account.currency }} Account — {{ formatAccountBalance(account.currency, account.balance) }}
-            </option>
-          </select>
-          <div class="validator-hint">Please select an account</div>
-        </label>
+        <div class="p-5 bg-base-200 rounded-lg shadow-lg mb-6 flex flex-col gap-4">
+          <!-- Currency -->
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">From Account</span>
+            </div>
+            <select v-model="chosenAccount" class="select w-full validator" required>
+              <option disabled value="">Select account</option>
+              <option v-for="account in props.debtorAccounts" :key="account.id" :value="account">
+                {{ account.currency }} Account — {{ formatAccountBalance(account.currency, account.balance) }}
+              </option>
+            </select>
+            <div class="validator-hint">Please select an account</div>
+          </label>
 
-        <!-- Creditor Section -->
-        <h3 class="card-title text-xl">Recipient</h3>
+          <!-- Creditor Section -->
+          <h3 class="card-title text-xl">Recipient</h3>
 
-        <!-- Bank -->
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">Creditor BIC</span>
-          </div>
-          <input
-            id="creditorBic"
-            v-model="form.creditorBic"
-            placeholder="Enter BIC/SWIFT code"
-            class="input w-full validator"
-            required
-            pattern="^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
-            title="BIC/SWIFT code must be 8 or 11 characters (e.g., DEUTDEFF)"
-            list="bicList"
-          />
-          <datalist id="bicList">
-            <option v-for="bic in utils.bics" :key="bic" :value="bic">{{ bic }}</option>
-          </datalist>
-          <div class="validator-hint">BIC/SWIFT code must be 8 or 11 characters</div>
-          <div class="transfer-hint alert-soft">
-            <Icon icon="mdi:information-variant" />
-            <div>
-              <p>
-                To perform a successful test payment transaction, please use the following mock BIC: {{ utils.bics[0] }}
-              </p>
-              <p>
-                You may also enter other BIC values for demonstration purposes, but transfers will fail or stay in
-                pending status by design to showcase error handling.
-              </p>
+          <!-- Bank -->
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Creditor BIC</span>
+            </div>
+            <input
+              id="creditorBic"
+              v-model="form.creditorBic"
+              placeholder="Enter BIC/SWIFT code"
+              class="input w-full validator"
+              required
+              pattern="^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
+              title="BIC/SWIFT code must be 8 or 11 characters (e.g., DEUTDEFF)"
+              list="bicList"
+            />
+            <datalist id="bicList">
+              <option v-for="bic in utils.bics" :key="bic" :value="bic">{{ bic }}</option>
+            </datalist>
+            <div class="validator-hint">BIC/SWIFT code must be 8 or 11 characters</div>
+          </label>
+
+          <!-- Client ID -->
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Creditor Account (IBAN)</span>
+            </div>
+            <input
+              id="creditorIban"
+              list="ibanList"
+              v-model="form.creditorAccountId"
+              type="text"
+              placeholder="Enter IBAN"
+              class="input w-full validator"
+              required
+              pattern="^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$"
+              title="IBAN must start with 2 letters, followed by 2 digits, then up to 30 alphanumeric characters"
+            />
+            <datalist id="ibanList">
+              <option v-for="iban in utils.ibans" :key="iban" :value="iban">{{ iban }}</option>
+            </datalist>
+            <div class="validator-hint">Valid IBAN required (e.g., DE89370400440532013000)</div>
+          </label>
+
+          <!-- Creditor Name -->
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Creditor Name</span>
+            </div>
+            <input
+              v-model="form.creditorName"
+              type="text"
+              placeholder="Enter recipient name"
+              class="input w-full validator"
+              required
+              minlength="2"
+              maxlength="100"
+              title="Creditor name is required"
+            />
+            <div class="validator-hint">Recipient name is required (2-100 characters)</div>
+          </label>
+
+          <!-- Currency -->
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Currency</span>
+            </div>
+            <select v-model="form.currency" class="select w-full validator" required>
+              <option disabled value="">Select currency</option>
+              <option v-for="currency in utils.currencies" :key="currency" :value="currency">
+                {{ currency }}
+              </option>
+            </select>
+            <div class="validator-hint">Please select a currency</div>
+          </label>
+
+          <!-- Amount -->
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Amount</span>
+            </div>
+            <input
+              v-model.number="form.amount"
+              type="number"
+              placeholder="250"
+              class="input w-full pr-12 validator"
+              step="0.01"
+              min="0.01"
+              required
+              title="Amount must be greater than 0"
+            />
+            <div class="validator-hint">Amount must be greater than 0</div>
+          </label>
+
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Comment (Optional)</span>
+            </div>
+            <textarea
+              v-model="form.comment"
+              class="textarea w-full"
+              placeholder="Enter additional payment details or reference"
+              maxlength="255"
+            ></textarea>
+            <div class="validator-hint">Optional payment reference (max 255 characters)</div>
+          </label>
+
+          <div v-if="chosenAccount.currency !== form.currency" class="alert alert-soft flex flex-col mb-2">
+            <div v-if="convertedAmount && chosenAccount">
+              Converted Amount: {{ formatAccountBalance(chosenAccount.currency, convertedAmount) }}
+            </div>
+            <div class="text-sm" v-if="exchangeRate && chosenAccount && form.currency">
+              Exchange Rate: {{ formatAccountBalance(chosenAccount.currency, 1) }} ≈
+              {{ formatAccountBalance(form.currency, exchangeRate) }}
             </div>
           </div>
-        </label>
 
-        <!-- Client ID -->
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">Creditor Account (IBAN)</span>
-          </div>
-          <input
-            id="creditorIban"
-            list="ibanList"
-            v-model="form.creditorAccountId"
-            type="text"
-            placeholder="Enter IBAN"
-            class="input w-full validator"
-            required
-            pattern="^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$"
-            title="IBAN must start with 2 letters, followed by 2 digits, then up to 30 alphanumeric characters"
-          />
-          <datalist id="ibanList">
-            <option v-for="iban in utils.ibans" :key="iban" :value="iban">{{ iban }}</option>
-          </datalist>
-          <div class="validator-hint">Valid IBAN required (e.g., DE89370400440532013000)</div>
-          <div class="transfer-hint alert-soft">
-            <Icon icon="mdi:information-variant" />
-            <div>
-              <p>To perform a successful test payment transaction, please use one of the following mock IBANs:</p>
-              <ul class="list-disc pl-5">
-                <li v-for="iban in utils.ibans" :key="iban">{{ iban }}</li>
-              </ul>
-              <p>
-                You may also enter other IBAN values for demonstration purposes, but transfers will fail or stay in
-                pending status by design to showcase error handling.
-              </p>
-            </div>
-          </div>
-        </label>
-
-        <!-- Creditor Name -->
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">Creditor Name</span>
-          </div>
-          <input
-            v-model="form.creditorName"
-            type="text"
-            placeholder="Enter recipient name"
-            class="input w-full validator"
-            required
-            minlength="2"
-            maxlength="100"
-            title="Creditor name is required"
-          />
-          <div class="validator-hint">Recipient name is required (2-100 characters)</div>
-        </label>
-
-        <!-- Currency -->
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">Currency</span>
-          </div>
-          <select v-model="form.currency" class="select w-full validator" required>
-            <option disabled value="">Select currency</option>
-            <option v-for="currency in utils.currencies" :key="currency" :value="currency">
-              {{ currency }}
-            </option>
-          </select>
-          <div class="validator-hint">Please select a currency</div>
-        </label>
-
-        <!-- Amount -->
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">Amount</span>
-          </div>
-          <input
-            v-model.number="form.amount"
-            type="number"
-            placeholder="250"
-            class="input w-full pr-12 validator"
-            step="0.01"
-            min="0.01"
-            required
-            title="Amount must be greater than 0"
-          />
-          <div class="validator-hint">Amount must be greater than 0</div>
-        </label>
-
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">Comment (Optional)</span>
-          </div>
-          <textarea
-            v-model="form.comment"
-            class="textarea w-full"
-            placeholder="Enter additional payment details or reference"
-            maxlength="255"
-          ></textarea>
-          <div class="validator-hint">Optional payment reference (max 255 characters)</div>
-        </label>
-
-        <div v-if="chosenAccount.currency !== form.currency" class="alert alert-soft flex flex-col mb-2">
-          <div v-if="convertedAmount && chosenAccount">
-            Converted Amount: {{ formatAccountBalance(chosenAccount.currency, convertedAmount) }}
-          </div>
-          <div class="text-sm" v-if="exchangeRate && chosenAccount && form.currency">
-            Exchange Rate: {{ formatAccountBalance(chosenAccount.currency, 1) }} ≈
-            {{ formatAccountBalance(form.currency, exchangeRate) }}
-          </div>
+          <!-- Start Transaction Button -->
+          <button
+            type="submit"
+            class="btn btn-primary btn-lg w-full shadow-lg/40 shadow-primary"
+            :disabled="!isFormComplete || isSending"
+            :class="{ 'btn-disabled': !isFormComplete || isSending }"
+          >
+            <template v-if="!isSending"> Send Transfer </template>
+            <template v-else>
+              <span class="loading loading-spinner loading-sm"></span>
+            </template>
+          </button>
         </div>
-
-        <!-- Start Transaction Button -->
-        <button
-          type="submit"
-          class="btn btn-primary btn-lg w-full shadow-lg/40 shadow-primary"
-          :disabled="!isFormComplete || isSending"
-          :class="{ 'btn-disabled': !isFormComplete || isSending }"
-        >
-          <template v-if="!isSending"> Send Transfer </template>
-          <template v-else>
-            <span class="loading loading-spinner loading-sm"></span>
-          </template>
-        </button>
+      </section>
+    </form>
+    <div class="card card-sm bg-base-200 shadow-lg mt-12 flex flex-col gap-4 order-1 lg:order-3">
+      <div class="card-body">
+        <p>To perform a successful test payment transaction, please use the following mock credentials:</p>
+        <h3 class="card-title">Creditor BIC</h3>
+        <ul v-if="utils">
+          <li class="flex justify-between items-center" v-for="bic in utils.bics" :key="bic">
+            <span>{{ bic }}</span>
+            <button class="btn btn-xs btn-ghost btn-circle text-primary" @click="copy(bic)">
+              <Icon icon="mdi:content-copy" />
+            </button>
+          </li>
+        </ul>
+        <h3 class="card-title">Creditor Account (IBAN)</h3>
+        <ul v-if="utils">
+          <li class="flex justify-between items-center" v-for="iban in utils.ibans" :key="iban">
+            <span>{{ iban }}</span>
+            <button class="btn btn-xs btn-ghost btn-circle text-primary" @click="copy(iban)">
+              <Icon icon="mdi:content-copy" />
+            </button>
+          </li>
+        </ul>
+        <p>
+          You may also enter other BIC or IBAN values for demonstration purposes, but transfers will fail or remain
+          pending by design to showcase error handling.
+        </p>
       </div>
-    </section>
-  </form>
+    </div>
+  </div>
 </template>
 
 <style>
