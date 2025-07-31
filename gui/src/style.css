@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+    --color-grad-bg-1: #3f979f;
+    --color-grad-bg-2: #3b5865;
+    --color-grad-bg-logo-1: #6dbbb9;
+    --color-grad-bg-logo-2: #3c7b86;
+    --color-grad-bg-logo-3: #78c3c2;
+}
+
 @plugin "daisyui/theme" {
     name: "banka";
     default: true; /* set as default */
