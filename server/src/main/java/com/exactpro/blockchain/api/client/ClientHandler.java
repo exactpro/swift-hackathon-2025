@@ -95,7 +95,13 @@ public class ClientHandler {
                     Collections.singletonList(transactionInfo)
                 );
 
-                Transfer transferToSave = converter.convert(customerCreditTransfer, TransferStatus.PENDING).get(0);
+                Transfer transferToSave;
+                try {
+                    transferToSave = converter.convert(customerCreditTransfer, TransferStatus.PENDING).get(0);
+                }
+                catch (IllegalArgumentException e) {
+                    return Mono.error(new RuntimeException("Failed to convert CustomerCreditTransfer to Transfer", e));
+                }
 
                 return transferRepository.save(transferToSave)
                     .flatMap(transfer -> {
@@ -103,7 +109,7 @@ public class ClientHandler {
                         try {
                             encodedTransfer = xmlCodec.encode(customerCreditTransfer);
                         } catch (JAXBException | TransformerException e) {
-                            throw new RuntimeException(e);
+                            return Mono.error(new RuntimeException("Failed to encode to XML", e));
                         }
 
                         return kafkaPublisher.publishMessage(transferDetails.getTargetBic(), encodedTransfer)
