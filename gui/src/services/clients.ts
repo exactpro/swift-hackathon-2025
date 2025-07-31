@@ -21,6 +21,7 @@ export async function fetchClientTransactions(clientId: string): Promise<JSONify
   return []
 }
 
+// Not used at the moment
 export async function exchangeCurrency(
   clientId: string,
   fromCurrency: Currency,
