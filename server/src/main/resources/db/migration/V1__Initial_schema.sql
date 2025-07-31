@@ -21,3 +21,32 @@ CREATE TABLE Account (
     FOREIGN KEY (clientId) REFERENCES Client(clientId),
     FOREIGN KEY (currencyCode) REFERENCES CurrencyCode(code)
 );
+
+CREATE TABLE Transfer (
+    transferId SERIAL PRIMARY KEY,
+    clientId INTEGER,
+    status VARCHAR(255) NOT NULL,
+    messageId VARCHAR(255) NOT NULL,
+    transferTimestamp TIMESTAMPTZ NOT NULL,
+    endToEndId VARCHAR(255) NOT NULL,
+    currency VARCHAR(255) NOT NULL,
+    amount NUMERIC(19, 4) NOT NULL,
+    settlementDate DATE NOT NULL,
+    debtorFullName VARCHAR(255) NOT NULL,
+    debtorIban VARCHAR(255) NOT NULL,
+    debtorBic VARCHAR(255) NOT NULL,
+    creditorFullName VARCHAR(255) NOT NULL,
+    creditorIban VARCHAR(255) NOT NULL,
+    creditorBic VARCHAR(255) NOT NULL,
+    remittanceInfo VARCHAR(255),
+    FOREIGN KEY (clientId) REFERENCES Client(clientId),
+);
+
+CREATE TABLE ConversionRate (
+    id SERIAL PRIMARY KEY,
+    baseCurrency VARCHAR(3) NOT NULL,
+    targetCurrency VARCHAR(3) NOT NULL,
+    rate NUMERIC(10, 6) NOT NULL,
+    FOREIGN KEY (baseCurrency) REFERENCES CurrencyCode(code),
+    FOREIGN KEY (targetCurrency) REFERENCES CurrencyCode(code)
+);

@@ -7,4 +7,6 @@ import reactor.core.publisher.Flux;
 
 public interface AccountRepository extends ReactiveCrudRepository<Account, String> {
     @NonNull Flux<Account> findByClientId(int clientId);
+    @NonNull Flux<Account> findByIban(String iban);
+    @NonNull Flux<Account> findByClientIdAndIban(int clientId, String iban);
 }

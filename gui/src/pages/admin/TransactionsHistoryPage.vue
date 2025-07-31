@@ -4,6 +4,11 @@ import { useAsyncState } from '@vueuse/core'
 import { fetchTransactions, subscribeToTransactionsUpdates } from '../../services/transactions.js'
 import TransactionsTable from '../../components/TransactionsTable.vue'
 import { useRoute } from 'vue-router'
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Transactions History'
+})
 
 const route = useRoute()
 const bic = route.meta.bic as string

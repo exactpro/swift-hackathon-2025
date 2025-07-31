@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+    --color-grad-bg-1: #3f979f;
+    --color-grad-bg-2: #3b5865;
+    --color-grad-bg-logo-1: #6dbbb9;
+    --color-grad-bg-logo-2: #3c7b86;
+    --color-grad-bg-logo-3: #78c3c2;
+}
+
 @plugin "daisyui/theme" {
     name: "banka";
     default: true; /* set as default */
@@ -10,34 +18,73 @@
     --color-primary: #3f969e;
     --color-secondary: #f8f8f7;
     --color-accent: #00cfef;
-    --color-success: #00995f33;
-    --color-error: #c5160033;
-    --radius-box: 0.5rem;
-    --size-field: 0.25rem;
-    --color-base-100: #f9f9f9;
+    --color-base-100: #f8f8f8;
     --color-base-200: #ffffff;
-    --color-base-300: #e7e7e7;
+    --color-base-300: #8a8a8a;
     --color-base-content: #18181b;
     --color-primary-content: #f6f8fa;
     --color-secondary-content: #123452;
     --color-accent-content: #ffffff;
     --color-neutral: #002833;
     --color-neutral-content: #c6e1ef;
-    --color-info: #b2b2b2;
-    --color-info-content: #50545f;
-    --color-warning: #ffc107;
-    --color-success-content: #00995f;
-    --color-warning-content: #c51700;
-    --color-error-content: #5a0d1b;
-    --color-content: #17171a;
+
+    --color-info: oklch(72.06% 0.191 231.6);
+    --color-info-content: oklch(0% 0 0);
+    --color-success: oklch(64.8% 0.15 160);
+    --color-success-content: oklch(0% 0 0);
+    --color-warning: oklch(84.71% 0.199 83.87);
+    --color-warning-content: oklch(0% 0 0);
+    --color-error: oklch(71.76% 0.221 22.18);
+    --color-error-content: oklch(0% 0 0);
+
+    --radius-selector: 1rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+
+    --color-grad-bg-1: #3f979f;
+    --color-grad-bg-2: #3b5865;
+    --color-grad-bg-logo-1: #6dbbb9;
+    --color-grad-bg-logo-2: #3c7b86;
+    --color-grad-bg-logo-3: #78c3c2;
+}
+
+@plugin "daisyui/theme" {
+    name: "bankb";
+    default: false; /* set as default */
+    prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+    color-scheme: light; /* color of browser-provided UI */
+
+    --color-primary: #7c33af;
+    --color-secondary: #f8f8f7;
+    --color-accent: #00cfef;
+    --radius-box: 0.5rem;
+    --size-field: 0.25rem;
+    --color-base-100: #f8f8f8;
+    --color-base-200: #ffffff;
+    --color-base-300: #8a8a8a;
+    --color-base-content: #18181b;
+    --color-primary-content: #f7f9fa;
+    --color-secondary-content: #123452;
+    --color-accent-content: #ffffff;
+    --color-neutral: #002833;
+    --color-neutral-content: #c6e1ef;
+
+    --color-grad-bg-1: #7c33af;
+    --color-grad-bg-2: #430064;
+    --color-grad-bg-logo-1: #9b4ad1;
+    --color-grad-bg-logo-2: #662c90;
+    --color-grad-bg-logo-3: #9f55d9;
 }
 
 @plugin "daisyui" {
     themes:
-        emerald --default,
-        dim,
-        pastel,
-        banka;
+        banka --default,
+        bankb;
 }
 
 .section-title {

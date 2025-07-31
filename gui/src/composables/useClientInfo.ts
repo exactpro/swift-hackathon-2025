@@ -10,7 +10,12 @@ export function useClientInfo() {
 
   async function refresh() {
     isLoading.value = true
-    client.value = await fetchClientData(clientId)
+    const newData = await fetchClientData(clientId)
+    if (JSON.stringify(newData) === JSON.stringify(client.value)) {
+      isLoading.value = false
+      return
+    }
+    client.value = newData
     isLoading.value = false
   }
 

@@ -6,6 +6,9 @@ import { useAsyncState } from '@vueuse/core'
 import { fetchClientTransactions } from '../../services/clients'
 import { useRoute } from 'vue-router'
 import { useFakeSocket } from '../../composables/useFakeSocket'
+import BalanceWidget from '../../components/BalanceWidget.vue'
+import { computed } from 'vue'
+import { useHead } from '@unhead/vue'
 
 const route = useRoute()
 const clientId = route.meta.clientId as string
@@ -14,6 +17,12 @@ const { state: transactions, isLoading: isLoadingTransactions } = useAsyncState(
   () => fetchClientTransactions(clientId),
   []
 )
+
+const title = computed(() => {
+  return client.value ? `${client.value.fullName}'s Dashboard` : 'Client Dashboard'
+})
+
+useHead({ title })
 
 async function refreshTransactions() {
   isLoadingTransactions.value = true
@@ -28,10 +37,14 @@ async function refresh() {
 useFakeSocket(refresh)
 </script>
 <template>
-  <div>
-    <ClientInfoWidget :client="client" :isLoading="isLoading" show-accounts />
+  <div class="">
+    <ClientInfoWidget :client="client" :isLoading="isLoading" />
+    <section class="mt-10" v-if="client">
+      <h2 class="section-title">Balance</h2>
+      <BalanceWidget :accounts="client.accounts" class="-mx-3 md:-mx-6 lg:-mx-10 pl-3 md:pl-6 lg:pl-10" />
+    </section>
     <section class="mt-10">
-      <h2 class="section-title max-w-6xl mx-auto">Transaction Table</h2>
+      <h2 class="section-title">Transaction Table</h2>
       <TransactionsTable :transactions="transactions" :isLoading="isLoadingTransactions" client-mode />
     </section>
   </div>

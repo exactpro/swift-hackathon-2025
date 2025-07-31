@@ -13,8 +13,6 @@ export function formatAccountBalance(currency: Currency, amount: number) {
     return `€${formattedBalance}`
   } else if (currency === 'USD') {
     return `$${formattedBalance}`
-  } else if (currency === 'S-USDC') {
-    return `${formattedBalance} S-USDC`
   }
   return `${formattedBalance} ${currency}`
 }

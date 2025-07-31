@@ -6,7 +6,11 @@ import { Icon } from '@iconify/vue'
 import { computed, ref } from 'vue'
 import { formatAccountBalance } from '../../utils/formatNumber'
 import { useFakeSocket } from '../../composables/useFakeSocket'
+import { useHead } from '@unhead/vue'
 
+useHead({
+  title: 'Transaction Status'
+})
 const route = useRoute()
 const uetr = route.params.uetr as string
 
