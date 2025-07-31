@@ -39,3 +39,10 @@ CREATE TABLE Transfer (
     creditorBic VARCHAR(255) NOT NULL,
     remittanceInfo VARCHAR(255)
 );
+
+CREATE TABLE ConversionRate (
+    id SERIAL PRIMARY KEY,
+    baseCurrency VARCHAR(3) NOT NULL,
+    targetCurrency VARCHAR(3) NOT NULL,
+    rate NUMERIC(10, 6) NOT NULL,
+);
