@@ -23,10 +23,10 @@ import java.time.Duration;
 public class Application {
     private final static Logger logger = LogManager.getLogger(Application.class);
 
-    @Value("#{server.port:8081}")
+    @Value("${server.port:8081}")
     private int port;
 
-    @Value("#{server.host:0.0.0.0}")
+    @Value("${server.host:0.0.0.0}")
     private String host;
 
     public static void main(@NonNull String[] args) {
