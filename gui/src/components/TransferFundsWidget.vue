@@ -275,8 +275,10 @@ async function startTransaction() {
       </section>
     </form>
     <div class="card card-sm bg-base-200 shadow-lg mt-12 flex flex-col gap-4 order-1 lg:order-3">
-      <div class="card-body text-xs leading-3">
-        <p>To perform a successful test payment transaction, please use the following mock credentials:</p>
+      <div class="card-body text-xs leading-[0.9375rem]">
+        <p class="text-balance">
+          To perform a successful test payment transaction, please use the following mock credentials:
+        </p>
         <h3 class="font-bold">Creditor BIC</h3>
         <table v-if="utils" class="w-fit">
           <tbody>
@@ -303,7 +305,7 @@ async function startTransaction() {
             </tr>
           </tbody>
         </table>
-        <p>
+        <p class="text-balance">
           You may also enter other BIC or IBAN values for demonstration purposes, but transfers will fail or remain
           pending by design to showcase error handling.
         </p>
