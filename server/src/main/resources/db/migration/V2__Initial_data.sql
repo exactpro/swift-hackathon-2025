@@ -5,21 +5,37 @@ INSERT INTO CurrencyCode (code) VALUES
 
 WITH new_client AS (
     INSERT INTO Client (fullName)
-    VALUES ('Anton Sitnikov')
+    VALUES ('Marcus Vellon')
     RETURNING clientId
 )
 INSERT INTO Account (iban, clientId, currencyCode, balance)
-SELECT 'GB29NWBK60161331926819', clientId, 'USD', 1000.00
-FROM new_client;
+SELECT accounts*, nc.clientId
+FROM new_client nc,
+     (VALUES
+         ('GB33BUKB20201555555555', 'USD', 5000.00),
+         ('GB33BUKB20201555555555', 'EUR', 2500.00),
+         ('GB33BUKB20201555555555', 'USDC', 10000.00),
+         ('GB33BUKB20201555555556', 'USD', 5000.00),
+         ('GB33BUKB20201555555556', 'EUR', 2500.00),
+         ('GB33BUKB20201555555556', 'USDC', 10000.00)
+     ) AS accounts(iban, currencyCode, balance);
 
 WITH new_client AS (
     INSERT INTO Client (fullName)
-    VALUES ('Tony Stark')
+    VALUES ('Lena Brightfield')
     RETURNING clientId
 )
 INSERT INTO Account (iban, clientId, currencyCode, balance)
-SELECT 'CH7889144788712476784', clientId, 'USD', 5000.00
-FROM new_client;
+SELECT accounts.*, nc.clientId
+FROM new_client nc,
+     (VALUES
+         ('GE60NB0000000123456788', 'USD', 5000.00),
+         ('GE60NB0000000123456788', 'EUR', 2500.00),
+         ('GE60NB0000000123456788', 'USDC', 10000.00),
+         ('GE60NB0000000123456789', 'USD', 5000.00),
+         ('GE60NB0000000123456789', 'EUR', 2500.00),
+         ('GE60NB0000000123456789', 'USDC', 10000.00)
+     ) AS accounts(iban, currencyCode, balance);
 
 INSERT INTO ConversionRate (baseCurrency, targetCurrency, rate) VALUES
 ('USD', 'EUR', 0.88),
