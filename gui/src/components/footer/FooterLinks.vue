@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { RouterLink } from 'vue-router'
 
 const socialLinks = [
   {
