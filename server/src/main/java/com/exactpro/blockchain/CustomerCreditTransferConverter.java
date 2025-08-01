@@ -44,7 +44,7 @@ public class CustomerCreditTransferConverter {
             .settlementDate(LocalDate.now())
             .debtor(debtor)
             .creditor(creditor)
-            .remittanceInfo("")
+            .remittanceInfo("Transfer")
             .build();
 
         return new CustomerCreditTransfer(
