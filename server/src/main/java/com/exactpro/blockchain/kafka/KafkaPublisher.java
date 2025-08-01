@@ -44,13 +44,12 @@ public class KafkaPublisher {
             SenderRecord.create(new ProducerRecord<>(targetBankBic, key, message), key);
 
         return sender.send(Mono.just(senderRecord))
-            .doOnNext(result -> {
+            .doOnNext(result ->
                 logger.info("Message sent successfully to topic: {}, partition: {}, offset: {}, key: {}",
                     result.recordMetadata().topic(),
                     result.recordMetadata().partition(),
                     result.recordMetadata().offset(),
-                    result.correlationMetadata());
-            })
+                    result.correlationMetadata()))
             .doOnError(e -> {
                 logger.error("Failed to send message to Kafka. Key: {}. Error: {}", key, e.getMessage(), e);
             })

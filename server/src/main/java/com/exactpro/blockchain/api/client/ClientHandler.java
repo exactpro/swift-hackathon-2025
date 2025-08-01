@@ -96,17 +96,17 @@ public class ClientHandler {
                                     }
 
                                     return kafkaPublisher.publishMessage(transferDetails.getCreditorBic(), encodedTransfer)
-                                        .doOnSuccess(senderResult -> {
+                                        .flatMap(senderResult -> {
                                             transfer.setStatus(TransferStatus.COMPLETED);
-                                            transferRepository.save(transfer).subscribe();
+                                            return transferRepository.save(transfer);
                                         })
                                         .onErrorResume(e -> {
                                             transfer.setStatus(TransferStatus.FAILED);
-                                            transferRepository.save(transfer).subscribe();
-                                            return Mono.error(new RuntimeException("Kafka send failed", e));
+                                            return transferRepository.save(transfer)
+                                                .flatMap(failedTransfer -> Mono.error(new RuntimeException("Kafka send failed", e)));
                                         })
                                         .then(ServerResponse.accepted()
-                                            .bodyValue(MessageFormat.format("Transfer successful for client {0}. Details: {1}", clientId, transferDetails)));
+                                            .bodyValue(MessageFormat.format("Transfer successful for client {0}", clientId)));
                                 });
                         });
             })

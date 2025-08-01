@@ -109,14 +109,14 @@ public class KafkaConsumer {
 
         KafkaReceiver.create(receiverOptions)
             .receive()
-            .doOnNext(this::processMessage)
+            .flatMap(this::processMessage)
             .subscribe();
     }
 
-    private void processMessage(@NonNull ReceiverRecord<String, String> record) {
+    private Mono<Void> processMessage(@NonNull ReceiverRecord<String, String> record) {
         logger.info("Received message: {}", record.value());
 
-        Mono.just(record.value())
+        return Mono.just(record.value())
             .flatMap(message -> {
                 try {
                     CustomerCreditTransfer creditTransfer = xmlCodec.decode(message);
@@ -140,7 +140,9 @@ public class KafkaConsumer {
                     logger.error("Failed to decode XML message: {}", e.getMessage(), e);
                     return Mono.error(new RuntimeException("XML decoding failed", e));
                 }
-            });
+            })
+            .doOnError(e -> logger.error(e.getMessage(), e))
+            .doFinally(signalType -> record.receiverOffset().acknowledge());
     }
 
     private Mono<Account> addToRecipientBalanceMono(Transfer transfer) {
