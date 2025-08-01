@@ -9,7 +9,7 @@ WITH new_client AS (
     RETURNING clientId
 )
 INSERT INTO Account (iban, clientId, currencyCode, balance)
-SELECT accounts*, nc.clientId
+SELECT accounts.*, nc.clientId
 FROM new_client nc,
      (VALUES
          ('GB33BUKB20201555555555', 'USD', 5000.00),
