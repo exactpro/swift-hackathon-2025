@@ -17,10 +17,13 @@ import java.util.Map;
 public class KafkaPublisher {
     private static final Logger logger = LogManager.getLogger(KafkaPublisher.class);
 
-    @Value("${kafka.bootstrap.servers}")
-    private String bootstrapServers;
+    private final String bootstrapServers;
+    private final KafkaSender<String, String> sender;
 
-    private final KafkaSender<String, String> sender = createSender();
+    public KafkaPublisher(@Value("${kafka.bootstrap.servers}") String bootstrapServers) {
+        this.bootstrapServers = bootstrapServers;
+        this.sender = createSender();
+    }
 
     private KafkaSender<String, String> createSender() {
         final Map<String, Object> producerProps = Map.of(
@@ -55,6 +58,6 @@ public class KafkaPublisher {
     }
 
     public Mono<Void> publishMessage(String topic, String xmlMessage) {
-        return publishMessage(topic, xmlMessage, null); // Отправляем без ключа
+        return publishMessage(topic, xmlMessage, null);
     }
 }
