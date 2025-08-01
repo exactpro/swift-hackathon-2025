@@ -1,22 +1,22 @@
 INSERT INTO CurrencyCode (code) VALUES
     ('USD'),
     ('EUR'),
-    ('USDС');
+    ('USDC');
 
 WITH new_client AS (
     INSERT INTO Client (fullName)
     VALUES ('Marcus Vellon')
     RETURNING clientId
 )
-INSERT INTO Account (iban, clientId, currencyCode, balance)
+INSERT INTO Account (iban, currencyCode, balance, clientId)
 SELECT accounts.*, nc.clientId
 FROM new_client nc,
      (VALUES
-         ('GB33BUKB20201555555555', 'USD', 5000.00),
+         ('GB33BUKB20201555555551', 'USD', 5000.00),
+         ('GB33BUKB20201555555552', 'EUR', 2500.00),
+         ('GB33BUKB20201555555553', 'USDC', 10000.00),
+         ('GB33BUKB20201555555554', 'USD', 5000.00),
          ('GB33BUKB20201555555555', 'EUR', 2500.00),
-         ('GB33BUKB20201555555555', 'USDC', 10000.00),
-         ('GB33BUKB20201555555556', 'USD', 5000.00),
-         ('GB33BUKB20201555555556', 'EUR', 2500.00),
          ('GB33BUKB20201555555556', 'USDC', 10000.00)
      ) AS accounts(iban, currencyCode, balance);
 
@@ -25,16 +25,16 @@ WITH new_client AS (
     VALUES ('Lena Brightfield')
     RETURNING clientId
 )
-INSERT INTO Account (iban, clientId, currencyCode, balance)
+INSERT INTO Account (iban, currencyCode, balance, clientId)
 SELECT accounts.*, nc.clientId
 FROM new_client nc,
      (VALUES
-         ('GE60NB0000000123456788', 'USD', 5000.00),
-         ('GE60NB0000000123456788', 'EUR', 2500.00),
-         ('GE60NB0000000123456788', 'USDC', 10000.00),
-         ('GE60NB0000000123456789', 'USD', 5000.00),
-         ('GE60NB0000000123456789', 'EUR', 2500.00),
-         ('GE60NB0000000123456789', 'USDC', 10000.00)
+         ('GE60NB0000000123456781', 'USD', 5000.00),
+         ('GE60NB0000000123456782', 'EUR', 2500.00),
+         ('GE60NB0000000123456783', 'USDC', 10000.00),
+         ('GE60NB0000000123456784', 'USD', 5000.00),
+         ('GE60NB0000000123456785', 'EUR', 2500.00),
+         ('GE60NB0000000123456786', 'USDC', 10000.00)
      ) AS accounts(iban, currencyCode, balance);
 
 INSERT INTO ConversionRate (baseCurrency, targetCurrency, rate) VALUES

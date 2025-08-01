@@ -39,13 +39,13 @@ CREATE TABLE Transfer (
     creditorIban VARCHAR(255) NOT NULL,
     creditorBic VARCHAR(255) NOT NULL,
     remittanceInfo VARCHAR(255),
-    FOREIGN KEY (clientId) REFERENCES Client(clientId),
+    FOREIGN KEY (clientId) REFERENCES Client(clientId)
 );
 
 CREATE TABLE ConversionRate (
     id SERIAL PRIMARY KEY,
-    baseCurrency VARCHAR(3) NOT NULL,
-    targetCurrency VARCHAR(3) NOT NULL,
+    baseCurrency VARCHAR(20) NOT NULL,
+    targetCurrency VARCHAR(20) NOT NULL,
     rate NUMERIC(10, 6) NOT NULL,
     FOREIGN KEY (baseCurrency) REFERENCES CurrencyCode(code),
     FOREIGN KEY (targetCurrency) REFERENCES CurrencyCode(code)
