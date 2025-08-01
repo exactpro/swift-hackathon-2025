@@ -37,25 +37,17 @@ const socialLinks = [
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-6">
-    <!-- Social Media Links -->
-    <div class="flex gap-2">
-      <a
-        v-for="link in socialLinks"
-        :key="link.name"
-        :href="link.url"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-white hover:scale-110 transition-transform duration-200"
-        :title="link.name"
-      >
-        <Icon :icon="link.icon" class="w-10 h-10" />
-      </a>
-    </div>
-
-    <!-- About Section -->
-    <div class="text-center">
-      <RouterLink to="/" class="link text-white text-lg font-semibold"> About this solution </RouterLink>
-    </div>
+  <div class="flex items-center gap-2">
+    <a
+      v-for="link in socialLinks"
+      :key="link.name"
+      :href="link.url"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-white hover:scale-110 transition-transform duration-200"
+      :title="link.name"
+    >
+      <Icon :icon="link.icon" class="w-6 h-6" />
+    </a>
   </div>
 </template>
