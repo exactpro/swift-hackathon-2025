@@ -24,19 +24,19 @@ public class CustomerCreditTransferConverter {
 
         Participant debtor = Participant.builder()
             .fullName(client.getFullName())
-            .iban(transferDetails.getSelfIban()) // TODO Check that account belongs to the client
+            .iban(transferDetails.getDebtorIban()) // TODO Check that account belongs to the client
             .bic(clientBic)
             .build();
 
         Participant creditor = Participant.builder()
-            .fullName(transferDetails.getTargetFullName())
-            .iban(transferDetails.getTargetIban())
-            .bic(transferDetails.getTargetBic())
+            .fullName(transferDetails.getCreditorFullName())
+            .iban(transferDetails.getCreditorIban())
+            .bic(transferDetails.getCreditorBic())
             .build();
 
         TransactionInfo transactionInfo = TransactionInfo.builder()
             .endToEndId("")
-            .currency(transferDetails.getCurrency())
+            .currency(transferDetails.getCurrencyCode())
             .amount(transferDetails.getAmount())
             .settlementDate(LocalDate.now())
             .debtor(debtor)

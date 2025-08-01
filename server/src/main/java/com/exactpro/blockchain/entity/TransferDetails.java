@@ -3,79 +3,71 @@ package com.exactpro.blockchain.entity;
 import java.math.BigDecimal;
 
 public class TransferDetails {
-    private String accountID;
-    private String selfIban;
-    private String targetFullName;
-    private String targetBic;
-    private String targetIban;
-    private String currency;
+    private String debtorIban;
+    private String creditorFullName;
+    private String creditorBic;
+    private String creditorIban;
+    private String currencyCode;
     private BigDecimal amount;
+    private String comment;
 
     public TransferDetails() {
     }
 
-    public TransferDetails(String accountID,
-                           String selfIban,
-                           String targetFullName,
-                           String targetBic,
-                           String targetIban,
-                           String currency,
-                           BigDecimal amount) {
-        this.accountID = accountID;
-        this.selfIban = selfIban;
-        this.targetFullName = targetFullName;
-        this.targetBic = targetBic;
-        this.targetIban = targetIban;
-        this.currency = currency;
+    public TransferDetails(String debtorIban,
+                           String creditorFullName,
+                           String creditorBic,
+                           String creditorIban,
+                           String currencyCode,
+                           BigDecimal amount,
+                           String comment) {
+        this.debtorIban = debtorIban;
+        this.creditorFullName = creditorFullName;
+        this.creditorBic = creditorBic;
+        this.creditorIban = creditorIban;
+        this.currencyCode = currencyCode;
         this.amount = amount;
+        this.comment = comment;
     }
 
-    public String getAccountID() {
-        return accountID;
+    public String getDebtorIban() {
+        return debtorIban;
     }
 
-    public void setAccountID(String accountID) {
-        this.accountID = accountID;
+    public void setDebtorIban(String debtorIban) {
+        this.debtorIban = debtorIban;
     }
 
-    public String getSelfIban() {
-        return selfIban;
+    public String getCreditorFullName() {
+        return creditorFullName;
     }
 
-    public void setSelfIban(String selfIban) {
-        this.selfIban = selfIban;
+    public void setCreditorFullName(String creditorFullName) {
+        this.creditorFullName = creditorFullName;
     }
 
-    public String getTargetFullName() {
-        return targetFullName;
+    public String getCreditorBic() {
+        return creditorBic;
     }
 
-    public void setTargetFullName(String targetFullName) {
-        this.targetFullName = targetFullName;
+    public void setCreditorBic(String creditorBic) {
+        this.creditorBic = creditorBic;
     }
 
-    public String getTargetBic() {
-        return targetBic;
+    public String getCreditorIban() {
+        return creditorIban;
     }
 
-    public void setTargetBic(String targetBic) {
-        this.targetBic = targetBic;
+    public void setCreditorIban(String creditorIban) {
+        this.creditorIban = creditorIban;
     }
 
-    public String getTargetIban() {
-        return targetIban;
+    public String getCurrencyCode() {
+        return currencyCode;
     }
 
-    public void setTargetIban(String targetIban) {
-        this.targetIban = targetIban;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
     public BigDecimal getAmount() {
@@ -84,5 +76,13 @@ public class TransferDetails {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

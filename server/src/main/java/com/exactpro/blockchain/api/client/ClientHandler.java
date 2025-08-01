@@ -30,7 +30,10 @@ import java.text.MessageFormat;
 public class ClientHandler {
     private static final Logger logger = LogManager.getLogger(ClientHandler.class);
 
-    private final String clientBic;
+    @Value("${client.bic}")
+    private String clientBic;
+    @Value("${default.user}")
+    private Integer clientId;
     private final AccountRepository accountRepository;
     private final ClientRepository clientRepository;
     private final ConversionRateRepository conversionRateRepository;
@@ -39,15 +42,13 @@ public class ClientHandler {
     private final CustomerCreditTransferConverter converter;
     private final KafkaPublisher kafkaPublisher;
 
-    public ClientHandler(@Value("${client.bic}") String clientBic,
-                         AccountRepository accountRepository,
+    public ClientHandler(AccountRepository accountRepository,
                          ClientRepository clientRepository,
                          ConversionRateRepository conversionRateRepository,
                          XmlCodec xmlCodec,
                          TransferRepository transferRepository,
                          CustomerCreditTransferConverter converter,
                          KafkaPublisher kafkaPublisher) {
-        this.clientBic = clientBic;
         this.accountRepository = accountRepository;
         this.clientRepository = clientRepository;
         this.conversionRateRepository = conversionRateRepository;
@@ -58,12 +59,14 @@ public class ClientHandler {
     }
 
     public Mono<ServerResponse> getAccountsByClientId(ServerRequest request) {
-        int clientId = Integer.parseInt(request.pathVariable("clientId"));
-        return ServerResponse.ok().body(accountRepository.findByClientId(clientId), com.exactpro.blockchain.entity.Account.class);
+        return ServerResponse.ok().body(accountRepository.findByClientId(clientId), Account.class);
+    }
+
+    public Mono<ServerResponse> getTransfersByClientId(ServerRequest request) {
+        return ServerResponse.ok().body(transferRepository.findByClientId(clientId), Transfer.class);
     }
 
     public Mono<ServerResponse> transfer(ServerRequest request) {
-        int clientId = Integer.parseInt(request.pathVariable("clientId"));
         return Mono.zip(request.bodyToMono(TransferDetails.class),
                 clientRepository.findByClientId(clientId).singleOrEmpty())
             .flatMap(data -> {
@@ -72,8 +75,7 @@ public class ClientHandler {
                 Client client = data.getT2();
 
                 return subtractSelfBalanceMono(clientId, transferDetails)
-                    .flatMap(debitedAccount -> addToRecipientBalanceMono(transferDetails)
-                        .flatMap(creditedAccount -> {
+                    .flatMap(debitedAccount -> {
 
                             CustomerCreditTransfer customerCreditTransfer = converter.convertFromClientAndTransferDetails(client, clientBic, transferDetails);
 
@@ -93,7 +95,7 @@ public class ClientHandler {
                                         return Mono.error(new RuntimeException("Failed to encode to XML", e));
                                     }
 
-                                    return kafkaPublisher.publishMessage(transferDetails.getTargetBic(), encodedTransfer)
+                                    return kafkaPublisher.publishMessage(transferDetails.getCreditorBic(), encodedTransfer)
                                         .doOnSuccess(senderResult -> {
                                             transfer.setStatus(TransferStatus.COMPLETED);
                                             transferRepository.save(transfer).subscribe();
@@ -106,21 +108,21 @@ public class ClientHandler {
                                         .then(ServerResponse.accepted()
                                             .bodyValue(MessageFormat.format("Transfer successful for client {0}. Details: {1}", clientId, transferDetails)));
                                 });
-                        }));
+                        });
             })
             .onErrorResume(RuntimeException.class, e -> ServerResponse.status(500).bodyValue("Internal Server Error"))
             .switchIfEmpty(ServerResponse.badRequest().bodyValue("Invalid request"));
     }
 
     private Mono<Account> subtractSelfBalanceMono(int clientId, TransferDetails transferDetails) {
-        return accountRepository.findByClientIdAndIban(clientId, transferDetails.getSelfIban())
+        return accountRepository.findByClientIdAndIban(clientId, transferDetails.getDebtorIban())
             .singleOrEmpty()
             .switchIfEmpty(Mono.error(
                 new IllegalArgumentException(MessageFormat.format(
-                    "Debtor Account not found for client ID {0} and IBAN: {1}", clientId, transferDetails.getSelfIban()))))
+                    "Debtor Account not found for client ID {0} and IBAN: {1}", clientId, transferDetails.getDebtorIban()))))
             .flatMap(account -> {
                 BigDecimal amountToDebit = transferDetails.getAmount();
-                String transferCurrency = transferDetails.getCurrency();
+                String transferCurrency = transferDetails.getCurrencyCode();
                 String accountCurrency = account.getCurrencyCode();
 
                 if (!accountCurrency.equals(transferCurrency)) {
@@ -129,7 +131,7 @@ public class ClientHandler {
                         .switchIfEmpty(Mono.error(new IllegalArgumentException(MessageFormat.format(
                             "Conversion rate not found from {0} to {1}", transferCurrency, accountCurrency))))
                         .flatMap(rate -> {
-                            BigDecimal convertedAmount = transferDetails.getAmount().multiply(rate.getRate());
+                            BigDecimal convertedAmount = amountToDebit.multiply(rate.getRate());
                             logger.info("Converted amount for debit: {} {} (from {} {}) using rate {}",
                                 convertedAmount, accountCurrency, amountToDebit, transferCurrency, rate.getRate());
                             return performDebit(account, convertedAmount);
@@ -150,41 +152,6 @@ public class ClientHandler {
             )));
         }
         account.setBalance(account.getBalance().subtract(amountToDebit));
-        return accountRepository.save(account);
-    }
-
-    private Mono<Account> addToRecipientBalanceMono(TransferDetails transferDetails) {
-        return accountRepository.findByIban(transferDetails.getTargetIban())
-            .singleOrEmpty()
-            .switchIfEmpty(Mono.error(
-                new IllegalArgumentException(MessageFormat.format(
-                    "Creditor Account not found for IBAN: {0}", transferDetails.getTargetIban()))))
-            .flatMap(account -> {
-                BigDecimal amountToCredit = transferDetails.getAmount();
-                String transferCurrency = transferDetails.getCurrency();
-                String accountCurrency = account.getCurrencyCode();
-
-                if (!accountCurrency.equals(transferCurrency)) {
-                    return conversionRateRepository.findByBaseCurrencyAndTargetCurrency(transferCurrency, accountCurrency)
-                        .singleOrEmpty()
-                        .switchIfEmpty(Mono.error(new IllegalArgumentException(MessageFormat.format(
-                            "Conversion rate not found from {0} to {1}", transferCurrency, accountCurrency))))
-                        .flatMap(rate -> {
-                            BigDecimal convertedAmount = transferDetails.getAmount().multiply(rate.getRate());
-                            logger.info("Converted amount for credit: {} {} (from {} {}) using rate {}",
-                                convertedAmount, accountCurrency, amountToCredit, transferCurrency, rate.getRate());
-                            return performCredit(account, convertedAmount);
-                        });
-                } else {
-                    return performCredit(account, amountToCredit);
-                }
-            })
-            .doOnSuccess(creditedAccount -> logger.info("Balance successfully credited to recipient account (IBAN: {}). New balance: {}. Amount: {}",
-                creditedAccount.getIban(), creditedAccount.getBalance(), transferDetails.getAmount()));
-    }
-
-    private Mono<Account> performCredit(Account account, BigDecimal amountToCredit) {
-        account.setBalance(account.getBalance().add(amountToCredit));
         return accountRepository.save(account);
     }
 }

@@ -7,4 +7,5 @@ import reactor.core.publisher.Flux;
 
 public interface TransferRepository extends ReactiveCrudRepository<Transfer, Integer> {
     @NonNull Flux<Transfer> findByTransferId(int transferId);
+    @NonNull Flux<Transfer> findByClientId(int clientId);
 }
