@@ -83,7 +83,6 @@ public class ClientHandler {
                             try {
                                 transferToSave = converter.convertToTransfer(customerCreditTransfer, TransferStatus.PENDING).get(0);
                             } catch (IllegalArgumentException e) {
-                                logger.error("Failed to convert CustomerCreditTransfer to Transfer", e);
                                 return Mono.error(new RuntimeException("Failed to convert CustomerCreditTransfer to Transfer", e));
                             }
 
@@ -93,7 +92,6 @@ public class ClientHandler {
                                     try {
                                         encodedTransfer = xmlCodec.encode(customerCreditTransfer);
                                     } catch (JAXBException | TransformerException e) {
-                                        logger.error("Failed to encode to XML", e);
                                         return Mono.error(new RuntimeException("Failed to encode to XML", e));
                                     }
 
@@ -105,7 +103,6 @@ public class ClientHandler {
                                         .onErrorResume(e -> {
                                             transfer.setStatus(TransferStatus.FAILED);
                                             transferRepository.save(transfer).subscribe();
-                                            logger.error("Failed to send message to Kafka", e);
                                             return Mono.error(new RuntimeException("Kafka send failed", e));
                                         })
                                         .then(ServerResponse.accepted()
@@ -113,7 +110,10 @@ public class ClientHandler {
                                 });
                         });
             })
-            .onErrorResume(RuntimeException.class, e -> ServerResponse.status(500).bodyValue("Internal Server Error"))
+            .onErrorResume(RuntimeException.class, e -> {
+                logger.error(e.getMessage(), e);
+                return ServerResponse.status(500).bodyValue("Internal Server Error");
+            })
             .switchIfEmpty(ServerResponse.badRequest().bodyValue("Invalid request"));
     }
 
