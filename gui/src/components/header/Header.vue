@@ -5,19 +5,20 @@ import CoincentoLogo from './CoincentoLogo.vue'
 
 defineProps<{
   homeLink?: string
+  noBgImage?: boolean
 }>()
 </script>
 
 <template>
-  <header class="relative h-20 bg-linear-to-r from-grad-bg-1 to-grad-bg-2">
-    <figure class="absolute inset-0 z-0 overflow-hidden flex justify-end">
+  <header class="relative h-16 bg-linear-to-r from-grad-bg-1 to-grad-bg-2">
+    <figure v-if="!noBgImage" class="absolute inset-0 z-0 overflow-hidden flex justify-end">
       <HeaderBgImage class="header-bg-image" />
     </figure>
-    <div class="relative z-10 flex items-center h-full p-3 md:p-6 lg:p-10 justify-between">
-      <RouterLink :to="homeLink || '/'">
-        <CoincentoLogo class="h-8 sm:h-12 w-auto" />
+    <div class="relative z-10 flex items-center h-full px-3 md:px-6 lg:px-10 justify-between">
+      <RouterLink to="/">
+        <CoincentoLogo class="h-6 sm:h-8 w-auto" />
       </RouterLink>
-      <div class="flex-none flex items-center text-white">
+      <div class="flex-none flex items-center text-white gap-1">
         <slot />
       </div>
     </div>

@@ -21,16 +21,16 @@ const transferLink = useBankRoute('transfer')
 </script>
 
 <template>
-  <Header :home-link="homeLink">
-    <ul class="menu menu-horizontal px-1 gap-1">
+  <Header no-bg-image>
+    <ul class="px-1 gap-1 flex">
       <li class="hidden sm:block">
-        <RouterLink :to="transferLink" active-class="menu-active">
+        <RouterLink :to="transferLink" class="btn btn-sm btn-ghost" active-class="btn-active">
           <Icon icon="mdi:transfer" class="inline-block" />
           Transfer
         </RouterLink>
       </li>
       <li class="hidden sm:block">
-        <RouterLink :to="homeLink" exact-active-class="menu-active">
+        <RouterLink :to="homeLink" class="btn btn-sm btn-ghost" exact-active-class="btn-active">
           <Icon icon="mdi:view-dashboard" class="inline-block" />
           Dashboard
         </RouterLink>
