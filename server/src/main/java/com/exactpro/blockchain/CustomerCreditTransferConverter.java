@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -36,7 +35,7 @@ public class CustomerCreditTransferConverter {
             .build();
 
         TransactionInfo transactionInfo = TransactionInfo.builder()
-            .endToEndId(String.valueOf(UUID.randomUUID()))
+            .endToEndId(IdGenerator.generateId(16))
             .currency(transferDetails.getCurrencyCode())
             .amount(transferDetails.getAmount())
             .settlementDate(LocalDate.now())
