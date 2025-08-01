@@ -1,6 +1,7 @@
 package com.exactpro.blockchain.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
@@ -10,21 +11,34 @@ import java.time.LocalDate;
 @Table("Transfer")
 public class Transfer {
     @Id
+    @Column("transferId")
     private Integer transferId;
+    @Column("clientId")
     private Integer clientId;
     private TransferStatus status;
+    @Column("messageId")
     private String messageId;
+    @Column("transferTimestamp")
     private Instant transferTimestamp;
+    @Column("endToEndId")
     private String endToEndId;
     private String currency;
     private BigDecimal amount;
+    @Column("settlementDate")
     private LocalDate settlementDate;
+    @Column("debtorFullName")
     private String debtorFullName;
+    @Column("debtorIban")
     private String debtorIban;
+    @Column("debtorBic")
     private String debtorBic;
+    @Column("creditorFullName")
     private String creditorFullName;
+    @Column("creditorIban")
     private String creditorIban;
+    @Column("creditorBic")
     private String creditorBic;
+    @Column("remittanceInfo")
     private String remittanceInfo;
 
     public Integer getTransferId() {

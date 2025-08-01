@@ -7,6 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("Client")
 public class Client {
     @Id
+    @Column("clientId")
     private Integer clientId;
 
     @Column("fullName")
