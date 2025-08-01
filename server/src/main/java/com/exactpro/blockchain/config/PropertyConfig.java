@@ -9,17 +9,22 @@ import org.springframework.core.io.ClassPathResource;
 
 @Configuration
 public class PropertyConfig {
-
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
 
-        configurer.setLocations(
-             new ClassPathResource("application.properties"), // src/main/resources
-             new FileSystemResource("config/config.properties")
-        );
+        String configurationPath = System.getProperty("server.config");
+        if (configurationPath == null) {
+            configurer.setLocations(
+                new ClassPathResource("application.properties") // src/main/resources
+            );
+        } else {
+            configurer.setLocations(
+                new FileSystemResource(configurationPath)
+            );
+        }
 
-        configurer.setIgnoreUnresolvablePlaceholders(true);
+//        configurer.setIgnoreUnresolvablePlaceholders(true);
         return configurer;
     }
 }

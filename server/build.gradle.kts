@@ -1,5 +1,6 @@
 plugins {
     application
+    id("com.gradleup.shadow") version "8.3.8"
 }
 
 repositories {
@@ -57,13 +58,7 @@ tasks {
         jvmArgs("-Djava.net.preferIPv4Stack=true")
     }
 
-    jar {
-        manifest.attributes["Main-Class"] = "com.exactpro.blockchain.Application"
-        val dependencies = configurations
-            .runtimeClasspath
-            .get()
-            .map(::zipTree)
-        from(dependencies)
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    shadowJar {
+        mergeServiceFiles()
     }
 }

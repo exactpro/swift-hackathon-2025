@@ -20,6 +20,7 @@ public class FlywayConfig {
     public Flyway flyway() {
         return Flyway.configure()
             .dataSource(flywayUrl, flywayUser, flywayPassword)
+            .validateMigrationNaming(true)
             .load();
     }
 }
