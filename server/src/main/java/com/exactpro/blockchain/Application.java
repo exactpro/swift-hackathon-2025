@@ -8,8 +8,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.server.reactive.HttpHandler;
 import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter;
 import org.springframework.lang.NonNull;
@@ -38,11 +36,6 @@ public class Application {
         try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Application.class)) {
             context.getBean(HttpServer.class).bindUntilJavaShutdown(Duration.ofSeconds(60), null);
         }
-    }
-
-    @Bean
-    public static @NonNull PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-        return new PropertySourcesPlaceholderConfigurer();
     }
 
     @Bean
