@@ -18,7 +18,7 @@ import reactor.netty.http.server.HttpServer;
 import java.time.Duration;
 
 @Configuration
-@ComponentScan
+@ComponentScan(basePackages = "com.exactpro")
 @EnableWebFlux
 public class Application {
     private final static Logger logger = LogManager.getLogger(Application.class);
