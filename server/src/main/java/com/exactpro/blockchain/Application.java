@@ -23,14 +23,11 @@ import java.time.Duration;
 public class Application {
     private final static Logger logger = LogManager.getLogger(Application.class);
 
-    @Value("#{port:8081}")
+    @Value("#{server.port:8081}")
     private int port;
 
-    @Value("#{host:0.0.0.0}")
+    @Value("#{server.host:0.0.0.0}")
     private String host;
-
-    @Value("#{compress:false}")
-    private boolean compress;
 
     public static void main(@NonNull String[] args) {
         try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Application.class)) {
