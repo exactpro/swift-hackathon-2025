@@ -39,7 +39,7 @@ CREATE TABLE Transfer (
     creditorIban VARCHAR(255) NOT NULL,
     creditorBic VARCHAR(255) NOT NULL,
     remittanceInfo VARCHAR(255),
-    FOREIGN KEY (clientId) REFERENCES Client(clientId),
+    FOREIGN KEY (clientId) REFERENCES Client(clientId)
 );
 
 CREATE TABLE ConversionRate (
