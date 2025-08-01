@@ -275,26 +275,34 @@ async function startTransaction() {
       </section>
     </form>
     <div class="card card-sm bg-base-200 shadow-lg mt-12 flex flex-col gap-4 order-1 lg:order-3">
-      <div class="card-body">
+      <div class="card-body text-xs leading-3">
         <p>To perform a successful test payment transaction, please use the following mock credentials:</p>
-        <h3 class="card-title">Creditor BIC</h3>
-        <ul v-if="utils">
-          <li class="flex justify-between items-center" v-for="bic in utils.bics" :key="bic">
-            <span>{{ bic }}</span>
-            <button class="btn btn-xs btn-ghost btn-circle text-primary" @click="copy(bic)">
-              <Icon icon="mdi:content-copy" />
-            </button>
-          </li>
-        </ul>
-        <h3 class="card-title">Creditor Account (IBAN)</h3>
-        <ul v-if="utils">
-          <li class="flex justify-between items-center" v-for="iban in utils.ibans" :key="iban">
-            <span>{{ iban }}</span>
-            <button class="btn btn-xs btn-ghost btn-circle text-primary" @click="copy(iban)">
-              <Icon icon="mdi:content-copy" />
-            </button>
-          </li>
-        </ul>
+        <h3 class="font-bold">Creditor BIC</h3>
+        <table v-if="utils" class="w-fit">
+          <tbody>
+            <tr v-for="bic in utils.bics" :key="bic">
+              <td>{{ bic }}</td>
+              <td>
+                <button class="btn btn-xs btn-ghost btn-circle text-primary" @click="copy(bic)">
+                  <Icon icon="mdi:content-copy" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 class="font-bold">Creditor Account (IBAN)</h3>
+        <table v-if="utils" class="w-fit">
+          <tbody>
+            <tr v-for="iban in utils.ibans" :key="iban">
+              <td>{{ iban }}</td>
+              <td>
+                <button class="btn btn-xs btn-ghost btn-circle text-primary" @click="copy(iban)">
+                  <Icon icon="mdi:content-copy" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
         <p>
           You may also enter other BIC or IBAN values for demonstration purposes, but transfers will fail or remain
           pending by design to showcase error handling.
