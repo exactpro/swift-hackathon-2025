@@ -30,6 +30,6 @@ import ExactproLogo from './ExactproLogo.vue'
 <style scoped>
 @reference "../../style.css";
 .footer__bg-logo {
-  @apply w-full mr-[-50%] sm:w-auto sm:h-[150%] sm:-mr-20;
+  @apply w-full mr-[-40%] sm:w-auto sm:h-[150%] sm:-mr-8;
 }
 </style>
