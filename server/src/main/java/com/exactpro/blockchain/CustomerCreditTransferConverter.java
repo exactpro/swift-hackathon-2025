@@ -20,7 +20,10 @@ import java.util.stream.Collectors;
 public class CustomerCreditTransferConverter {
 
     public CustomerCreditTransfer convertFromClientAndTransferDetails(Client client, String clientBic, TransferDetails transferDetails) {
-        GroupHeader groupHeader = GroupHeader.builder().messageId("").timestamp(Instant.now()).build();
+        GroupHeader groupHeader = GroupHeader.builder()
+            .messageId(IdGenerator.generateId(16))
+            .timestamp(Instant.now())
+            .build();
 
         Participant debtor = Participant.builder()
             .fullName(client.getFullName())
