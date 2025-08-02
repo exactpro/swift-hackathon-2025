@@ -1,5 +1,6 @@
 import type { BankName } from '../../../config'
 import config from '../../../config'
+import { bankAIbans, bankBIbans, currencies, exchangeValues } from '../hardcoded'
 import { simulate } from './simulation'
 import type { Transaction, JSONify, Currency, TransactionMessageStatus } from './types'
 import { BackendUpdates, deepCopy } from './utils'
@@ -51,19 +52,11 @@ export function getClientTransactions(clientId: string): JSONify<Transaction>[] 
 }
 
 export function getTransactionFormData(senderBank: BankName) {
-  const currencies: Currency[] = ['EUR', 'USD', 'USDC']
   return {
     currencies,
-    exchangeValues: {
-      EUR: 1.16,
-      USD: 1,
-      USDC: 1.01
-    },
+    exchangeValues,
     bics: senderBank === 'Bank A' ? [config.bankB.bic] : [config.bankA.bic],
-    ibans:
-      senderBank === 'Bank A'
-        ? ['GB33BUKB20201555555555', 'GB33BUKB20201555555556']
-        : ['GE60NB0000000123456789', 'GE60NB0000000123456788']
+    ibans: senderBank === 'Bank A' ? bankBIbans : bankAIbans
   }
 }
 

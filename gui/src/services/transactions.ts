@@ -35,12 +35,12 @@ export async function subscribeToTransactionsUpdates(
   return () => clearInterval(interval)
 }
 
-export async function fetchTransactionFormData() {
+export async function fetchTransactionFormData(): ReturnType<typeof api.getTransferHelpers> {
   if (config.useMock) {
     const { getTransactionFormData } = await import('./mock-backend/api.js')
     return getTransactionFormData(currentBankName())
   }
-  throw new Error('Transaction form data is not available in non-mock mode.')
+  return api.getTransferHelpers(currentBankName())
 }
 
 export async function newTransaction(

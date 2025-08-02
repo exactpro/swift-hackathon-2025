@@ -17,7 +17,6 @@ import {
   TransferMessageSchema,
   TransferSchema,
   AccountSchema,
-  type TransferDetails,
   TransferDetailsSchema,
   type Account
 } from './models'
@@ -28,6 +27,7 @@ import {
   convertFrontendTransactionToBackendTransferDetails
 } from './converters'
 import config from '../../../config'
+import * as hardcoded from '../hardcoded'
 
 function bankBaseRoute(bank: BankName): string {
   return `/${bank.toLowerCase().replace(/ /g, '')}/api`
@@ -163,6 +163,66 @@ export async function makeTransfer(
     return convertBackendTransferToFrontendJSON(createdTransfer)
   } catch (error) {
     handleError('creating a new transfer', error)
-    return null
+    throw new Error('Failed to create transfer')
   }
+}
+
+async function getAvailableCurrencies(bank: BankName): Promise<string[]> {
+  try {
+    const response = await ofetch<string[]>(joinURL(bankBaseRoute(bank), 'helpers', 'currencies'), {
+      method: 'GET'
+    })
+    return z.string().array().parse(response)
+  } catch (error) {
+    handleError(`fetching available currencies for ${bank}`, error)
+    return []
+  }
+}
+
+async function getExchangeValues(bank: BankName): Promise<Record<string, number>> {
+  try {
+    const response = await ofetch<Record<string, number>>(joinURL(bankBaseRoute(bank), 'helpers', 'exchangeValues'), {
+      method: 'GET'
+    })
+    return z.record(z.string(), z.number()).parse(response)
+  } catch (error) {
+    handleError(`fetching exchange values for ${bank}`, error)
+    return {}
+  }
+}
+
+async function getIbans(bank: BankName): Promise<string[]> {
+  try {
+    const contraBank = bank === 'Bank A' ? 'Bank B' : 'Bank A'
+    const response = await ofetch<string[]>(joinURL(bankBaseRoute(contraBank), 'helpers', 'ibans'), {
+      method: 'GET'
+    })
+    return z.string().array().parse(response)
+  } catch (error) {
+    handleError(`fetching IBANs for ${bank}`, error)
+    return []
+  }
+}
+
+export async function getTransferHelpers(bank: BankName): Promise<{
+  currencies: string[]
+  exchangeValues: Record<string, number>
+  ibans: string[]
+  bics: string[]
+}> {
+  let [currencies, exchangeValues, ibans] = await Promise.all([
+    getAvailableCurrencies(bank),
+    getExchangeValues(bank),
+    getIbans(bank)
+  ])
+  if (currencies.length === 0) {
+    currencies = hardcoded.currencies
+  }
+  if (Object.keys(exchangeValues).length === 0) {
+    exchangeValues = hardcoded.exchangeValues
+  }
+  if (ibans.length === 0) {
+    ibans = bank === 'Bank A' ? hardcoded.bankBIbans : hardcoded.bankAIbans
+  }
+  return { currencies, exchangeValues, ibans, bics: bank === 'Bank A' ? [config.bankB.bic] : [config.bankA.bic] }
 }
