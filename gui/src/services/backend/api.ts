@@ -26,7 +26,7 @@ function handleError(action: string, error: unknown): void {
   }
 }
 
-// Bank handler
+// Bank admin handler
 
 export async function getTransfers(bank: BankName): Promise<ReturnType<typeof getTransactions>> {
   try {
@@ -78,3 +78,5 @@ export async function getTransferStatus(
   }
   return { transaction: convertBackendTransferToFrontendJSON(transfer), messages }
 }
+
+// Bank client handler

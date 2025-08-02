@@ -10,7 +10,7 @@ export async function fetchClientData(clientId: string): Promise<ClientDataRespo
     const { getClientData } = await import('./mock-backend/api.js')
     return getClientData(clientId)
   }
-  return null
+  throw new Error('Client data is not available in non-mock mode.')
 }
 
 export async function fetchClientTransactions(clientId: string): Promise<JSONify<Transaction>[]> {
@@ -18,7 +18,7 @@ export async function fetchClientTransactions(clientId: string): Promise<JSONify
     const { getClientTransactions } = await import('./mock-backend/api.js')
     return getClientTransactions(clientId)
   }
-  return []
+  throw new Error('Client transactions are not available in non-mock mode.')
 }
 
 // Not used at the moment
@@ -37,7 +37,5 @@ export async function exchangeCurrency(
       amount
     })
   }
-  // In a real application, this would call the backend API to perform the exchange
-  console.warn('Exchange operation is not implemented in mock mode.')
-  return false
+  throw new Error('Currency exchange is not available in non-mock mode.')
 }
