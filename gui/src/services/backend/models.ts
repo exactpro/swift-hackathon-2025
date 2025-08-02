@@ -39,7 +39,7 @@ export const TransferSchema = z.object({
   clientId: z.number().int(),
   status: TransferStatusSchema,
   messageId: z.string().optional(),
-  transferTimestamp: z.string().datetime().optional(), // ISO 8601 string
+  transferTimestamp: z.iso.datetime().optional(), // ISO 8601 string
   endToEndId: z.string().optional(),
   currency: z.string(),
   amount: z.number(),
@@ -53,3 +53,12 @@ export const TransferSchema = z.object({
   remittanceInfo: z.string().optional()
 })
 export type Transfer = z.infer<typeof TransferSchema>
+
+export const TransferMessageSchema = z.object({
+  type: z.string(),
+  title: z.string(),
+  summary: z.record(z.string(), z.unknown()),
+  timestamp: z.iso.datetime()
+})
+
+export type TransferMessage = z.infer<typeof TransferMessageSchema>
