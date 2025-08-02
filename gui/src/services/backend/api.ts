@@ -1,11 +1,33 @@
 import { ofetch, FetchError } from 'ofetch'
 import { joinURL } from 'ufo'
 import { z } from 'zod'
-import type { getTransactions, getTransactionDetails } from '../mock-backend/api'
+import type {
+  getTransactions,
+  getTransactionDetails,
+  getClientTransactions,
+  getClientData,
+  newTransaction
+} from '../mock-backend/api'
 import { useToasts } from '../../composables/useToasts'
 import type { BankName } from '../../../config'
-import { type Transfer, type TransferMessage, TransferMessageSchema, TransferSchema } from './models'
-import { convertBackendTransfersToFrontendJSON, convertBackendTransferToFrontendJSON } from './converters'
+import type { Client, Account as FrontendAccount, Transaction } from '../mock-backend/types'
+import {
+  type Transfer,
+  type TransferMessage,
+  TransferMessageSchema,
+  TransferSchema,
+  AccountSchema,
+  type TransferDetails,
+  TransferDetailsSchema,
+  type Account
+} from './models'
+import {
+  convertBackendAccountsToFrontend,
+  convertBackendTransfersToFrontendJSON,
+  convertBackendTransferToFrontendJSON,
+  convertFrontendTransactionToBackendTransferDetails
+} from './converters'
+import config from '../../../config'
 
 function bankBaseRoute(bank: BankName): string {
   return `/${bank.toLowerCase().replace(/ /g, '')}/api`
@@ -43,7 +65,7 @@ export async function getTransfers(bank: BankName): Promise<ReturnType<typeof ge
 
 async function getTransferById(bank: BankName, uetr: string): Promise<Transfer | null> {
   try {
-    const response = await ofetch<Transfer | null>(joinURL(bankBaseRoute(bank), `transfers/${uetr}`), {
+    const response = await ofetch<Transfer | null>(joinURL(bankBaseRoute(bank), 'transfers', uetr), {
       method: 'GET'
     })
     if (!response) {
@@ -58,7 +80,7 @@ async function getTransferById(bank: BankName, uetr: string): Promise<Transfer |
 
 async function getTransferMessages(bank: BankName, uetr: string): Promise<TransferMessage[]> {
   try {
-    const response = await ofetch<TransferMessage[]>(joinURL(bankBaseRoute(bank), `transfers/${uetr}/messages`), {
+    const response = await ofetch<TransferMessage[]>(joinURL(bankBaseRoute(bank), 'transfers', uetr, 'messages'), {
       method: 'GET'
     })
     return TransferMessageSchema.array().parse(response)
@@ -80,3 +102,67 @@ export async function getTransferStatus(
 }
 
 // Bank client handler
+
+async function getClientAccounts(bank: BankName, clientId: string): Promise<FrontendAccount[]> {
+  try {
+    const response = await ofetch<Account[]>(joinURL(bankBaseRoute(bank), 'client', 'account'), {
+      method: 'GET'
+    })
+    const parsedResponse = AccountSchema.array().parse(response)
+    return convertBackendAccountsToFrontend(parsedResponse)
+  } catch (error) {
+    handleError(`fetching accounts for client ${clientId}`, error)
+    return []
+  }
+}
+
+async function getClient(bank: BankName): Promise<Client> {
+  const bankInfo = bank === 'Bank A' ? config.bankA : config.bankB
+  return {
+    id: bankInfo.client.id,
+    fullName: bankInfo.client.name,
+    bic: bankInfo.bic
+  }
+}
+
+export async function getClientPageData(bank: BankName, clientId: string): Promise<ReturnType<typeof getClientData>> {
+  const [client, accounts] = await Promise.all([getClient(bank), getClientAccounts(bank, clientId)])
+  return { ...client, accounts }
+}
+
+export async function getClientTransfers(
+  bank: BankName,
+  clientId: string
+): Promise<ReturnType<typeof getClientTransactions>> {
+  try {
+    const response = await ofetch<Transfer[]>(joinURL(bankBaseRoute(bank), 'client', 'transfer'), {
+      method: 'GET'
+    })
+    const parsedResponse = TransferSchema.array().parse(response)
+    return convertBackendTransfersToFrontendJSON(parsedResponse)
+  } catch (error) {
+    handleError(`fetching transfers for client ${clientId}`, error)
+    return []
+  }
+}
+
+export async function makeTransfer(
+  bank: BankName,
+  transferDetails: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & { comment: string | null }
+): Promise<ReturnType<typeof newTransaction>> {
+  try {
+    const convertedDetails = convertFrontendTransactionToBackendTransferDetails(transferDetails)
+    const response = await ofetch<Transfer>(joinURL(bankBaseRoute(bank), 'client', 'makeTransfer'), {
+      method: 'POST',
+      body: TransferDetailsSchema.parse(convertedDetails)
+    })
+    if (!response) {
+      return null
+    }
+    const createdTransfer = TransferSchema.parse(response)
+    return convertBackendTransferToFrontendJSON(createdTransfer)
+  } catch (error) {
+    handleError('creating a new transfer', error)
+    return null
+  }
+}

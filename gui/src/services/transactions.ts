@@ -52,7 +52,7 @@ export async function newTransaction(
     const { newTransaction } = await import('./mock-backend/api.js')
     return newTransaction(transaction)
   }
-  throw new Error('Creating a new transaction is not available in non-mock mode.')
+  return api.makeTransfer(currentBankName(), transaction)
 }
 
 export async function fetchTransactionDetails(
