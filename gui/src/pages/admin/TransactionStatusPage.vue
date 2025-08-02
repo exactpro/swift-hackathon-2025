@@ -7,6 +7,7 @@ import { computed, ref } from 'vue'
 import { formatAccountBalance } from '../../utils/formatNumber'
 import { useFakeSocket } from '../../composables/useFakeSocket'
 import { useHead } from '@unhead/vue'
+import { useCurrentBank } from '../../composables/useCurrentBank'
 
 useHead({
   title: 'Transaction Status'
@@ -14,7 +15,10 @@ useHead({
 const route = useRoute()
 const uetr = route.params.uetr as string
 
-const { state: transactionDetails, isLoading } = useAsyncState(() => fetchTransactionDetails(uetr), null)
+const { state: transactionDetails, isLoading } = useAsyncState(
+  () => fetchTransactionDetails(useCurrentBank(), uetr),
+  null
+)
 
 // Track expanded items
 const expandedItems = ref<Set<string>>(new Set())
@@ -41,7 +45,7 @@ function isExpanded(messageId: string) {
 
 async function refresh() {
   isLoading.value = true
-  transactionDetails.value = await fetchTransactionDetails(uetr)
+  transactionDetails.value = await fetchTransactionDetails(useCurrentBank(), uetr)
   isLoading.value = false
 }
 

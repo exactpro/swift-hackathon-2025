@@ -1,32 +1,28 @@
-import { useRoute } from 'vue-router'
-import config from '../../config.js'
+import config, { type BankName } from '../../config.js'
 import type { Client, JSONify, Account, Currency, Transaction } from './mock-backend/types.js'
-import type { BankName } from '../../config.js'
 import * as api from './backend/api.js'
-
-function currentBankName(): BankName {
-  const route = useRoute()
-  return route.meta.bankName as BankName
-}
 
 export interface ClientDataResponse extends JSONify<Client> {
   accounts: JSONify<Account>[]
 }
 
-export async function fetchClientData(clientId: string): Promise<ClientDataResponse | null> {
+export async function fetchClientData(currentBank: BankName, clientId: string): Promise<ClientDataResponse | null> {
   if (config.useMock) {
     const { getClientData } = await import('./mock-backend/api.js')
     return getClientData(clientId)
   }
-  return api.getClientPageData(currentBankName(), clientId)
+  return api.getClientPageData(currentBank, clientId)
 }
 
-export async function fetchClientTransactions(clientId: string): Promise<JSONify<Transaction>[]> {
+export async function fetchClientTransactions(
+  currentBank: BankName,
+  clientId: string
+): Promise<JSONify<Transaction>[]> {
   if (config.useMock) {
     const { getClientTransactions } = await import('./mock-backend/api.js')
     return getClientTransactions(clientId)
   }
-  return api.getClientTransfers(currentBankName(), clientId)
+  return api.getClientTransfers(currentBank, clientId)
 }
 
 // Not used at the moment

@@ -5,6 +5,7 @@ import { fetchTransactions, subscribeToTransactionsUpdates } from '../../service
 import TransactionsTable from '../../components/TransactionsTable.vue'
 import { useRoute } from 'vue-router'
 import { useHead } from '@unhead/vue'
+import { useCurrentBank } from '../../composables/useCurrentBank.js'
 
 useHead({
   title: 'Transactions History'
@@ -13,10 +14,10 @@ useHead({
 const route = useRoute()
 const bic = route.meta.bic as string
 
-const { state: transactions } = useAsyncState(() => fetchTransactions(bic), [])
+const { state: transactions } = useAsyncState(() => fetchTransactions(useCurrentBank(), bic), [])
 
 const { state: unsubscribe } = useAsyncState(
-  subscribeToTransactionsUpdates(bic, (transactionsUpdated) => {
+  subscribeToTransactionsUpdates(useCurrentBank(), bic, (transactionsUpdated) => {
     transactions.value = transactionsUpdated
   }),
   () => {}

@@ -8,8 +8,9 @@ import { fetchTransactionFormData, newTransaction } from '../services/transactio
 import type { Account, Currency } from '../services/mock-backend/types'
 import { calculateExchangeValue } from '../utils/calculateExchangeValue'
 import { useToasts } from '../composables/useToasts'
+import { useCurrentBank } from '../composables/useCurrentBank'
 
-const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
+const { state: utils } = useAsyncState(fetchTransactionFormData(useCurrentBank()), null)
 
 const { addToast } = useToasts()
 
@@ -81,7 +82,7 @@ async function startTransaction() {
   }
   isSending.value = true
   try {
-    await newTransaction({
+    await newTransaction(useCurrentBank(), {
       debtor: {
         bic: ownBic,
         accountId: chosenAccount.value.id,
