@@ -1,0 +1,17 @@
+{
+  "name": "coincento",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npx hardhat compile"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "hardhat": "^2.26.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0"
+  }
+}
