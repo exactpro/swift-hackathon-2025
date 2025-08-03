@@ -1,16 +1,17 @@
-import { useRoute } from 'vue-router'
 import config, { type BankName } from '../../config.js'
 import type { Transaction, JSONify, TransactionMessageStatus } from './mock-backend/types.js'
+import * as api from './backend/api.js'
 
-export async function fetchTransactions(bic: string): Promise<JSONify<Transaction[]>> {
+export async function fetchTransactions(currentBank: BankName, bic: string): Promise<JSONify<Transaction[]>> {
   if (config.useMock) {
     const { getTransactions } = await import('./mock-backend/api.js')
     return getTransactions().filter((tx) => tx.debtor.bic === bic || tx.creditor.bic === bic)
   }
-  return []
+  return api.getTransfers(currentBank)
 }
 
 export async function subscribeToTransactionsUpdates(
+  currentBank: BankName,
   bic: string,
   callback: (transactions: JSONify<Transaction>[]) => void
 ): Promise<() => void> {
@@ -22,17 +23,23 @@ export async function subscribeToTransactionsUpdates(
     const { subscribeToTransactionsUpdates } = await import('./mock-backend/api.js')
     return subscribeToTransactionsUpdates(filteredCallback)
   }
-  return () => {}
+  const interval = setInterval(async () => {
+    const transactions = await fetchTransactions(currentBank, bic)
+    callback(transactions)
+  }, 5000)
+  return () => clearInterval(interval)
 }
 
-export async function fetchTransactionFormData() {
-  const route = useRoute()
-  const senderBank = route.meta.bankName as BankName
-  const { getTransactionFormData } = await import('./mock-backend/api.js')
-  return getTransactionFormData(senderBank)
+export async function fetchTransactionFormData(currentBank: BankName): ReturnType<typeof api.getTransferHelpers> {
+  if (config.useMock) {
+    const { getTransactionFormData } = await import('./mock-backend/api.js')
+    return getTransactionFormData(currentBank)
+  }
+  return api.getTransferHelpers(currentBank)
 }
 
 export async function newTransaction(
+  currentBank: BankName,
   transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & {
     comment: string | null
   }
@@ -41,15 +48,16 @@ export async function newTransaction(
     const { newTransaction } = await import('./mock-backend/api.js')
     return newTransaction(transaction)
   }
-  return null
+  return api.makeTransfer(currentBank, transaction)
 }
 
 export async function fetchTransactionDetails(
+  currentBank: BankName,
   uetr: string
 ): Promise<JSONify<{ transaction: Transaction; messages: JSONify<TransactionMessageStatus>[] }> | null> {
   if (config.useMock) {
     const { getTransactionDetails } = await import('./mock-backend/api.js')
     return getTransactionDetails(uetr)
   }
-  return null
+  return api.getTransferStatus(currentBank, uetr)
 }

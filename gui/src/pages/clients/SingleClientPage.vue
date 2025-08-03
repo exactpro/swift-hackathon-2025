@@ -9,12 +9,14 @@ import { useFakeSocket } from '../../composables/useFakeSocket'
 import BalanceWidget from '../../components/BalanceWidget.vue'
 import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
+import { useCurrentBank } from '../../composables/useCurrentBank'
 
 const route = useRoute()
 const clientId = route.meta.clientId as string
+const currentBank = useCurrentBank()
 const { client, isLoading, refresh: refreshClientInfo } = useClientInfo()
 const { state: transactions, isLoading: isLoadingTransactions } = useAsyncState(
-  () => fetchClientTransactions(clientId),
+  () => fetchClientTransactions(currentBank, clientId),
   []
 )
 
@@ -26,7 +28,7 @@ useHead({ title })
 
 async function refreshTransactions() {
   isLoadingTransactions.value = true
-  transactions.value = await fetchClientTransactions(clientId)
+  transactions.value = await fetchClientTransactions(currentBank, clientId)
   isLoadingTransactions.value = false
 }
 

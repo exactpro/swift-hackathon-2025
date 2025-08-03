@@ -33,7 +33,7 @@ export type Client = {
 }
 
 export type TransactionMessageStatus = {
-  type: 'SWIFT' | 'DLT'
+  type: string
   title: string
   summary: object
   timestamp: Date

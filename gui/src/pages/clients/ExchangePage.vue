@@ -8,8 +8,9 @@ import { calculateExchangeValue } from '../../utils/calculateExchangeValue'
 import { exchangeCurrency } from '../../services/clients'
 import Breadcrumbs from '../../components/Breadcrumbs.vue'
 import { useBankRoute } from '../../composables/useBankRoute'
+import { useCurrentBank } from '../../composables/useCurrentBank'
 
-const { state: utils } = useAsyncState(fetchTransactionFormData(), null)
+const { state: utils } = useAsyncState(fetchTransactionFormData(useCurrentBank()), null)
 
 interface ExchangeForm {
   fromCurrency: string

@@ -83,7 +83,6 @@ public class ClientHandler {
                             try {
                                 transferToSave = converter.convertToTransfer(customerCreditTransfer, TransferStatus.PENDING).get(0);
                             } catch (IllegalArgumentException e) {
-                                logger.error("Failed to convert CustomerCreditTransfer to Transfer", e);
                                 return Mono.error(new RuntimeException("Failed to convert CustomerCreditTransfer to Transfer", e));
                             }
 
@@ -93,27 +92,28 @@ public class ClientHandler {
                                     try {
                                         encodedTransfer = xmlCodec.encode(customerCreditTransfer);
                                     } catch (JAXBException | TransformerException e) {
-                                        logger.error("Failed to encode to XML", e);
                                         return Mono.error(new RuntimeException("Failed to encode to XML", e));
                                     }
 
                                     return kafkaPublisher.publishMessage(transferDetails.getCreditorBic(), encodedTransfer)
-                                        .doOnSuccess(senderResult -> {
+                                        .flatMap(senderResult -> {
                                             transfer.setStatus(TransferStatus.COMPLETED);
-                                            transferRepository.save(transfer).subscribe();
+                                            return transferRepository.save(transfer);
                                         })
                                         .onErrorResume(e -> {
                                             transfer.setStatus(TransferStatus.FAILED);
-                                            transferRepository.save(transfer).subscribe();
-                                            logger.error("Failed to send message to Kafka", e);
-                                            return Mono.error(new RuntimeException("Kafka send failed", e));
+                                            return transferRepository.save(transfer)
+                                                .flatMap(failedTransfer -> Mono.error(new RuntimeException("Kafka send failed", e)));
                                         })
                                         .then(ServerResponse.accepted()
-                                            .bodyValue(MessageFormat.format("Transfer successful for client {0}. Details: {1}", clientId, transferDetails)));
+                                            .bodyValue(MessageFormat.format("Transfer successful for client {0}", clientId)));
                                 });
                         });
             })
-            .onErrorResume(RuntimeException.class, e -> ServerResponse.status(500).bodyValue("Internal Server Error"))
+            .onErrorResume(RuntimeException.class, e -> {
+                logger.error(e.getMessage(), e);
+                return ServerResponse.status(500).bodyValue("Internal Server Error");
+            })
             .switchIfEmpty(ServerResponse.badRequest().bodyValue("Invalid request"));
     }
 

@@ -90,15 +90,19 @@ export function convertBackendTransfersToFrontend(backendTransfers: BackendTrans
   return backendTransfers.map(convertBackendTransferToFrontend)
 }
 
+export function convertBackendTransferToFrontendJSON(backendTransfer: BackendTransfer): JSONify<Transaction> {
+  return {
+    ...convertBackendTransferToFrontend(backendTransfer),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+}
+
 /**
  * Convert array of backend transfers to JSONified frontend transactions
  */
 export function convertBackendTransfersToFrontendJSON(backendTransfers: BackendTransfer[]): JSONify<Transaction>[] {
-  return convertBackendTransfersToFrontend(backendTransfers).map((transaction) => ({
-    ...transaction,
-    createdAt: transaction.createdAt.toISOString(),
-    updatedAt: transaction.updatedAt.toISOString()
-  }))
+  return backendTransfers.map(convertBackendTransferToFrontendJSON)
 }
 
 /**

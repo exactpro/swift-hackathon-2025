@@ -14,14 +14,16 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class CustomerCreditTransferConverter {
 
     public CustomerCreditTransfer convertFromClientAndTransferDetails(Client client, String clientBic, TransferDetails transferDetails) {
-        GroupHeader groupHeader = GroupHeader.builder().messageId("").timestamp(Instant.now()).build();
+        GroupHeader groupHeader = GroupHeader.builder()
+            .messageId(IdGenerator.generateId(16))
+            .timestamp(Instant.now())
+            .build();
 
         Participant debtor = Participant.builder()
             .fullName(client.getFullName())
@@ -36,13 +38,13 @@ public class CustomerCreditTransferConverter {
             .build();
 
         TransactionInfo transactionInfo = TransactionInfo.builder()
-            .endToEndId(String.valueOf(UUID.randomUUID()))
+            .endToEndId(IdGenerator.generateId(16))
             .currency(transferDetails.getCurrencyCode())
             .amount(transferDetails.getAmount())
             .settlementDate(LocalDate.now())
             .debtor(debtor)
             .creditor(creditor)
-            .remittanceInfo("")
+            .remittanceInfo("Transfer")
             .build();
 
         return new CustomerCreditTransfer(
