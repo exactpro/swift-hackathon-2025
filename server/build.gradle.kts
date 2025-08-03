@@ -28,6 +28,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-r2dbc")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-webflux")
+    implementation("org.web3j:core:4.13.0")
 
     runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2")
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl")

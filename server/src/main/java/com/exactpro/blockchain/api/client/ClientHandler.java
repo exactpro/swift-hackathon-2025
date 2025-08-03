@@ -1,6 +1,7 @@
 package com.exactpro.blockchain.api.client;
 
 import com.exactpro.blockchain.CustomerCreditTransferConverter;
+import com.exactpro.blockchain.coincento.CoincentoWallet;
 import com.exactpro.blockchain.entity.*;
 import com.exactpro.blockchain.kafka.KafkaPublisher;
 import com.exactpro.blockchain.repository.*;
@@ -38,6 +39,7 @@ public class ClientHandler {
     private final XmlCodec xmlCodec;
     private final CustomerCreditTransferConverter converter;
     private final KafkaPublisher kafkaPublisher;
+    private final CoincentoWallet wallet;
 
     public ClientHandler(
         AccountRepository accountRepository,
@@ -47,7 +49,8 @@ public class ClientHandler {
         TransferRepository transferRepository,
         XmlCodec xmlCodec,
         CustomerCreditTransferConverter converter,
-        KafkaPublisher kafkaPublisher
+        KafkaPublisher kafkaPublisher,
+        CoincentoWallet wallet
     ) {
         this.accountRepository = accountRepository;
         this.clientRepository = clientRepository;
@@ -57,6 +60,7 @@ public class ClientHandler {
         this.xmlCodec = xmlCodec;
         this.converter = converter;
         this.kafkaPublisher = kafkaPublisher;
+        this.wallet = wallet;
     }
 
     public Mono<ServerResponse> getAccountsByClientId(ServerRequest request) {
@@ -74,6 +78,14 @@ public class ClientHandler {
                 debitAccount(account, transferRequest)
                 .then(Mono.defer(() -> publishPacs008(transfer)))
                 .then(Mono.defer(() -> transferRepository.save(transfer.withStatus(TransferStatus.COMPLETED))))
+                .then(Mono.defer(() -> {
+                    if (currency.getAddress() == null) {
+                        return Mono.empty();
+                    }
+                    return wallet.transfer(
+                        transfer.getCreditorBic(), transfer.getEndToEndId(), currency, transfer.getAmount()
+                    );
+                }))
                 .onErrorResume(ex ->
                     transferRepository.save(transfer.withStatus(TransferStatus.FAILED))
                     .flatMap(failedTransfer -> Mono.error(new Exception("Kafka send failed", ex)))
@@ -155,10 +167,10 @@ public class ClientHandler {
             )
             .flatMap(data -> handler.handle(data.getT1(), data.getT2(), data.getT3(), data.getT4()))
             .then(
-                ServerResponse.accepted().bodyValue(String.format("Transfer successful for client %d", clientId))
+                ServerResponse.accepted().bodyValue(String.format("Transfer succeeded for client %d", clientId))
             )
-            .onErrorResume(RuntimeException.class, e -> {
-                logger.error(e.getMessage(), e);
+            .onErrorResume(RuntimeException.class, ex -> {
+                logger.error("Unable to handle Credit Transfer Request", ex);
                 return ServerResponse.status(500).bodyValue("Internal Server Error");
             });
     }
