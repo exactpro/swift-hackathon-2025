@@ -2,7 +2,7 @@ package com.exactpro.blockchain.entity;
 
 import java.math.BigDecimal;
 
-public class TransferDetails {
+public class TransferRequest {
     private String debtorIban;
     private String creditorFullName;
     private String creditorBic;
@@ -11,10 +11,10 @@ public class TransferDetails {
     private BigDecimal amount;
     private String comment;
 
-    public TransferDetails() {
+    public TransferRequest() {
     }
 
-    public TransferDetails(String debtorIban,
+    public TransferRequest(String debtorIban,
                            String creditorFullName,
                            String creditorBic,
                            String creditorIban,

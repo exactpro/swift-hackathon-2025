@@ -131,8 +131,7 @@ public class KafkaConsumer {
                                 })
                                 .onErrorResume(e -> {
                                     logger.error("Failed to credit recipient balance for transfer {}: {}. Saving transfer with FAILED status.", transfer.getEndToEndId(), e.getMessage());
-                                    transfer.setStatus(TransferStatus.FAILED);
-                                    return transferRepository.save(transfer).then(Mono.error(new RuntimeException("Credit failed", e)));
+                                    return transferRepository.save(transfer.withStatus(TransferStatus.FAILED)).then(Mono.error(new RuntimeException("Credit failed", e)));
                                 })
                         )
                         .then();
@@ -154,7 +153,7 @@ public class KafkaConsumer {
                     "Creditor Account not found for IBAN: {0}", creditorIban))))
             .flatMap(account -> {
                 BigDecimal amountToCredit = transfer.getAmount();
-                String transferCurrency = transfer.getCurrency();
+                String transferCurrency = transfer.getCurrencyCode();
                 String accountCurrency = account.getCurrencyCode();
 
                 if (!accountCurrency.equals(transferCurrency)) {

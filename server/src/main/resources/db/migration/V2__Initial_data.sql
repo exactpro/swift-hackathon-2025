@@ -3,6 +3,9 @@ INSERT INTO CurrencyCode (code) VALUES
     ('EUR'),
     ('USDC');
 
+INSERT INTO Token (currencyCode, address) VALUES
+    ('USDC', '345cA3e014Aaf5dcA488057592ee47305D9B3e10');
+
 WITH new_client AS (
     INSERT INTO Client (fullName)
     VALUES ('Marcus Vellon')

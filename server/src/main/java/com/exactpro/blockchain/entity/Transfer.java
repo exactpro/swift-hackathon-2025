@@ -3,191 +3,157 @@ package com.exactpro.blockchain.entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.lang.NonNull;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Table("Transfer")
 public class Transfer {
     @Id
     @Column("transferId")
     private Integer transferId;
+
+    private BigDecimal amount;
+
     @Column("clientId")
     private Integer clientId;
-    private TransferStatus status;
-    @Column("messageId")
-    private String messageId;
-    @Column("transferTimestamp")
-    private Instant transferTimestamp;
-    @Column("endToEndId")
-    private String endToEndId;
-    private String currency;
-    private BigDecimal amount;
-    @Column("settlementDate")
-    private LocalDate settlementDate;
-    @Column("debtorFullName")
-    private String debtorFullName;
-    @Column("debtorIban")
-    private String debtorIban;
-    @Column("debtorBic")
-    private String debtorBic;
-    @Column("creditorFullName")
-    private String creditorFullName;
-    @Column("creditorIban")
-    private String creditorIban;
+
     @Column("creditorBic")
     private String creditorBic;
+
+    @Column("creditorFullName")
+    private String creditorFullName;
+
+    @Column("creditorIban")
+    private String creditorIban;
+
+    @Column("currencyCode")
+    private String currencyCode;
+
+    @Column("debtorBic")
+    private String debtorBic;
+
+    @Column("debtorFullName")
+    private String debtorFullName;
+
+    @Column("debtorIban")
+    private String debtorIban;
+
+    @Column("endToEndId")
+    private String endToEndId;
+
     @Column("remittanceInfo")
     private String remittanceInfo;
 
-    public Integer getTransferId() {
-        return transferId;
-    }
+    @Column("settlementDate")
+    private LocalDate settlementDate;
 
-    public void setTransferId(Integer transferId) {
-        this.transferId = transferId;
+    private TransferStatus status;
+
+    @Column("transferTimestamp")
+    private Instant transferTimestamp;
+
+    public BigDecimal getAmount() {
+        return amount;
     }
 
     public Integer getClientId() {
         return clientId;
     }
 
-    public void setClientId(Integer clientId) {
-        this.clientId = clientId;
-    }
-
-    public TransferStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TransferStatus status) {
-        this.status = status;
-    }
-
-    public String getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
-    }
-
-    public Instant getTransferTimestamp() {
-        return transferTimestamp;
-    }
-
-    public void setTransferTimestamp(Instant transferTimestamp) {
-        this.transferTimestamp = transferTimestamp;
-    }
-
-    public String getEndToEndId() {
-        return endToEndId;
-    }
-
-    public void setEndToEndId(String endToEndId) {
-        this.endToEndId = endToEndId;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public LocalDate getSettlementDate() {
-        return settlementDate;
-    }
-
-    public void setSettlementDate(LocalDate settlementDate) {
-        this.settlementDate = settlementDate;
-    }
-
-    public String getDebtorFullName() {
-        return debtorFullName;
-    }
-
-    public void setDebtorFullName(String debtorFullName) {
-        this.debtorFullName = debtorFullName;
-    }
-
-    public String getDebtorIban() {
-        return debtorIban;
-    }
-
-    public void setDebtorIban(String debtorIban) {
-        this.debtorIban = debtorIban;
-    }
-
-    public String getDebtorBic() {
-        return debtorBic;
-    }
-
-    public void setDebtorBic(String debtorBic) {
-        this.debtorBic = debtorBic;
+    public String getCreditorBic() {
+        return creditorBic;
     }
 
     public String getCreditorFullName() {
         return creditorFullName;
     }
 
-    public void setCreditorFullName(String creditorFullName) {
-        this.creditorFullName = creditorFullName;
-    }
-
     public String getCreditorIban() {
         return creditorIban;
     }
 
-    public void setCreditorIban(String creditorIban) {
-        this.creditorIban = creditorIban;
+    public String getCurrencyCode() {
+        return currencyCode;
     }
 
-    public String getCreditorBic() {
-        return creditorBic;
+    public String getDebtorBic() {
+        return debtorBic;
     }
 
-    public void setCreditorBic(String creditorBic) {
-        this.creditorBic = creditorBic;
+    public String getDebtorFullName() {
+        return debtorFullName;
+    }
+
+    public String getDebtorIban() {
+        return debtorIban;
+    }
+
+    public String getEndToEndId() {
+        return endToEndId;
     }
 
     public String getRemittanceInfo() {
         return remittanceInfo;
     }
 
-    public void setRemittanceInfo(String remittanceInfo) {
-        this.remittanceInfo = remittanceInfo;
+    public LocalDate getSettlementDate() {
+        return settlementDate;
     }
 
-    public Transfer() {
+    public TransferStatus getStatus() {
+        return status;
     }
 
-    public Transfer(Builder builder) {
+    public Integer getTransferId() {
+        return transferId;
+    }
+
+    public Instant getTransferTimestamp() {
+        return transferTimestamp;
+    }
+
+    public @NonNull Transfer withStatus(@NonNull TransferStatus newStatus) {
+        Transfer updated = new Transfer();
+        updated.transferId = this.transferId;
+        updated.amount = this.amount;
+        updated.clientId = this.clientId;
+        updated.creditorBic = this.creditorBic;
+        updated.creditorFullName = this.creditorFullName;
+        updated.creditorIban = this.creditorIban;
+        updated.currencyCode = this.currencyCode;
+        updated.debtorBic = this.debtorBic;
+        updated.debtorFullName = this.debtorFullName;
+        updated.debtorIban = this.debtorIban;
+        updated.endToEndId = this.endToEndId;
+        updated.remittanceInfo = this.remittanceInfo;
+        updated.settlementDate = this.settlementDate;
+        updated.status = newStatus;
+        updated.transferTimestamp = this.transferTimestamp;
+        return updated;
+    }
+
+    protected Transfer() {
+    }
+
+    private Transfer(Builder builder) {
+        this.amount = Objects.requireNonNull(builder.amount, "amount must not be null");
         this.clientId = builder.clientId;
-        this.status = builder.status;
-        this.messageId = builder.messageId;
-        this.transferTimestamp = builder.transferTimestamp;
-        this.endToEndId = builder.endToEndId;
-        this.currency = builder.currency;
-        this.amount = builder.amount;
-        this.settlementDate = builder.settlementDate;
-        this.debtorFullName = builder.debtorFullName;
-        this.debtorIban = builder.debtorIban;
-        this.debtorBic = builder.debtorBic;
-        this.creditorFullName = builder.creditorFullName;
-        this.creditorIban = builder.creditorIban;
-        this.creditorBic = builder.creditorBic;
+        this.creditorBic = Objects.requireNonNull(builder.creditorBic, "creditorBic must not be null");
+        this.creditorFullName = Objects.requireNonNull(builder.creditorFullName, "creditorFullName must not be null");
+        this.creditorIban = Objects.requireNonNull(builder.creditorIban, "creditorIban must not be null");
+        this.currencyCode = Objects.requireNonNull(builder.currencyCode, "currency must not be null");
+        this.debtorBic = Objects.requireNonNull(builder.debtorBic, "debtorBic must not be null");
+        this.debtorFullName = Objects.requireNonNull(builder.debtorFullName, "debtorFullName must not be null");
+        this.debtorIban = Objects.requireNonNull(builder.debtorIban, "debtorIban must not be null");
+        this.endToEndId = Objects.requireNonNull(builder.endToEndId, "endToEndId must not be null");
         this.remittanceInfo = builder.remittanceInfo;
+        this.settlementDate = Objects.requireNonNull(builder.settlementDate, "settlementDate must not be null");
+        this.status = Objects.requireNonNull(builder.status, "status must not be null");
+        this.transferTimestamp = Objects.requireNonNull(builder.transferTimestamp, "transferTimestamp must not be null");
     }
 
     public static Builder builder() {
@@ -195,74 +161,37 @@ public class Transfer {
     }
 
     public static class Builder {
-        private Integer clientId;
-        private TransferStatus status;
-        private String messageId;
-        private Instant transferTimestamp;
-        private String endToEndId;
-        private String currency;
         private BigDecimal amount;
-        private LocalDate settlementDate;
-        private String debtorFullName;
-        private String debtorIban;
-        private String debtorBic;
+        private Integer clientId;
+        private String creditorBic;
         private String creditorFullName;
         private String creditorIban;
-        private String creditorBic;
+        private String currencyCode;
+        private String debtorBic;
+        private String debtorFullName;
+        private String debtorIban;
+        private String endToEndId;
         private String remittanceInfo;
-
-        public Builder clientId(Integer clientId) {
-            this.clientId = clientId;
-            return this;
-        }
-
-        public Builder status(TransferStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public Builder messageId(String messageId) {
-            this.messageId = messageId;
-            return this;
-        }
-
-        public Builder transferTimestamp(Instant transferTimestamp) {
-            this.transferTimestamp = transferTimestamp;
-            return this;
-        }
-
-        public Builder endToEndId(String endToEndId) {
-            this.endToEndId = endToEndId;
-            return this;
-        }
-
-        public Builder currency(String currency) {
-            this.currency = currency;
-            return this;
-        }
+        private LocalDate settlementDate;
+        private TransferStatus status;
+        private Instant transferTimestamp;
 
         public Builder amount(BigDecimal amount) {
             this.amount = amount;
             return this;
         }
 
-        public Builder settlementDate(LocalDate settlementDate) {
-            this.settlementDate = settlementDate;
+        public Transfer build() {
+            return new Transfer(this);
+        }
+
+        public Builder clientId(Integer clientId) {
+            this.clientId = clientId;
             return this;
         }
 
-        public Builder debtorFullName(String debtorFullName) {
-            this.debtorFullName = debtorFullName;
-            return this;
-        }
-
-        public Builder debtorIban(String debtorIban) {
-            this.debtorIban = debtorIban;
-            return this;
-        }
-
-        public Builder debtorBic(String debtorBic) {
-            this.debtorBic = debtorBic;
+        public Builder creditorBic(String creditorBic) {
+            this.creditorBic = creditorBic;
             return this;
         }
 
@@ -276,8 +205,28 @@ public class Transfer {
             return this;
         }
 
-        public Builder creditorBic(String creditorBic) {
-            this.creditorBic = creditorBic;
+        public Builder currencyCode(String currencyCode) {
+            this.currencyCode = currencyCode;
+            return this;
+        }
+
+        public Builder debtorBic(String debtorBic) {
+            this.debtorBic = debtorBic;
+            return this;
+        }
+
+        public Builder debtorFullName(String debtorFullName) {
+            this.debtorFullName = debtorFullName;
+            return this;
+        }
+
+        public Builder debtorIban(String debtorIban) {
+            this.debtorIban = debtorIban;
+            return this;
+        }
+
+        public Builder endToEndId(String endToEndId) {
+            this.endToEndId = endToEndId;
             return this;
         }
 
@@ -286,8 +235,20 @@ public class Transfer {
             return this;
         }
 
-        public Transfer build() {
-            return new Transfer(this);
+        public Builder settlementDate(LocalDate settlementDate) {
+            this.settlementDate = settlementDate;
+            return this;
+        }
+
+        public Builder status(TransferStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder transferTimestamp(Instant transferTimestamp) {
+            this.transferTimestamp = transferTimestamp;
+            return this;
         }
     }
 }
+
