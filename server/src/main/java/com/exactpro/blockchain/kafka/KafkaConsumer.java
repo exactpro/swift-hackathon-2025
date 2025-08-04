@@ -139,11 +139,10 @@ public class KafkaConsumer {
                         .flatMap(tuple -> {
                             Transfer transfer = tuple.getT1();
                             Pacs008Message pacs008Message = tuple.getT2();
-
-                            return Mono.zip(
-                                processSingleTransfer(transfer),
-                                saveSinglePacs008Message(transfer, pacs008Message)
-                            ).then();
+                            return
+                                processSingleTransfer(transfer)
+                                .flatMap(updatedTransfer -> saveSinglePacs008Message(updatedTransfer, pacs008Message))
+                                .then();
                         })
                         .then();
                 } catch (IOException | TransformerException | SAXException | JAXBException e) {

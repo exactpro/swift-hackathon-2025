@@ -5,6 +5,7 @@ import com.exactpro.blockchain.entity.Transfer;
 import com.exactpro.blockchain.repository.AccountRepository;
 import com.exactpro.blockchain.repository.MessageRepository;
 import com.exactpro.blockchain.repository.TransferRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,9 @@ import java.util.Objects;
 
 @Component
 public class BankHandler {
+    @Value("${default.user}")
+    private Integer clientId;
+
     private final @NonNull AccountRepository accountRepository;
     private final @NonNull MessageRepository messageRepository;
     private final @NonNull TransferRepository transferRepository;
@@ -46,7 +50,7 @@ public class BankHandler {
 
     public Mono<ServerResponse> getAllIbans(ServerRequest request) {
         return ServerResponse.ok().body(
-            accountRepository.findAll().map(Account::getIban).collectList(),
+            accountRepository.findByClientId(clientId).map(Account::getIban).collectList(),
             new ParameterizedTypeReference<>() {}
         );
     }
