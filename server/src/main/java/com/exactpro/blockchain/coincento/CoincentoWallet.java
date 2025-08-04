@@ -1,8 +1,10 @@
 package com.exactpro.blockchain.coincento;
 
-import com.exactpro.blockchain.entity.BankETHAddress;
-import com.exactpro.blockchain.entity.Currency;
+import com.exactpro.blockchain.entity.*;
 import com.exactpro.blockchain.repository.BankETHAddressRepository;
+import com.exactpro.blockchain.repository.MessageRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,21 +41,30 @@ public class CoincentoWallet {
     private final @NonNull Credentials credentials;
 
     private final BankETHAddressRepository bankETHAddressRepository;
+    private final ObjectMapper objectMapper;
+
+    private final MessageRepository messageRepository;
 
     @Value("${ethereum.coincento}")
     private String coincentoAddress;
 
     public CoincentoWallet(@NonNull Web3j web3j,
                            @NonNull Credentials credentials,
-                           BankETHAddressRepository bankETHAddressRepository) {
+                           BankETHAddressRepository bankETHAddressRepository,
+                           ObjectMapper objectMapper,
+                           MessageRepository messageRepository) {
         this.web3j = Objects.requireNonNull(web3j);
         this.credentials = Objects.requireNonNull(credentials);
         this.bankETHAddressRepository = bankETHAddressRepository;
+        this.objectMapper = objectMapper;
+        this.messageRepository = messageRepository;
     }
 
-    public Mono<Void> transfer(
-        @NonNull String creditorBic, @NonNull String endToEndId, @NonNull Currency currency, @NonNull BigDecimal amount
-    ) {
+    public Mono<Void> transfer(@NonNull Integer transferId,
+                               @NonNull String creditorBic,
+                               @NonNull String endToEndId,
+                               @NonNull Currency currency,
+                               @NonNull BigDecimal amount) {
         return
             Mono.zip(getEthereumAddress(creditorBic), getNonce())
             .flatMap(data -> {
@@ -92,7 +103,8 @@ public class CoincentoWallet {
                         if (it.hasError()) {
                             return Mono.error(new Exception(it.getError().getMessage()));
                         }
-                        return Mono.just(it);
+                        return createAndSaveMessage(transferId, endToEndId, currency, amount, toAddress)
+                            .flatMap(message -> Mono.just(it));
                     })
                     .doOnSuccess(it -> logger.info("Sent transfer transaction {}", it.getTransactionHash()))
                     .then();
@@ -109,5 +121,30 @@ public class CoincentoWallet {
 
     private @NonNull Mono<String> getEthereumAddress(@NonNull String bic) {
         return bankETHAddressRepository.getByBic(bic).map(BankETHAddress::getEthAddress);
+    }
+
+    private @NonNull Mono<Message> createAndSaveMessage(Integer transferId,
+                                                        String endToEndId,
+                                                        Currency currency,
+                                                        BigDecimal amount,
+                                                        String toAddress) {
+        DltMessage dltMessage = DltMessage.builder()
+            .endToEndId(endToEndId)
+            .currencyId(currency.getAddress())
+            .amount(amount.multiply(XXX))
+            .debtorAddress(credentials.getAddress())
+            .creditorAddress(toAddress)
+            .build();
+
+        String dltJson;
+        try {
+            dltJson = objectMapper.writeValueAsString(dltMessage);
+        } catch (JsonProcessingException e) {
+            return Mono.error(new RuntimeException("Failed to convert DltMessage to JSON", e));
+        }
+
+        Message message = new Message("erc-1155.safeTransfer", transferId, dltJson);
+
+        return messageRepository.save(message);
     }
 }
