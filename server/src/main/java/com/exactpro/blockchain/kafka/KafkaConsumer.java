@@ -194,7 +194,7 @@ public class KafkaConsumer {
         return addToRecipientBalanceMono(transfer)
             .flatMap(updatedAccount -> {
                 logger.info("Successfully credited recipient account {}.", transfer.getCreditorIban());
-                return transferRepository.save(transfer);
+                return transferRepository.save(transfer.withClientId(updatedAccount.getClientId()));
             })
             .onErrorResume(e -> {
                 logger.error("Failed to credit recipient balance for transfer {}: {}. Saving transfer with FAILED status.", transfer.getEndToEndId(), e.getMessage());
