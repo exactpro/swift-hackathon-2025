@@ -62,7 +62,7 @@ export function getTransactionFormData(senderBank: BankName) {
 
 export function newTransaction(
   transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'>
-): JSONify<Transaction> | null {
+): void {
   const newTransaction: Transaction = {
     ...transaction,
     uetr: faker.string.uuid(),
@@ -84,7 +84,6 @@ export function newTransaction(
 
   state.transactions.unshift(newTransaction)
   emitter.updateTransactions(state.transactions)
-  return deepCopy(newTransaction)
 }
 
 export interface ExchangeProps {

@@ -10,6 +10,9 @@ import reactor.core.publisher.Mono;
 import java.util.NoSuchElementException;
 
 public interface CurrencyRepository extends R2dbcRepository<Currency, String> {
+    @Query("SELECT cc.code, t.address FROM CurrencyCode cc LEFT JOIN Token t ON cc.code = t.currencyCode")
+    Flux<Currency> listAll();
+
     @Query("SELECT cc.code, t.address FROM CurrencyCode cc LEFT JOIN Token t ON cc.code = t.currencyCode WHERE cc.code = :currencyCode")
     Mono<Currency> findByCurrencyCode(@Param("currencyCode") String currencyCode);
 

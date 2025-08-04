@@ -43,12 +43,13 @@ export async function newTransaction(
   transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & {
     comment: string | null
   }
-): Promise<JSONify<Transaction> | null> {
+): Promise<void> {
   if (config.useMock) {
     const { newTransaction } = await import('./mock-backend/api.js')
-    return newTransaction(transaction)
+    newTransaction(transaction)
+    return
   }
-  return api.makeTransfer(currentBank, transaction)
+  await api.makeTransfer(currentBank, transaction)
 }
 
 export async function fetchTransactionDetails(

@@ -6,7 +6,6 @@ import type {
   getTransactionDetails,
   getClientTransactions,
   getClientData,
-  newTransaction
 } from '../mock-backend/api'
 import { useToasts } from '../../composables/useToasts'
 import type { BankName } from '../../../config'
@@ -30,7 +29,7 @@ import config from '../../../config'
 import * as hardcoded from '../hardcoded'
 
 function bankBaseRoute(bank: BankName): string {
-  return `/${bank.toLowerCase().replace(/ /g, '')}/api`
+  return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
 }
 
 function handleError(action: string, error: unknown): void {
@@ -52,10 +51,10 @@ function handleError(action: string, error: unknown): void {
 
 export async function getTransfers(bank: BankName): Promise<ReturnType<typeof getTransactions>> {
   try {
-    const response = await ofetch<Transfer[]>(joinURL(bankBaseRoute(bank), 'transfers'), {
+    const response = await ofetch<Transfer[]>(joinURL(bankBaseRoute(bank), 'bank', 'transfer'), {
       method: 'GET'
     })
-    const parsedResponse = TransferSchema.array().parse(response)
+    const parsedResponse = TransferSchema.array().parse(mapTransfers(response))
     return convertBackendTransfersToFrontendJSON(parsedResponse)
   } catch (error) {
     handleError('fetching transfers', error)
@@ -65,7 +64,7 @@ export async function getTransfers(bank: BankName): Promise<ReturnType<typeof ge
 
 async function getTransferById(bank: BankName, uetr: string): Promise<Transfer | null> {
   try {
-    const response = await ofetch<Transfer | null>(joinURL(bankBaseRoute(bank), 'transfers', uetr), {
+    const response = await ofetch<Transfer | null>(joinURL(bankBaseRoute(bank), 'transfer', uetr), {
       method: 'GET'
     })
     if (!response) {
@@ -80,7 +79,7 @@ async function getTransferById(bank: BankName, uetr: string): Promise<Transfer |
 
 async function getTransferMessages(bank: BankName, uetr: string): Promise<TransferMessage[]> {
   try {
-    const response = await ofetch<TransferMessage[]>(joinURL(bankBaseRoute(bank), 'transfers', uetr, 'messages'), {
+    const response = await ofetch<TransferMessage[]>(joinURL(bankBaseRoute(bank), 'transfer', uetr, 'message'), {
       method: 'GET'
     })
     return TransferMessageSchema.array().parse(response)
@@ -138,7 +137,7 @@ export async function getClientTransfers(
     const response = await ofetch<Transfer[]>(joinURL(bankBaseRoute(bank), 'client', 'transfer'), {
       method: 'GET'
     })
-    const parsedResponse = TransferSchema.array().parse(response)
+    const parsedResponse = TransferSchema.array().parse(mapTransfers(response))
     return convertBackendTransfersToFrontendJSON(parsedResponse)
   } catch (error) {
     handleError(`fetching transfers for client ${clientId}`, error)
@@ -146,21 +145,40 @@ export async function getClientTransfers(
   }
 }
 
+function mapTransfers(transfers: any[]): Transfer[] {
+  return transfers.map(transfer => {return {
+    transferId: transfer.transferId,
+    clientId: transfer.clientId,
+    status: transfer.status,
+    messageId: "SHOULD BE REMOVED FROM GUI",
+    transferTimestamp: transfer.transferTimestamp,
+    endToEndId: transfer.endToEndId,
+    currency: transfer.currencyCode,
+    amount: transfer.amount,
+    settlementDate: transfer.settlementDate,
+    debtorFullName: transfer.debtorFullName,
+    debtorIban: transfer.debtorIban,
+    debtorBic: transfer.debtorBic,
+    creditorFullName: transfer.creditorFullName,
+    creditorIban: transfer.creditorIban,
+    creditorBic: transfer.creditorBic,
+    remittanceInfo: transfer.remittanceInfo,
+  }});
+}
+
 export async function makeTransfer(
   bank: BankName,
   transferDetails: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & { comment: string | null }
-): Promise<ReturnType<typeof newTransaction>> {
+): Promise<void> {
   try {
     const convertedDetails = convertFrontendTransactionToBackendTransferDetails(transferDetails)
-    const response = await ofetch<Transfer>(joinURL(bankBaseRoute(bank), 'client', 'makeTransfer'), {
+    const response = await ofetch<Transfer>(joinURL(bankBaseRoute(bank), 'client', 'transfer'), {
       method: 'POST',
       body: TransferDetailsSchema.parse(convertedDetails)
     })
     if (!response) {
-      return null
+      return
     }
-    const createdTransfer = TransferSchema.parse(response)
-    return convertBackendTransferToFrontendJSON(createdTransfer)
   } catch (error) {
     handleError('creating a new transfer', error)
     throw new Error('Failed to create transfer')
@@ -169,7 +187,7 @@ export async function makeTransfer(
 
 async function getAvailableCurrencies(bank: BankName): Promise<string[]> {
   try {
-    const response = await ofetch<string[]>(joinURL(bankBaseRoute(bank), 'helpers', 'currencies'), {
+    const response = await ofetch<string[]>(joinURL(bankBaseRoute(bank), 'client', 'currency'), {
       method: 'GET'
     })
     return z.string().array().parse(response)
@@ -181,11 +199,12 @@ async function getAvailableCurrencies(bank: BankName): Promise<string[]> {
 
 async function getExchangeValues(bank: BankName): Promise<Record<string, number>> {
   try {
-    const response = await ofetch<Record<string, number>>(joinURL(bankBaseRoute(bank), 'helpers', 'exchangeValues'), {
-      method: 'GET'
-    })
+//     const response = await ofetch<Record<string, number>>(joinURL(bankBaseRoute(bank), 'helpers', 'exchangeValues'), {
+//       method: 'GET'
+//     })
+    const response = { 'EUR': 0.88, 'USDC': 1 }
     return z.record(z.string(), z.number()).parse(response)
-  } catch (error) {
+    } catch (error) {
     handleError(`fetching exchange values for ${bank}`, error)
     return {}
   }
@@ -194,9 +213,10 @@ async function getExchangeValues(bank: BankName): Promise<Record<string, number>
 async function getIbans(bank: BankName): Promise<string[]> {
   try {
     const contraBank = bank === 'Bank A' ? 'Bank B' : 'Bank A'
-    const response = await ofetch<string[]>(joinURL(bankBaseRoute(contraBank), 'helpers', 'ibans'), {
+    const response = await ofetch<string[]>(joinURL(bankBaseRoute(contraBank), 'bank', 'iban'), {
       method: 'GET'
     })
+//     const response = ["GB33BUKB20201555555555"];
     return z.string().array().parse(response)
   } catch (error) {
     handleError(`fetching IBANs for ${bank}`, error)

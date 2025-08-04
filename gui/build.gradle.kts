@@ -24,6 +24,8 @@ tasks {
     }
 
     val runTask = register<NpmTask>("run") {
+        dependsOn(npmBuildTask)
+        // environment.put("VITE_DOMAIN ", "http://localhost:8083")
         args = listOf("run", "preview")
         dependsOn(npmCiTask)
     }

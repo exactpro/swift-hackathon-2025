@@ -11,6 +11,7 @@ import jakarta.xml.bind.JAXBException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -92,6 +93,13 @@ public class ClientHandler {
                 )
                 .then()
             )
+        );
+    }
+
+    public Mono<ServerResponse> getCurrencies(ServerRequest request) {
+        return ServerResponse.ok().body(
+            currencyRepository.listAll().map(Currency::getCode).collectList(),
+            new ParameterizedTypeReference<>() {}
         );
     }
 

@@ -14,8 +14,10 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class BankRouter {
     @Value("${content.path}")
     private String contentPath;
+
     @Bean
     public @NonNull RouterFunction<ServerResponse> bankRoutes(@NonNull BankHandler bankHandler) {
-        return route(GET(contentPath + "/api/bank/transfer"), bankHandler::getAllTransfers);
+        return route(GET(contentPath + "/api/bank/transfer"), bankHandler::getAllTransfers)
+            .andRoute(GET(contentPath + "/api/bank/iban"), bankHandler::getAllIbans);
     }
 }

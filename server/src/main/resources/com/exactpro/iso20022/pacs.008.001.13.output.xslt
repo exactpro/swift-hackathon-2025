@@ -34,6 +34,12 @@
         </iso:GrpHdr>
     </xsl:template>
 
+    <xsl:template match="RmtInf">
+        <iso:RmtInf>
+            <iso:Ustrd><xsl:value-of select="text()"/></iso:Ustrd>
+        </iso:RmtInf>
+    </xsl:template>
+
     <xsl:template match="CdtTrfTxInf">
         <iso:CdtTrfTxInf>
             <iso:PmtId>
@@ -71,9 +77,7 @@
                     <xsl:apply-templates select="Cdtr/IBAN"/>
                 </iso:Id>
             </iso:CdtrAcct>
-            <iso:RmtInf>
-                <iso:Ustrd><xsl:value-of select="RmtInf/text()"/></iso:Ustrd>
-            </iso:RmtInf>
+            <xsl:apply-templates select="RmtInf"/>
         </iso:CdtTrfTxInf>
     </xsl:template>
 

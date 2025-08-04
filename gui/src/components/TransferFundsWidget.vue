@@ -36,9 +36,9 @@ interface TransferForm {
 }
 
 const route = useRoute()
-
 const ownBic = route.meta.bic as string
 const debtorName = route.meta.clientName as string
+const currentBank = useCurrentBank()
 
 const form = reactive<TransferForm>({
   creditorBic: '',
@@ -82,7 +82,7 @@ async function startTransaction() {
   }
   isSending.value = true
   try {
-    await newTransaction(useCurrentBank(), {
+    await newTransaction(currentBank, {
       debtor: {
         bic: ownBic,
         accountId: chosenAccount.value.id,

@@ -1,5 +1,7 @@
 package com.exactpro.blockchain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -45,14 +47,17 @@ public class Transfer {
     @Column("endToEndId")
     private String endToEndId;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Column("remittanceInfo")
     private String remittanceInfo;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Column("settlementDate")
     private LocalDate settlementDate;
 
     private TransferStatus status;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Column("transferTimestamp")
     private Instant transferTimestamp;
 

@@ -19,6 +19,7 @@ public class ClientRouter {
     public @NonNull RouterFunction<ServerResponse> clientRoutes(@NonNull ClientHandler clientHandler) {
         return route(GET(contentPath + "/api/client/account"), clientHandler::getAccountsByClientId)
             .andRoute(GET(contentPath + "/api/client/transfer"), clientHandler::getTransfersByClientId)
-            .andRoute(POST(contentPath + "/api/client/transfer"), clientHandler::transfer);
+            .andRoute(POST(contentPath + "/api/client/transfer"), clientHandler::transfer)
+            .andRoute(GET(contentPath + "/api/client/currency"), clientHandler::getCurrencies);
     }
 }

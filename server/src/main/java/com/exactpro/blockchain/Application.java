@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.reactive.HttpHandler;
 import org.springframework.http.server.reactive.ReactorHttpHandlerAdapter;
 import org.springframework.lang.NonNull;
+import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
 import reactor.netty.http.server.HttpServer;
 
@@ -20,7 +22,7 @@ import java.time.Duration;
 @Configuration
 @ComponentScan(basePackages = "com.exactpro")
 @EnableWebFlux
-public class Application {
+public class Application implements WebFluxConfigurer {
     private final static Logger logger = LogManager.getLogger(Application.class);
 
     @Value("${server.port:8081}")
@@ -44,5 +46,13 @@ public class Application {
                 .host(this.host)
                 .port(this.port)
                 .handle(adapter);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("*")
+                .allowedHeaders("*");
     }
 }
