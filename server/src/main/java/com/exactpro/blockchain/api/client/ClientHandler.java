@@ -85,12 +85,8 @@ public class ClientHandler {
             saveTransferRequest(client, transferRequest)
             .flatMap(transfer ->
                 debitAccount(account, transferRequest)
-                .then(Mono.defer(() -> {
-                    CustomerCreditTransfer customerCreditTransfer = converter.toCustomerCreditTransfer(transfer);
-
-                    return createAndSaveMessage(transfer, customerCreditTransfer)
-                        .flatMap(message -> encodeAndPublishToKafka(transfer, customerCreditTransfer));
-                }))
+                .then(Mono.defer(() -> createAndSaveMessage(transfer)))
+                .then(Mono.defer(() -> encodeAndPublishToKafka(transfer)))
                 .then(Mono.defer(() -> transferRepository.save(transfer.withStatus(TransferStatus.COMPLETED))))
                 .then(Mono.defer(() -> {
                     if (currency.getAddress() == null) {
@@ -195,15 +191,11 @@ public class ClientHandler {
         return transferRepository.save(converter.newTransfer(client, transferRequest));
     }
 
-    private @NonNull Mono<Message> createAndSaveMessage(@NonNull Transfer transfer,
-                                                        @NonNull CustomerCreditTransfer customerCreditTransfer) {
+    private @NonNull Mono<Message> createAndSaveMessage(@NonNull Transfer transfer) {
         try {
             String transferJson = objectMapper.writeValueAsString(transfer);
 
-            Message message = new Message(
-                customerCreditTransfer.getGroupHeader().getMessageId(),
-                transfer.getTransferId(),
-                transferJson);
+            Message message = new Message(transfer.getTransferId(), transferJson);
 
             return messageRepository.save(message);
         } catch (JsonProcessingException e) {
@@ -211,8 +203,9 @@ public class ClientHandler {
         }
     }
 
-    private @NonNull Mono<Void> encodeAndPublishToKafka(@NonNull Transfer transfer,
-                                                        @NonNull CustomerCreditTransfer customerCreditTransfer) {
+    private @NonNull Mono<Void> encodeAndPublishToKafka(@NonNull Transfer transfer) {
+        CustomerCreditTransfer customerCreditTransfer = converter.toCustomerCreditTransfer(transfer);
+
         String pacs008XmlString;
         try {
             pacs008XmlString = xmlCodec.encode(customerCreditTransfer);

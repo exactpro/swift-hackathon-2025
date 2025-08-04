@@ -56,7 +56,7 @@ CREATE TABLE BankETHAddress (
 );
 
 CREATE TABLE Message (
-    messageId VARCHAR(255) PRIMARY KEY,
+    messageId SERIAL PRIMARY KEY,
     transferId INTEGER,
     content TEXT,
     FOREIGN KEY (transferId) REFERENCES Transfer(transferId)

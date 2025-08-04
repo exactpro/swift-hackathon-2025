@@ -18,8 +18,7 @@ public class Message {
     public Message() {
     }
 
-    public Message(String messageId, Integer transferId, String content) {
-        this.messageId = messageId;
+    public Message(Integer transferId, String content) {
         this.transferId = transferId;
         this.content = content;
     }
