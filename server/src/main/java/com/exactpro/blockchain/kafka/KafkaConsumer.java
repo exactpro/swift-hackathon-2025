@@ -1,14 +1,15 @@
 package com.exactpro.blockchain.kafka;
 
 import com.exactpro.blockchain.CustomerCreditTransferConverter;
-import com.exactpro.blockchain.entity.Account;
-import com.exactpro.blockchain.entity.Transfer;
-import com.exactpro.blockchain.entity.TransferStatus;
+import com.exactpro.blockchain.entity.*;
 import com.exactpro.blockchain.repository.AccountRepository;
 import com.exactpro.blockchain.repository.ConversionRateRepository;
+import com.exactpro.blockchain.repository.MessageRepository;
 import com.exactpro.blockchain.repository.TransferRepository;
 import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.XmlCodec;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.bind.JAXBException;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -26,6 +27,7 @@ import reactor.core.publisher.Mono;
 import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.receiver.ReceiverRecord;
+import reactor.util.function.Tuples;
 
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
@@ -56,17 +58,23 @@ public class KafkaConsumer {
     private final AccountRepository accountRepository;
     private final ConversionRateRepository conversionRateRepository;
     private final TransferRepository transferRepository;
+    private final ObjectMapper objectMapper;
+    private final MessageRepository messageRepository;
 
     public KafkaConsumer(XmlCodec xmlCodec,
                          CustomerCreditTransferConverter converter,
                          AccountRepository accountRepository,
                          ConversionRateRepository conversionRateRepository,
-                         TransferRepository transferRepository) {
+                         TransferRepository transferRepository,
+                         ObjectMapper objectMapper,
+                         MessageRepository messageRepository) {
         this.xmlCodec = xmlCodec;
         this.converter = converter;
         this.accountRepository = accountRepository;
         this.conversionRateRepository = conversionRateRepository;
         this.transferRepository = transferRepository;
+        this.objectMapper = objectMapper;
+        this.messageRepository = messageRepository;
     }
 
     @EventListener(ContextRefreshedEvent.class)
@@ -120,20 +128,22 @@ public class KafkaConsumer {
             .flatMap(message -> {
                 try {
                     CustomerCreditTransfer creditTransfer = xmlCodec.decode(message);
-                    List<Transfer> transferEntities = converter.convertToTransfer(creditTransfer, TransferStatus.COMPLETED);
+                    List<Transfer> transferEntities = converter.toTransfer(creditTransfer, TransferStatus.COMPLETED);
+                    List<Pacs008Message> pacs008Messages = converter.toPacs008Message(creditTransfer);
 
-                    return Flux.fromIterable(transferEntities)
-                        .flatMap(transfer ->
-                            addToRecipientBalanceMono(transfer)
-                                .flatMap(updatedAccount -> {
-                                    logger.info("Successfully credited recipient account {}.", transfer.getCreditorIban());
-                                    return transferRepository.save(transfer);
-                                })
-                                .onErrorResume(e -> {
-                                    logger.error("Failed to credit recipient balance for transfer {}: {}. Saving transfer with FAILED status.", transfer.getEndToEndId(), e.getMessage());
-                                    return transferRepository.save(transfer.withStatus(TransferStatus.FAILED)).then(Mono.error(new RuntimeException("Credit failed", e)));
-                                })
-                        )
+                    Flux<Transfer> transferFlux = Flux.fromIterable(transferEntities);
+                    Flux<Pacs008Message> pacs008MessageFlux = Flux.fromIterable(pacs008Messages);
+
+                    return Flux.zip(transferFlux, pacs008MessageFlux, Tuples::of)
+                        .flatMap(tuple -> {
+                            Transfer transfer = tuple.getT1();
+                            Pacs008Message pacs008Message = tuple.getT2();
+
+                            return Mono.zip(
+                                processSingleTransfer(transfer),
+                                saveSinglePacs008Message(transfer, pacs008Message)
+                            ).then();
+                        })
                         .then();
                 } catch (IOException | TransformerException | SAXException | JAXBException e) {
                     logger.error("Failed to decode XML message: {}", e.getMessage(), e);
@@ -178,5 +188,36 @@ public class KafkaConsumer {
     private Mono<Account> performCredit(Account account, BigDecimal amountToCredit) {
         account.setBalance(account.getBalance().add(amountToCredit));
         return accountRepository.save(account);
+    }
+
+    private Mono<Transfer> processSingleTransfer(Transfer transfer) {
+        return addToRecipientBalanceMono(transfer)
+            .flatMap(updatedAccount -> {
+                logger.info("Successfully credited recipient account {}.", transfer.getCreditorIban());
+                return transferRepository.save(transfer);
+            })
+            .onErrorResume(e -> {
+                logger.error("Failed to credit recipient balance for transfer {}: {}. Saving transfer with FAILED status.", transfer.getEndToEndId(), e.getMessage());
+                return transferRepository.save(transfer.withStatus(TransferStatus.FAILED)).then(Mono.error(new RuntimeException("Credit failed", e)));
+            });
+    }
+
+    private Mono<Message> saveSinglePacs008Message(Transfer transfer, Pacs008Message pacs008Message) {
+        return Mono.just(pacs008Message)
+            .flatMap(pacsMessage -> {
+                String pacs008MessageJson;
+                try {
+                    pacs008MessageJson = objectMapper.writeValueAsString(pacsMessage);
+                } catch (JsonProcessingException e) {
+                    return Mono.error(new RuntimeException("Failed to encode Pacs008Message to JSON", e));
+                }
+
+                Message messageEntity = new Message(
+                    "pacs.008",
+                    transfer.getTransferId(),
+                    pacs008MessageJson
+                );
+                return messageRepository.save(messageEntity);
+            });
     }
 }
