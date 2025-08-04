@@ -141,6 +141,26 @@ public class Transfer {
         return updated;
     }
 
+    public @NonNull Transfer withClientId(@NonNull Integer clientId) {
+        Transfer updated = new Transfer();
+        updated.transferId = this.transferId;
+        updated.amount = this.amount;
+        updated.clientId = clientId;
+        updated.creditorBic = this.creditorBic;
+        updated.creditorFullName = this.creditorFullName;
+        updated.creditorIban = this.creditorIban;
+        updated.currencyCode = this.currencyCode;
+        updated.debtorBic = this.debtorBic;
+        updated.debtorFullName = this.debtorFullName;
+        updated.debtorIban = this.debtorIban;
+        updated.endToEndId = this.endToEndId;
+        updated.remittanceInfo = this.remittanceInfo;
+        updated.settlementDate = this.settlementDate;
+        updated.status = this.status;
+        updated.transferTimestamp = this.transferTimestamp;
+        return updated;
+    }
+
     protected Transfer() {
     }
 

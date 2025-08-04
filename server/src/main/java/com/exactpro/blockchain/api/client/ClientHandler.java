@@ -53,6 +53,7 @@ public class ClientHandler {
         CurrencyRepository currencyRepository,
         ConversionRateRepository conversionRateRepository,
         TransferRepository transferRepository,
+        ObjectMapper objectMapper,
         MessageRepository messageRepository,
         XmlCodec xmlCodec,
         CustomerCreditTransferConverter converter,
@@ -63,8 +64,7 @@ public class ClientHandler {
         this.clientRepository = clientRepository;
         this.conversionRateRepository = conversionRateRepository;
         this.transferRepository = transferRepository;
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
+        this.objectMapper = objectMapper;
         this.messageRepository = messageRepository;
         this.currencyRepository = currencyRepository;
         this.xmlCodec = xmlCodec;
@@ -205,7 +205,7 @@ public class ClientHandler {
 
     private @NonNull Mono<Message> createAndSaveMessage(@NonNull Transfer transfer,
                                                         @NonNull CustomerCreditTransfer customerCreditTransfer) {
-        Pacs008Message pacs008Message = converter.convertToPacs008Message(customerCreditTransfer).get(0);
+        Pacs008Message pacs008Message = converter.toPacs008Message(customerCreditTransfer).get(0);
 
         String pacs008MessageJson;
         try {

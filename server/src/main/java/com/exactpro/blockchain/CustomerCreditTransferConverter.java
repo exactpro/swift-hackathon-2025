@@ -77,7 +77,7 @@ public class CustomerCreditTransferConverter {
         );
     }
 
-    public List<Transfer> convertToTransfer(CustomerCreditTransfer customerCreditTransfer, TransferStatus status) {
+    public List<Transfer> toTransfer(CustomerCreditTransfer customerCreditTransfer, TransferStatus status) {
         if (customerCreditTransfer == null || customerCreditTransfer.getTransactionInfos().isEmpty()) {
             return Collections.emptyList();
         }
@@ -109,7 +109,7 @@ public class CustomerCreditTransferConverter {
             .collect(Collectors.toList());
     }
 
-    public List<Pacs008Message> convertToPacs008Message(CustomerCreditTransfer customerCreditTransfer) {
+    public List<Pacs008Message> toPacs008Message(CustomerCreditTransfer customerCreditTransfer) {
         String messageId = customerCreditTransfer.getGroupHeader().getMessageId();
         Instant transferTimestamp = customerCreditTransfer.getGroupHeader().getTimestamp();
 
