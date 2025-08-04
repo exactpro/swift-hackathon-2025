@@ -161,4 +161,134 @@ public class Pacs008Message {
     public void setChargeBearer(String chargeBearer) {
         this.chargeBearer = chargeBearer;
     }
+
+    public Pacs008Message() {
+    }
+
+    public Pacs008Message(Builder builder) {
+        this.messageId = builder.messageId;
+        this.timestamp = builder.timestamp;
+        this.endToEndId = builder.endToEndId;
+        this.currency = builder.currency;
+        this.amount = builder.amount;
+        this.settlementDate = builder.settlementDate;
+        this.debtorFullName = builder.debtorFullName;
+        this.debtorIban = builder.debtorIban;
+        this.debtorBic = builder.debtorBic;
+        this.creditorFullName = builder.creditorFullName;
+        this.creditorIban = builder.creditorIban;
+        this.creditorBic = builder.creditorBic;
+        this.remittanceInfo = builder.remittanceInfo;
+        this.chargeBearer = builder.chargeBearer;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String messageId;
+
+        private Instant timestamp;
+
+        private String endToEndId;
+
+        private String currency;
+
+        private BigDecimal amount;
+
+        private LocalDate settlementDate;
+
+        private String debtorFullName;
+
+        private String debtorIban;
+
+        private String debtorBic;
+
+        private String creditorFullName;
+
+        private String creditorIban;
+
+        private String creditorBic;
+
+        private String remittanceInfo;
+
+        private String chargeBearer;
+
+        public Builder messageId(String messageId) {
+            this.messageId = messageId;
+            return this;
+        }
+
+        public Builder timestamp(Instant timestamp) {
+            this.timestamp = timestamp;
+            return this;
+        }
+
+        public Builder endToEndId(String endToEndId) {
+            this.endToEndId = endToEndId;
+            return this;
+        }
+
+        public Builder currency(String currency) {
+            this.currency = currency;
+            return this;
+        }
+
+        public Builder amount(BigDecimal amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public Builder settlementDate(LocalDate settlementDate) {
+            this.settlementDate = settlementDate;
+            return this;
+        }
+
+        public Builder debtorFullName(String debtorFullName) {
+            this.debtorFullName = debtorFullName;
+            return this;
+        }
+
+        public Builder debtorIban(String debtorIban) {
+            this.debtorIban = debtorIban;
+            return this;
+        }
+
+        public Builder debtorBic(String debtorBic) {
+            this.debtorBic = debtorBic;
+            return this;
+        }
+
+        public Builder creditorFullName(String creditorFullName) {
+            this.creditorFullName = creditorFullName;
+            return this;
+        }
+
+        public Builder creditorIban(String creditorIban) {
+            this.creditorIban = creditorIban;
+            return this;
+        }
+
+        public Builder creditorBic(String creditorBic) {
+            this.creditorBic = creditorBic;
+            return this;
+        }
+
+        public Builder remittanceInfo(String remittanceInfo) {
+            this.remittanceInfo = remittanceInfo;
+            return this;
+        }
+
+        public Builder chargeBearer(String chargeBearer) {
+            this.chargeBearer = chargeBearer;
+            return this;
+        }
+
+        public Pacs008Message build() {
+            return new Pacs008Message(this);
+        }
+
+    }
+
 }

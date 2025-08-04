@@ -85,8 +85,12 @@ public class ClientHandler {
             saveTransferRequest(client, transferRequest)
             .flatMap(transfer ->
                 debitAccount(account, transferRequest)
-                .then(Mono.defer(() -> createAndSaveMessage(transfer)))
-                .then(Mono.defer(() -> encodeAndPublishToKafka(transfer)))
+                .then(Mono.defer(() -> {
+                    CustomerCreditTransfer customerCreditTransfer = converter.toCustomerCreditTransfer(transfer);
+
+                    return createAndSaveMessage(transfer, customerCreditTransfer)
+                        .flatMap(message -> encodeAndPublishToKafka(transfer, customerCreditTransfer));
+                }))
                 .then(Mono.defer(() -> transferRepository.save(transfer.withStatus(TransferStatus.COMPLETED))))
                 .then(Mono.defer(() -> {
                     if (currency.getAddress() == null) {
@@ -191,21 +195,23 @@ public class ClientHandler {
         return transferRepository.save(converter.newTransfer(client, transferRequest));
     }
 
-    private @NonNull Mono<Message> createAndSaveMessage(@NonNull Transfer transfer) {
+    private @NonNull Mono<Message> createAndSaveMessage(@NonNull Transfer transfer,
+                                                        @NonNull CustomerCreditTransfer customerCreditTransfer) {
+        Pacs008Message pacs008Message = converter.convertToPacs008Message(customerCreditTransfer).get(0);
+
+        String pacs008MessageJson;
         try {
-            String transferJson = objectMapper.writeValueAsString(transfer);
-
-            Message message = new Message(transfer.getTransferId(), transferJson);
-
-            return messageRepository.save(message);
+            pacs008MessageJson = objectMapper.writeValueAsString(pacs008Message);
         } catch (JsonProcessingException e) {
-            return Mono.error(new Exception("Failed to convert Transfer to JSON", e));
+            return Mono.error(new RuntimeException("Failed to encode Pacs008Message to JSON", e));
         }
+
+        Message message = new Message("pacs.008", transfer.getTransferId(), pacs008MessageJson);
+        return messageRepository.save(message);
     }
 
-    private @NonNull Mono<Void> encodeAndPublishToKafka(@NonNull Transfer transfer) {
-        CustomerCreditTransfer customerCreditTransfer = converter.toCustomerCreditTransfer(transfer);
-
+    private @NonNull Mono<Void> encodeAndPublishToKafka(@NonNull Transfer transfer,
+                                                        @NonNull CustomerCreditTransfer customerCreditTransfer) {
         String pacs008XmlString;
         try {
             pacs008XmlString = xmlCodec.encode(customerCreditTransfer);

@@ -21,7 +21,8 @@ public class Message {
     public Message() {
     }
 
-    public Message(Integer transferId, String content) {
+    public Message(String messageType, Integer transferId, String content) {
+        this.messageType = messageType;
         this.transferId = transferId;
         this.content = content;
     }
