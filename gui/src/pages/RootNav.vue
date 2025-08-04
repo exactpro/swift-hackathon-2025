@@ -97,10 +97,9 @@ useHead({
     <h2>Additional Monitoring Solutions</h2>
     <ul>
       <li>
-        <strong>Infrastructure Monitoring:</strong>
         <ul>
-          <li>Kafka: <em>linkTBD</em></li>
-          <li>Block Explorer: <em>linkTBD</em></li>
+          <li><RouterLink to="/kafka/">Kafka - Swift Messages</RouterLink></li>
+          <li><RouterLink to="/explorer/">Blockchain Explorer</RouterLink></li>
         </ul>
       </li>
     </ul>

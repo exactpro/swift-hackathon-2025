@@ -60,9 +60,7 @@ export function getTransactionFormData(senderBank: BankName) {
   }
 }
 
-export function newTransaction(
-  transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'>
-): void {
+export function newTransaction(transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'>): void {
   const newTransaction: Transaction = {
     ...transaction,
     uetr: faker.string.uuid(),
