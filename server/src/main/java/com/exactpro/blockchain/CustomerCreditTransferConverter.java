@@ -1,9 +1,6 @@
 package com.exactpro.blockchain;
 
-import com.exactpro.blockchain.entity.Client;
-import com.exactpro.blockchain.entity.Transfer;
-import com.exactpro.blockchain.entity.TransferRequest;
-import com.exactpro.blockchain.entity.TransferStatus;
+import com.exactpro.blockchain.entity.*;
 import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.GroupHeader;
 import com.exactpro.iso20022.Participant;
@@ -98,6 +95,34 @@ public class CustomerCreditTransferConverter {
                     .transferTimestamp(transferTimestamp)
                     .endToEndId(transactionInfo.getEndToEndId())
                     .currencyCode(transactionInfo.getCurrency())
+                    .amount(transactionInfo.getAmount())
+                    .settlementDate(transactionInfo.getSettlementDate())
+                    .debtorFullName(debtor.getFullName())
+                    .debtorIban(debtor.getIban())
+                    .debtorBic(debtor.getBic())
+                    .creditorFullName(creditor.getFullName())
+                    .creditorIban(creditor.getIban())
+                    .creditorBic(creditor.getBic())
+                    .remittanceInfo(transactionInfo.getRemittanceInfo())
+                    .build();
+            })
+            .collect(Collectors.toList());
+    }
+
+    public List<Pacs008Message> convertToPacs008Message(CustomerCreditTransfer customerCreditTransfer) {
+        String messageId = customerCreditTransfer.getGroupHeader().getMessageId();
+        Instant transferTimestamp = customerCreditTransfer.getGroupHeader().getTimestamp();
+
+        return customerCreditTransfer.getTransactionInfos().stream()
+            .map(transactionInfo -> {
+                Participant debtor = transactionInfo.getDebtor();
+                Participant creditor = transactionInfo.getCreditor();
+
+                return Pacs008Message.builder()
+                    .messageId(messageId)
+                    .timestamp(transferTimestamp)
+                    .endToEndId(transactionInfo.getEndToEndId())
+                    .currency(transactionInfo.getCurrency())
                     .amount(transactionInfo.getAmount())
                     .settlementDate(transactionInfo.getSettlementDate())
                     .debtorFullName(debtor.getFullName())

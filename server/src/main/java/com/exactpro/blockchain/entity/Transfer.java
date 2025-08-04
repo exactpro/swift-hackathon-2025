@@ -186,10 +186,6 @@ public class Transfer {
             return this;
         }
 
-        public Transfer build() {
-            return new Transfer(this);
-        }
-
         public Builder clientId(Integer clientId) {
             this.clientId = clientId;
             return this;
@@ -253,6 +249,10 @@ public class Transfer {
         public Builder transferTimestamp(Instant transferTimestamp) {
             this.transferTimestamp = transferTimestamp;
             return this;
+        }
+
+        public Transfer build() {
+            return new Transfer(this);
         }
     }
 }

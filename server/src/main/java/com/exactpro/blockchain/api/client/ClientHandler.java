@@ -7,6 +7,9 @@ import com.exactpro.blockchain.kafka.KafkaPublisher;
 import com.exactpro.blockchain.repository.*;
 import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.XmlCodec;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.xml.bind.JAXBException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +40,8 @@ public class ClientHandler {
     private final ConversionRateRepository conversionRateRepository;
     private final CurrencyRepository currencyRepository;
     private final TransferRepository transferRepository;
+    private final ObjectMapper objectMapper;
+    private final MessageRepository messageRepository;
     private final XmlCodec xmlCodec;
     private final CustomerCreditTransferConverter converter;
     private final KafkaPublisher kafkaPublisher;
@@ -48,6 +53,7 @@ public class ClientHandler {
         CurrencyRepository currencyRepository,
         ConversionRateRepository conversionRateRepository,
         TransferRepository transferRepository,
+        MessageRepository messageRepository,
         XmlCodec xmlCodec,
         CustomerCreditTransferConverter converter,
         KafkaPublisher kafkaPublisher,
@@ -57,6 +63,9 @@ public class ClientHandler {
         this.clientRepository = clientRepository;
         this.conversionRateRepository = conversionRateRepository;
         this.transferRepository = transferRepository;
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
+        this.messageRepository = messageRepository;
         this.currencyRepository = currencyRepository;
         this.xmlCodec = xmlCodec;
         this.converter = converter;
@@ -77,7 +86,12 @@ public class ClientHandler {
             saveTransferRequest(client, transferRequest)
             .flatMap(transfer ->
                 debitAccount(account, transferRequest)
-                .then(Mono.defer(() -> publishPacs008(transfer)))
+                .then(Mono.defer(() -> {
+                    CustomerCreditTransfer customerCreditTransfer = converter.toCustomerCreditTransfer(transfer);
+
+                    return createAndSaveMessage(transfer, customerCreditTransfer)
+                        .flatMap(message -> encodeAndPublishToKafka(transfer, customerCreditTransfer));
+                }))
                 .then(Mono.defer(() -> transferRepository.save(transfer.withStatus(TransferStatus.COMPLETED))))
                 .then(Mono.defer(() -> {
                     if (currency.getAddress() == null) {
@@ -189,14 +203,30 @@ public class ClientHandler {
         return transferRepository.save(converter.newTransfer(client, transferRequest));
     }
 
-    private @NonNull Mono<Void> publishPacs008(@NonNull Transfer transfer) {
-        CustomerCreditTransfer customerCreditTransfer = converter.toCustomerCreditTransfer(transfer);
+    private @NonNull Mono<Message> createAndSaveMessage(@NonNull Transfer transfer,
+                                                        @NonNull CustomerCreditTransfer customerCreditTransfer) {
+        Pacs008Message pacs008Message = converter.convertToPacs008Message(customerCreditTransfer).get(0);
+
+        String pacs008MessageJson;
+        try {
+            pacs008MessageJson = objectMapper.writeValueAsString(pacs008Message);
+        } catch (JsonProcessingException e) {
+            return Mono.error(new RuntimeException("Failed to encode Pacs008Message to JSON", e));
+        }
+
+        Message message = new Message("pacs.008", transfer.getTransferId(), pacs008MessageJson);
+        return messageRepository.save(message);
+    }
+
+    private @NonNull Mono<Void> encodeAndPublishToKafka(@NonNull Transfer transfer,
+                                                        @NonNull CustomerCreditTransfer customerCreditTransfer) {
         String pacs008XmlString;
         try {
             pacs008XmlString = xmlCodec.encode(customerCreditTransfer);
         } catch (JAXBException | TransformerException ex) {
             return Mono.error(new Exception("Failed to encode transfer to pacs.008 XML", ex));
         }
+
         return kafkaPublisher.publishMessage(transfer.getCreditorBic(), pacs008XmlString);
     }
 }

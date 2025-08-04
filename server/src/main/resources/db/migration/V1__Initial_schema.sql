@@ -52,5 +52,13 @@ CREATE TABLE ConversionRate (
 
 CREATE TABLE BankETHAddress (
     bic VARCHAR(255) NOT NULL PRIMARY KEY,
-    ethAddress VARCHAR(255) NOT NULL UNIQUE
+    ethAddress VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Message (
+    messageId SERIAL PRIMARY KEY,
+    messageType VARCHAR(255) NOT NULL,
+    transferId INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    FOREIGN KEY (transferId) REFERENCES Transfer(transferId)
 );
