@@ -19,7 +19,7 @@ import ExactproLogo from './ExactproLogo.vue'
 
         <span class="text-xs text-balance max-w-sm">
           This is a solution prototype developed exclusively for the purposes of the Swift Hackathon 2025 and the
-          corresponding demo. Copyright © 2009 - 2025 Exactpro. All Rights Reserved.
+          corresponding demo. Copyright © 2009 - 2025 Exactpro. All rights reserved.
         </span>
       </div>
       <FooterLinks class="py-2" />

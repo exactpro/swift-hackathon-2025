@@ -98,7 +98,7 @@ public class ClientHandler {
                         return Mono.empty();
                     }
                     return wallet.transfer(
-                        transfer.getCreditorBic(), transfer.getEndToEndId(), currency, transfer.getAmount()
+                        transfer.getTransferId(), transfer.getCreditorBic(), transfer.getEndToEndId(), currency, transfer.getAmount()
                     );
                 }))
                 .onErrorResume(ex ->
@@ -211,7 +211,7 @@ public class ClientHandler {
         try {
             pacs008MessageJson = objectMapper.writeValueAsString(pacs008Message);
         } catch (JsonProcessingException e) {
-            return Mono.error(new RuntimeException("Failed to encode Pacs008Message to JSON", e));
+            return Mono.error(new RuntimeException("Failed to convert Pacs008Message to JSON", e));
         }
 
         Message message = new Message("pacs.008", transfer.getTransferId(), pacs008MessageJson);

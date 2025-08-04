@@ -209,14 +209,10 @@ public class KafkaConsumer {
                 try {
                     pacs008MessageJson = objectMapper.writeValueAsString(pacsMessage);
                 } catch (JsonProcessingException e) {
-                    return Mono.error(new RuntimeException("Failed to encode Pacs008Message to JSON", e));
+                    return Mono.error(new RuntimeException("Failed to convert Pacs008Message to JSON", e));
                 }
 
-                Message messageEntity = new Message(
-                    "pacs.008",
-                    transfer.getTransferId(),
-                    pacs008MessageJson
-                );
+                Message messageEntity = new Message("pacs.008", transfer.getTransferId(), pacs008MessageJson);
                 return messageRepository.save(messageEntity);
             });
     }

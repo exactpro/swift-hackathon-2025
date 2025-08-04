@@ -1,12 +1,7 @@
 import { ofetch, FetchError } from 'ofetch'
 import { joinURL } from 'ufo'
 import { z } from 'zod'
-import type {
-  getTransactions,
-  getTransactionDetails,
-  getClientTransactions,
-  getClientData,
-} from '../mock-backend/api'
+import type { getTransactions, getTransactionDetails, getClientTransactions, getClientData } from '../mock-backend/api'
 import { useToasts } from '../../composables/useToasts'
 import type { BankName } from '../../../config'
 import type { Client, Account as FrontendAccount, Transaction } from '../mock-backend/types'
@@ -29,8 +24,8 @@ import config from '../../../config'
 import * as hardcoded from '../hardcoded'
 
 function bankBaseRoute(bank: BankName): string {
-//   return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
-   return `/${bank.toLowerCase().replace(/ /g, '-')}/api`
+  // return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
+  return `/${bank.toLowerCase().replace(/ /g, '-')}/api`
 }
 
 function handleError(action: string, error: unknown): void {
@@ -166,7 +161,7 @@ function mapTransfer(transfer: any): Transfer {
     transferId: transfer.transferId,
     clientId: transfer.clientId,
     status: transfer.status,
-    messageId: "SHOULD BE REMOVED FROM GUI",
+    messageId: 'SHOULD BE REMOVED FROM GUI',
     transferTimestamp: transfer.transferTimestamp,
     endToEndId: transfer.endToEndId,
     currency: transfer.currencyCode,
@@ -219,12 +214,12 @@ async function getAvailableCurrencies(bank: BankName): Promise<string[]> {
 
 async function getExchangeValues(bank: BankName): Promise<Record<string, number>> {
   try {
-//     const response = await ofetch<Record<string, number>>(joinURL(bankBaseRoute(bank), 'helpers', 'exchangeValues'), {
-//       method: 'GET'
-//     })
-    const response = { 'EUR': 0.88, 'USDC': 1 }
+    //     const response = await ofetch<Record<string, number>>(joinURL(bankBaseRoute(bank), 'helpers', 'exchangeValues'), {
+    //       method: 'GET'
+    //     })
+    const response = { EUR: 0.88, USDC: 1 }
     return z.record(z.string(), z.number()).parse(response)
-    } catch (error) {
+  } catch (error) {
     handleError(`fetching exchange values for ${bank}`, error)
     return {}
   }
@@ -236,7 +231,7 @@ async function getIbans(bank: BankName): Promise<string[]> {
     const response = await ofetch<string[]>(joinURL(bankBaseRoute(contraBank), 'bank', 'iban'), {
       method: 'GET'
     })
-//     const response = ["GB33BUKB20201555555555"];
+    //     const response = ["GB33BUKB20201555555555"];
     return z.string().array().parse(response)
   } catch (error) {
     handleError(`fetching IBANs for ${bank}`, error)

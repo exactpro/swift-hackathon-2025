@@ -160,7 +160,7 @@ async function startTransaction() {
               list="bicList"
             />
             <datalist id="bicList">
-              <option v-for="bic in utils.bics" :key="bic" :value="bic">{{ bic }}</option>
+              <!-- <option v-for="bic in utils.bics" :key="bic" :value="bic">{{ bic }}</option> -->
             </datalist>
             <div class="validator-hint">BIC/Swift code must be 8 or 11 characters</div>
           </label>
@@ -182,7 +182,7 @@ async function startTransaction() {
               title="IBAN must start with 2 letters, followed by 2 digits, then up to 30 alphanumeric characters"
             />
             <datalist id="ibanList">
-              <option v-for="iban in utils.ibans" :key="iban" :value="iban">{{ iban }}</option>
+              <!-- <option v-for="iban in utils.ibans" :key="iban" :value="iban">{{ iban }}</option> -->
             </datalist>
             <div class="validator-hint">Valid IBAN required (e.g., DE89370400440532013000)</div>
           </label>
