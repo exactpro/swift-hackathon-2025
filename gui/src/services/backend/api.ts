@@ -24,7 +24,7 @@ import config from '../../../config'
 import * as hardcoded from '../hardcoded'
 
 function bankBaseRoute(bank: BankName): string {
-  // return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
+//  return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
   return `/${bank.toLowerCase().replace(/ /g, '-')}/api`
 }
 
@@ -94,7 +94,7 @@ function mapMessage(message: any): TransferMessage {
     type: message.messageType,
     title: "",
     summary: JSON.parse(message.content),
-    timestamp: "2025-08-04T14:59:22.028532Z"
+    timestamp: message.timestamp
   }
   console.log(foo)
   return foo
@@ -231,7 +231,7 @@ async function getIbans(bank: BankName): Promise<string[]> {
     const response = await ofetch<string[]>(joinURL(bankBaseRoute(contraBank), 'bank', 'iban'), {
       method: 'GET'
     })
-    //     const response = ["GB33BUKB20201555555555"];
+//     const response = ['GB33BUKB20201555555555'];
     return z.string().array().parse(response)
   } catch (error) {
     handleError(`fetching IBANs for ${bank}`, error)

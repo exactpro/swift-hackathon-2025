@@ -1,9 +1,12 @@
 package com.exactpro.blockchain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.Instant;
 
 @Table("Message")
 public class Message {
@@ -20,13 +23,17 @@ public class Message {
 
     private String content;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Instant timestamp;
+
     public Message() {
     }
 
-    public Message(String messageType, Integer transferId, String content) {
+    public Message(String messageType, Integer transferId, String content, Instant timestamp) {
         this.messageType = messageType;
         this.transferId = transferId;
         this.content = content;
+        this.timestamp = timestamp;
     }
 
     public String getMessageId() {

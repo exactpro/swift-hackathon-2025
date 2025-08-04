@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
@@ -141,7 +142,7 @@ public class CoincentoWallet {
             return Mono.error(new RuntimeException("Failed to convert DltMessage to JSON", e));
         }
 
-        Message message = new Message("erc-1155.safeTransfer", transferId, dltJson);
+        Message message = new Message("erc-1155.safeTransfer", transferId, dltJson, Instant.now());
 
         return messageRepository.save(message);
     }

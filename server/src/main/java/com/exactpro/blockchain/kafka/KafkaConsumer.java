@@ -33,6 +33,7 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -212,7 +213,7 @@ public class KafkaConsumer {
                     return Mono.error(new RuntimeException("Failed to convert Pacs008Message to JSON", e));
                 }
 
-                Message messageEntity = new Message("pacs.008", transfer.getTransferId(), pacs008MessageJson);
+                Message messageEntity = new Message("pacs.008", transfer.getTransferId(), pacs008MessageJson, Instant.now());
                 return messageRepository.save(messageEntity);
             });
     }

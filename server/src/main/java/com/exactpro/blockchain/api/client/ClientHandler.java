@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
 import javax.xml.transform.TransformerException;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.time.Instant;
 
 @Component
 public class ClientHandler {
@@ -214,7 +215,7 @@ public class ClientHandler {
             return Mono.error(new RuntimeException("Failed to convert Pacs008Message to JSON", e));
         }
 
-        Message message = new Message("pacs.008", transfer.getTransferId(), pacs008MessageJson);
+        Message message = new Message("pacs.008", transfer.getTransferId(), pacs008MessageJson, Instant.now());
         return messageRepository.save(message);
     }
 

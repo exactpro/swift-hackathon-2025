@@ -60,5 +60,6 @@ CREATE TABLE Message (
     messageType VARCHAR(255) NOT NULL,
     transferId INTEGER NOT NULL,
     content TEXT NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL,
     FOREIGN KEY (transferId) REFERENCES Transfer(transferId)
 );

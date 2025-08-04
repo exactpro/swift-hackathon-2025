@@ -29,7 +29,7 @@ public class CustomerCreditTransferConverter {
             .amount(transferRequest.getAmount())
             .clientId(client.getClientId())
             .creditorBic(transferRequest.getCreditorBic())
-            .creditorFullName(client.getFullName())
+            .creditorFullName(transferRequest.getCreditorFullName())
             .creditorIban(transferRequest.getCreditorIban())
             .currencyCode(transferRequest.getCurrencyCode())
             .debtorBic(myBic)
