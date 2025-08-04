@@ -47,3 +47,7 @@ INSERT INTO ConversionRate (baseCurrency, targetCurrency, rate) VALUES
 ('USDC', 'USD', 1.00),
 ('EUR', 'USDC', 1.14),
 ('USDC', 'EUR', 0.88);
+
+INSERT INTO BankETHAddress (bic, ethAddress) VALUES
+('TESTUKLLXXX', '0xf17f52151EbEF6C7334FAD080c5704D77216b732'),
+('TESTGETBXXX', '0xda6c0ca76e69b32c71301356043fb56d702dfb3d');

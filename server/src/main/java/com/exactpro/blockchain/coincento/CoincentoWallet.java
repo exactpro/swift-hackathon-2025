@@ -1,6 +1,8 @@
 package com.exactpro.blockchain.coincento;
 
+import com.exactpro.blockchain.entity.BankETHAddress;
 import com.exactpro.blockchain.entity.Currency;
+import com.exactpro.blockchain.repository.BankETHAddressRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +26,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
 
 @Component
@@ -37,12 +38,17 @@ public class CoincentoWallet {
 
     private final @NonNull Credentials credentials;
 
+    private final BankETHAddressRepository bankETHAddressRepository;
+
     @Value("${ethereum.coincento}")
     private String coincentoAddress;
 
-    public CoincentoWallet(@NonNull Web3j web3j, @NonNull Credentials credentials) {
+    public CoincentoWallet(@NonNull Web3j web3j,
+                           @NonNull Credentials credentials,
+                           BankETHAddressRepository bankETHAddressRepository) {
         this.web3j = Objects.requireNonNull(web3j);
         this.credentials = Objects.requireNonNull(credentials);
+        this.bankETHAddressRepository = bankETHAddressRepository;
     }
 
     public Mono<Void> transfer(
@@ -101,16 +107,10 @@ public class CoincentoWallet {
             .map(EthGetTransactionCount::getTransactionCount);
     }
 
-    private static final Map<String, String> BIC_TO_ADDRESS = Map.of(
-        "TESTUKLLXXX", "0xf17f52151EbEF6C7334FAD080c5704D77216b732",
-        "TESTGETBXXX", "0xda6c0ca76e69b32c71301356043fb56d702dfb3d"
-    );
-
     private @NonNull Mono<String> getEthereumAddress(@NonNull String bic) {
-        String address = BIC_TO_ADDRESS.get(bic);
-        if (address == null) {
-            return Mono.error(new Exception(String.format("BIC %s doesn't have associated Ethereum address", bic)));
-        }
-        return Mono.just(address);
+        return bankETHAddressRepository.findByBic(bic)
+            .singleOrEmpty()
+            .switchIfEmpty(Mono.error(new Exception(String.format("BIC %s doesn't have associated Ethereum address", bic))))
+            .map(BankETHAddress::getBic);
     }
 }

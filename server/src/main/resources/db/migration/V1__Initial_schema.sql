@@ -49,3 +49,8 @@ CREATE TABLE ConversionRate (
     FOREIGN KEY (baseCurrency) REFERENCES CurrencyCode(code),
     FOREIGN KEY (targetCurrency) REFERENCES CurrencyCode(code)
 );
+
+CREATE TABLE BankETHAddress (
+    bic VARCHAR(255) NOT NULL PRIMARY KEY,
+    ethAddress VARCHAR(255) NOT NULL UNIQUE
+);
