@@ -92,7 +92,7 @@ function mapMessages(messages: any[]): TransferMessage[] {
 function mapMessage(message: any): TransferMessage {
   const foo = {
     type: message.messageType,
-    title: "",
+    title: '',
     summary: JSON.parse(message.content),
     timestamp: message.timestamp
   }
@@ -178,7 +178,7 @@ function mapTransfer(transfer: any): Transfer {
 }
 
 function mapTransfers(transfers: any[]): Transfer[] {
-  return transfers.map(transfer => mapTransfer(transfer));
+  return transfers.map(transfer => mapTransfer(transfer))
 }
 
 export async function makeTransfer(
