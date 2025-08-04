@@ -1,6 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 const { Wallet } = require("ethers")
 
+const BESU_URL = process.env.BESU_URL || "http://localhost:8545/";
 const SALT_SEED = "6ec835c38b957f775cc9a8"
 const DEPLOYER_PRIVATE_KEY = "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3";
 const BANK_A_PRIVATE_KEY = "ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f";
@@ -12,7 +13,7 @@ module.exports = {
   solidity: "0.8.28",
   networks: {
     besu: {
-      url: `http://localhost:8545/`,
+      url: BESU_URL,
       chainId: 1337,
       accounts: [DEPLOYER_PRIVATE_KEY, BANK_A_PRIVATE_KEY, BANK_B_PRIVATE_KEY],
     },
