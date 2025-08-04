@@ -10,6 +10,9 @@ public class Message {
     @Column("messageId")
     private String messageId;
 
+    @Column("messageType")
+    private String messageType;
+
     @Column("transferId")
     private Integer transferId;
 
