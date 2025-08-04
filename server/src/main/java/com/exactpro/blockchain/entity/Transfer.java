@@ -1,5 +1,7 @@
 package com.exactpro.blockchain.entity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -12,6 +14,8 @@ import java.util.Objects;
 
 @Table("Transfer")
 public class Transfer {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     @Id
     @Column("transferId")
     private Integer transferId;
@@ -249,6 +253,10 @@ public class Transfer {
             this.transferTimestamp = transferTimestamp;
             return this;
         }
+    }
+
+    public String toJson() throws JsonProcessingException {
+        return objectMapper.writeValueAsString(this);
     }
 }
 

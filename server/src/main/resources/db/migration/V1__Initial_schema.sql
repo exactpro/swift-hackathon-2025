@@ -54,3 +54,10 @@ CREATE TABLE BankETHAddress (
     bic VARCHAR(255) NOT NULL PRIMARY KEY,
     ethAddress VARCHAR(255) NOT NULL UNIQUE
 );
+
+CREATE TABLE Message (
+    messageId VARCHAR(255) PRIMARY KEY,
+    transferId INTEGER,
+    content TEXT,
+    FOREIGN KEY (transferId) REFERENCES Transfer(transferId)
+);
