@@ -29,7 +29,8 @@ import config from '../../../config'
 import * as hardcoded from '../hardcoded'
 
 function bankBaseRoute(bank: BankName): string {
-  return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
+//   return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
+  return `/${bank.toLowerCase().replace(/ /g, '-')}/api`
 }
 
 function handleError(action: string, error: unknown): void {
