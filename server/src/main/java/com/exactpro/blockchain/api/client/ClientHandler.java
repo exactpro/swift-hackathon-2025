@@ -8,6 +8,7 @@ import com.exactpro.blockchain.repository.*;
 import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.XmlCodec;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.bind.JAXBException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +38,7 @@ public class ClientHandler {
     private final ConversionRateRepository conversionRateRepository;
     private final CurrencyRepository currencyRepository;
     private final TransferRepository transferRepository;
+    private final ObjectMapper objectMapper;
     private final MessageRepository messageRepository;
     private final XmlCodec xmlCodec;
     private final CustomerCreditTransferConverter converter;
@@ -59,6 +61,7 @@ public class ClientHandler {
         this.clientRepository = clientRepository;
         this.conversionRateRepository = conversionRateRepository;
         this.transferRepository = transferRepository;
+        this.objectMapper = new ObjectMapper();
         this.messageRepository = messageRepository;
         this.currencyRepository = currencyRepository;
         this.xmlCodec = xmlCodec;
@@ -190,7 +193,7 @@ public class ClientHandler {
 
         String transferJson;
         try {
-            transferJson = transfer.toJson();
+            transferJson = objectMapper.writeValueAsString(transfer);
         } catch (JsonProcessingException e) {
             return Mono.error(new Exception("Failed to convert Transfer to JSON", e));
         }
