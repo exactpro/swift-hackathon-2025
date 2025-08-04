@@ -108,9 +108,6 @@ public class CoincentoWallet {
     }
 
     private @NonNull Mono<String> getEthereumAddress(@NonNull String bic) {
-        return bankETHAddressRepository.findByBic(bic)
-            .singleOrEmpty()
-            .switchIfEmpty(Mono.error(new Exception(String.format("BIC %s doesn't have associated Ethereum address", bic))))
-            .map(BankETHAddress::getBic);
+        return bankETHAddressRepository.getByBic(bic).map(BankETHAddress::getEthAddress);
     }
 }
