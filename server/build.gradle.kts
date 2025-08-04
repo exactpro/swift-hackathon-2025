@@ -19,6 +19,7 @@ dependencies {
     implementation(platform("org.springframework.data:spring-data-bom:2024.0.8"))
     implementation(platform("org.springframework:spring-framework-bom:6.2.9"))
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2")
     implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
     implementation("io.projectreactor.kafka:reactor-kafka")
     implementation("io.projectreactor.netty:reactor-netty")
@@ -30,7 +31,6 @@ dependencies {
     implementation("org.springframework:spring-webflux")
     implementation("org.web3j:core:4.13.0")
 
-    runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2")
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j2-impl")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:11.10.3")
     runtimeOnly("org.glassfish.jaxb:jaxb-runtime:4.0.5")

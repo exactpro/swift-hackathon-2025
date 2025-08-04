@@ -9,6 +9,7 @@ import com.exactpro.iso20022.CustomerCreditTransfer;
 import com.exactpro.iso20022.XmlCodec;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.xml.bind.JAXBException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,6 +63,7 @@ public class ClientHandler {
         this.conversionRateRepository = conversionRateRepository;
         this.transferRepository = transferRepository;
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
         this.messageRepository = messageRepository;
         this.currencyRepository = currencyRepository;
         this.xmlCodec = xmlCodec;
@@ -83,7 +85,12 @@ public class ClientHandler {
             saveTransferRequest(client, transferRequest)
             .flatMap(transfer ->
                 debitAccount(account, transferRequest)
-                .then(Mono.defer(() -> saveMessageAndPublishPacs008(transfer)))
+                .then(Mono.defer(() -> {
+                    CustomerCreditTransfer customerCreditTransfer = converter.toCustomerCreditTransfer(transfer);
+
+                    return createAndSaveMessage(transfer, customerCreditTransfer)
+                        .flatMap(message -> encodeAndPublishToKafka(transfer, customerCreditTransfer));
+                }))
                 .then(Mono.defer(() -> transferRepository.save(transfer.withStatus(TransferStatus.COMPLETED))))
                 .then(Mono.defer(() -> {
                     if (currency.getAddress() == null) {
@@ -188,34 +195,31 @@ public class ClientHandler {
         return transferRepository.save(converter.newTransfer(client, transferRequest));
     }
 
-    private @NonNull Mono<Void> saveMessageAndPublishPacs008(@NonNull Transfer transfer) {
-        CustomerCreditTransfer customerCreditTransfer = converter.toCustomerCreditTransfer(transfer);
-
-        String transferJson;
+    private @NonNull Mono<Message> createAndSaveMessage(@NonNull Transfer transfer,
+                                                        @NonNull CustomerCreditTransfer customerCreditTransfer) {
         try {
-            transferJson = objectMapper.writeValueAsString(transfer);
+            String transferJson = objectMapper.writeValueAsString(transfer);
+
+            Message message = new Message(
+                customerCreditTransfer.getGroupHeader().getMessageId(),
+                transfer.getTransferId(),
+                transferJson);
+
+            return messageRepository.save(message);
         } catch (JsonProcessingException e) {
             return Mono.error(new Exception("Failed to convert Transfer to JSON", e));
         }
+    }
 
-        Message message = new Message(
-            customerCreditTransfer.getGroupHeader().getMessageId(),
-            transfer.getTransferId(),
-            transferJson);
+    private @NonNull Mono<Void> encodeAndPublishToKafka(@NonNull Transfer transfer,
+                                                        @NonNull CustomerCreditTransfer customerCreditTransfer) {
+        String pacs008XmlString;
+        try {
+            pacs008XmlString = xmlCodec.encode(customerCreditTransfer);
+        } catch (JAXBException | TransformerException ex) {
+            return Mono.error(new Exception("Failed to encode transfer to pacs.008 XML", ex));
+        }
 
-        return messageRepository.save(message)
-            .flatMap(savedMessage -> {
-                logger.info("Message saved with ID: {}", savedMessage.getMessageId());
-
-                String pacs008XmlString;
-                try {
-                    pacs008XmlString = xmlCodec.encode(customerCreditTransfer);
-                } catch (JAXBException | TransformerException ex) {
-                    return Mono.error(new Exception("Failed to encode transfer to pacs.008 XML", ex));
-                }
-
-                return kafkaPublisher.publishMessage(transfer.getCreditorBic(), pacs008XmlString);
-            })
-            .then();
+        return kafkaPublisher.publishMessage(transfer.getCreditorBic(), pacs008XmlString);
     }
 }
