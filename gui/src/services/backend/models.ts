@@ -36,7 +36,7 @@ export type TransferDetails = z.infer<typeof TransferDetailsSchema>
  */
 export const TransferSchema = z.object({
   transferId: z.number().int().optional(),
-  clientId: z.number().int(),
+  clientId: z.number().int().nullable(),
   status: TransferStatusSchema,
   messageId: z.string().optional(),
   transferTimestamp: z.iso.datetime().optional(), // ISO 8601 string
