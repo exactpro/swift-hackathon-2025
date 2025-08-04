@@ -30,7 +30,7 @@
     </xs:complexType>
     <xs:simpleType name="ActiveCurrencyCode">
         <xs:restriction base="xs:string">
-            <xs:pattern value="[A-Z]{3,3}"/>
+            <xs:pattern value="[A-Z]{3,20}"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="ActiveOrHistoricCurrencyAndAmount_SimpleType">
@@ -49,7 +49,7 @@
     </xs:complexType>
     <xs:simpleType name="ActiveOrHistoricCurrencyCode">
         <xs:restriction base="xs:string">
-            <xs:pattern value="[A-Z]{3,3}"/>
+            <xs:pattern value="[A-Z]{3,20}"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:complexType name="AdditionalDateTime1">
