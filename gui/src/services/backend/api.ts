@@ -217,7 +217,7 @@ async function getExchangeValues(bank: BankName): Promise<Record<string, number>
     //     const response = await ofetch<Record<string, number>>(joinURL(bankBaseRoute(bank), 'helpers', 'exchangeValues'), {
     //       method: 'GET'
     //     })
-    const response = { EUR: 0.88, USDC: 1 }
+    const response = { EUR: 0.88, USDC: 1, USDT: 1, EURC: 0.88 }
     return z.record(z.string(), z.number()).parse(response)
   } catch (error) {
     handleError(`fetching exchange values for ${bank}`, error)

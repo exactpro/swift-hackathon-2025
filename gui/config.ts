@@ -2,7 +2,7 @@ const config = {
   useMock: import.meta.env.VITE_USE_MOCK === 'true',
   bankA: {
     name: 'Bank A' as const,
-    bic: 'TESTGETBXXX',
+    bic: 'TESTUKLLXXX',
     client: {
       name: 'Marcus Vellon',
       id: '1'
@@ -10,7 +10,7 @@ const config = {
   },
   bankB: {
     name: 'Bank B' as const,
-    bic: 'TESTUKLLXXX',
+    bic: 'TESTGETBXXX',
     client: {
       name: 'Lena Brightfield',
       id: '2'
