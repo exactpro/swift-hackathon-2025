@@ -30,7 +30,7 @@ import * as hardcoded from '../hardcoded'
 
 function bankBaseRoute(bank: BankName): string {
 //   return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
-  return `/${bank.toLowerCase().replace(/ /g, '-')}/api`
+   return `/${bank.toLowerCase().replace(/ /g, '-')}/api`
 }
 
 function handleError(action: string, error: unknown): void {
@@ -65,13 +65,13 @@ export async function getTransfers(bank: BankName): Promise<ReturnType<typeof ge
 
 async function getTransferById(bank: BankName, uetr: string): Promise<Transfer | null> {
   try {
-    const response = await ofetch<Transfer | null>(joinURL(bankBaseRoute(bank), 'transfer', uetr), {
+    const response = await ofetch<Transfer | null>(joinURL(bankBaseRoute(bank), 'bank', 'transfer', uetr), {
       method: 'GET'
     })
     if (!response) {
       return null
     }
-    return TransferSchema.parse(response)
+    return TransferSchema.parse(mapTransfer(response))
   } catch (error) {
     handleError(`fetching transfer with UETR ${uetr}`, error)
     return null
@@ -80,14 +80,29 @@ async function getTransferById(bank: BankName, uetr: string): Promise<Transfer |
 
 async function getTransferMessages(bank: BankName, uetr: string): Promise<TransferMessage[]> {
   try {
-    const response = await ofetch<TransferMessage[]>(joinURL(bankBaseRoute(bank), 'transfer', uetr, 'message'), {
+    const response = await ofetch<TransferMessage[]>(joinURL(bankBaseRoute(bank), 'bank', 'transfer', uetr, 'message'), {
       method: 'GET'
     })
-    return TransferMessageSchema.array().parse(response)
+    return TransferMessageSchema.array().parse(mapMessages(response))
   } catch (error) {
     handleError(`fetching transfer messages for UETR ${uetr}`, error)
     return []
   }
+}
+
+function mapMessages(messages: any[]): TransferMessage[] {
+  return messages.map(message => mapMessage(message))
+}
+
+function mapMessage(message: any): TransferMessage {
+  const foo = {
+    type: message.messageType,
+    title: "",
+    summary: JSON.parse(message.content),
+    timestamp: "2025-08-04T14:59:22.028532Z"
+  }
+  console.log(foo)
+  return foo
 }
 
 export async function getTransferStatus(
@@ -146,8 +161,8 @@ export async function getClientTransfers(
   }
 }
 
-function mapTransfers(transfers: any[]): Transfer[] {
-  return transfers.map(transfer => {return {
+function mapTransfer(transfer: any): Transfer {
+  return {
     transferId: transfer.transferId,
     clientId: transfer.clientId,
     status: transfer.status,
@@ -164,7 +179,11 @@ function mapTransfers(transfers: any[]): Transfer[] {
     creditorIban: transfer.creditorIban,
     creditorBic: transfer.creditorBic,
     remittanceInfo: transfer.remittanceInfo,
-  }});
+  }
+}
+
+function mapTransfers(transfers: any[]): Transfer[] {
+  return transfers.map(transfer => mapTransfer(transfer));
 }
 
 export async function makeTransfer(

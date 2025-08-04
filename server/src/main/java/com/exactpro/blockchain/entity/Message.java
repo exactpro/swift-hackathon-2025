@@ -1,5 +1,6 @@
 package com.exactpro.blockchain.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -11,6 +12,7 @@ public class Message {
     private String messageId;
 
     @Column("messageType")
+    @JsonProperty("messageType")
     private String messageType;
 
     @Column("transferId")

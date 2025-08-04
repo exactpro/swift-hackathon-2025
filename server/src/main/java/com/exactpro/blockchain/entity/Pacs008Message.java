@@ -1,5 +1,6 @@
 package com.exactpro.blockchain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ public class Pacs008Message {
     @JsonProperty("MsgId")
     private String messageId;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @JsonProperty("CreDtTm")
     private Instant timestamp;
 
@@ -23,6 +25,7 @@ public class Pacs008Message {
     @JsonProperty("IntrBkSttlmAmt")
     private BigDecimal amount;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @JsonProperty("IntrBkSttlmDt")
     private LocalDate settlementDate;
 

@@ -18,6 +18,8 @@ public class BankRouter {
     @Bean
     public @NonNull RouterFunction<ServerResponse> bankRoutes(@NonNull BankHandler bankHandler) {
         return route(GET(contentPath + "/api/bank/transfer"), bankHandler::getAllTransfers)
+            .andRoute(GET(contentPath + "/api/bank/transfer/{endToEndId}"), bankHandler::getTransfer)
+            .andRoute(GET(contentPath + "/api/bank/transfer/{endToEndId}/message"), bankHandler::getMessages)
             .andRoute(GET(contentPath + "/api/bank/iban"), bankHandler::getAllIbans);
     }
 }

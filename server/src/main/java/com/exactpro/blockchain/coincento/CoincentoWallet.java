@@ -15,9 +15,7 @@ import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
-import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Numeric;
 import reactor.core.publisher.Mono;
 
@@ -83,7 +81,7 @@ public class CoincentoWallet {
                     payload
                 );
 
-                long chainId = 1337L;
+                long chainId = 1337L; // TODO: Get it from Ethereum node
                 byte[] signedMessage = TransactionEncoder.signMessage(rawTx, chainId, credentials);
                 String hexValue = Numeric.toHexString(signedMessage);
 
