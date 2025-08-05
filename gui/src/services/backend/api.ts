@@ -24,7 +24,7 @@ import config from '../../../config'
 import * as hardcoded from '../hardcoded'
 
 function bankBaseRoute(bank: BankName): string {
-//  return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
+  //  return `http://localhost:8083/${bank.toLowerCase().replace(/ /g, '-')}/api`
   return `/${bank.toLowerCase().replace(/ /g, '-')}/api`
 }
 
@@ -75,9 +75,12 @@ async function getTransferById(bank: BankName, uetr: string): Promise<Transfer |
 
 async function getTransferMessages(bank: BankName, uetr: string): Promise<TransferMessage[]> {
   try {
-    const response = await ofetch<TransferMessage[]>(joinURL(bankBaseRoute(bank), 'bank', 'transfer', uetr, 'message'), {
-      method: 'GET'
-    })
+    const response = await ofetch<TransferMessage[]>(
+      joinURL(bankBaseRoute(bank), 'bank', 'transfer', uetr, 'message'),
+      {
+        method: 'GET'
+      }
+    )
     return TransferMessageSchema.array().parse(mapMessages(response))
   } catch (error) {
     handleError(`fetching transfer messages for UETR ${uetr}`, error)
@@ -86,7 +89,7 @@ async function getTransferMessages(bank: BankName, uetr: string): Promise<Transf
 }
 
 function mapMessages(messages: any[]): TransferMessage[] {
-  return messages.map(message => mapMessage(message))
+  return messages.map((message) => mapMessage(message))
 }
 
 function mapMessage(message: any): TransferMessage {
@@ -173,12 +176,12 @@ function mapTransfer(transfer: any): Transfer {
     creditorFullName: transfer.creditorFullName,
     creditorIban: transfer.creditorIban,
     creditorBic: transfer.creditorBic,
-    remittanceInfo: transfer.remittanceInfo,
+    remittanceInfo: transfer.remittanceInfo
   }
 }
 
 function mapTransfers(transfers: any[]): Transfer[] {
-  return transfers.map(transfer => mapTransfer(transfer))
+  return transfers.map((transfer) => mapTransfer(transfer))
 }
 
 export async function makeTransfer(
@@ -231,7 +234,7 @@ async function getIbans(bank: BankName): Promise<string[]> {
     const response = await ofetch<string[]>(joinURL(bankBaseRoute(contraBank), 'bank', 'iban'), {
       method: 'GET'
     })
-//     const response = ['GB33BUKB20201555555555'];
+    //     const response = ['GB33BUKB20201555555555'];
     return z.string().array().parse(response)
   } catch (error) {
     handleError(`fetching IBANs for ${bank}`, error)
