@@ -73,7 +73,7 @@ export function convertBackendTransferToFrontend(backendTransfer: BackendTransfe
 
   return {
     uetr:
-      backendTransfer.endToEndId || backendTransfer.messageId || backendTransfer.transferId?.toString() || 'unknown',
+      backendTransfer.transferId?.toString() || backendTransfer.endToEndId || backendTransfer.messageId || 'unknown',
     status: convertBackendTransferStatusToFrontend(backendTransfer.status),
     type: 'transfer',
     debtor,
