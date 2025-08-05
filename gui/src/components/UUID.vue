@@ -11,7 +11,10 @@ const shortUuid = computed(() => {
 </script>
 
 <template>
-  <div class="tooltip" :data-tip="uuid">
+  <div v-if="uuid.length > 8" class="tooltip" :data-tip="uuid">
     {{ shortUuid }}
+  </div>
+  <div v-else>
+    {{ uuid }}
   </div>
 </template>
