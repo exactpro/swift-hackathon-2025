@@ -1,7 +1,7 @@
 import type { BankName } from '../../../config'
 import config from '../../../config'
 import { bankAIbans, bankBIbans, currencies, exchangeValues } from '../hardcoded'
-import { simulate } from './simulation'
+import { newTransactionId, simulate } from './simulation'
 import type { Transaction, JSONify, Currency, TransactionMessageStatus } from './types'
 import { BackendUpdates, deepCopy } from './utils'
 import { faker } from '@faker-js/faker'
@@ -60,9 +60,12 @@ export function getTransactionFormData(senderBank: BankName) {
   }
 }
 
-export function newTransaction(transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'>): void {
+export function newTransaction(
+  transaction: Omit<Transaction, 'id' | 'uetr' | 'createdAt' | 'updatedAt' | 'status'>
+): void {
   const newTransaction: Transaction = {
     ...transaction,
+    id: newTransactionId(),
     uetr: faker.string.uuid(),
     status: 'pending',
     createdAt: new Date(),
@@ -132,11 +135,11 @@ export function exchange(props: ExchangeProps): boolean {
   return true
 }
 
-export function getTransactionDetails(uetr: string): JSONify<{
+export function getTransactionDetails(transferId: string): JSONify<{
   transaction: Transaction
   messages: TransactionMessageStatus[]
 }> | null {
-  const transaction = state.transactions.find((t) => t.uetr === uetr)
+  const transaction = state.transactions.find((t) => t.id === Number(transferId))
   if (!transaction) {
     return null
   }

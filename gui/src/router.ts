@@ -16,7 +16,7 @@ const adminRoutes: RouteRecordRaw[] = [
         component: () => import('./pages/admin/TransactionsHistoryPage.vue')
       },
       {
-        path: 'transfers/:uetr',
+        path: 'transfers/:transferId',
         component: () => import('./pages/admin/TransactionStatusPage.vue')
       }
     ]

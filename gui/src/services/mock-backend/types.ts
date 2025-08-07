@@ -10,6 +10,7 @@ export type TransactionParty = {
 }
 
 export type Transaction = {
+  id: number
   uetr: string
   status: TransactionStatus
   type: TransactionType
@@ -17,6 +18,7 @@ export type Transaction = {
   creditor: TransactionParty
   createdAt: Date
   updatedAt: Date
+  comment: string | null
 }
 
 export type Account = {

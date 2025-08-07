@@ -4,6 +4,12 @@ import { faker } from '@faker-js/faker'
 import type { BackendUpdates } from './utils.js'
 import config from '../../../config.js'
 
+let lastTransactionId = 0
+
+export function newTransactionId(): number {
+  return ++lastTransactionId
+}
+
 /**
  * Initializes start data in state and cron jobs for changing state from the other end.
  * @param ownBIC - BIC of the own bank
@@ -38,6 +44,8 @@ export function simulate(emitter: BackendUpdates) {
       for (let j = 0; j < 5; j++) {
         const transaction: Transaction = {
           uetr: faker.string.uuid(),
+          id: newTransactionId(),
+          comment: null,
           status: faker.helpers.arrayElement(statuses),
           type: 'transfer',
           debtor: {
@@ -110,6 +118,8 @@ export function simulate(emitter: BackendUpdates) {
     }
     const incomingTransaction: Transaction = {
       uetr: faker.string.uuid(),
+      id: newTransactionId(),
+      comment: null,
       status: 'pending',
       type: 'transfer',
       debtor: {

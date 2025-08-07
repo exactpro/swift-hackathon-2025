@@ -6,7 +6,7 @@ const props = defineProps<{
   transaction: JSONify<Transaction>
 }>()
 
-const transactionStatusLink = useBankRoute('admin', 'transfers', props.transaction.uetr)
+const transactionStatusLink = useBankRoute('admin', 'transfers', String(props.transaction.id))
 
 defineEmits<{
   (e: 'transactionAccepted', acceptedTransaction: JSONify<Transaction>): void

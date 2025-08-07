@@ -13,10 +13,10 @@ useHead({
   title: 'Transaction Status'
 })
 const route = useRoute()
-const uetr = route.params.uetr as string
+const transferId = route.params.transferId as string
 
 const { state: transactionDetails, isLoading } = useAsyncState(
-  () => fetchTransactionDetails(useCurrentBank(), uetr),
+  () => fetchTransactionDetails(useCurrentBank(), transferId),
   null
 )
 
@@ -45,7 +45,7 @@ function isExpanded(messageId: string) {
 
 async function refresh() {
   isLoading.value = true
-  transactionDetails.value = await fetchTransactionDetails(useCurrentBank(), uetr)
+  transactionDetails.value = await fetchTransactionDetails(useCurrentBank(), transferId)
   isLoading.value = false
 }
 
@@ -59,8 +59,12 @@ useFakeSocket(refresh)
       <div class="mb-4">
         <h1 class="text-3xl font-bold">Transaction Status</h1>
       </div>
-      <p class="text-base-content/70" v-if="uetr">
-        Tracking transaction: <code class="badge badge-neutral font-mono">{{ uetr }}</code>
+      <p class="text-base-content/70">
+        Tracking transaction:
+        <code class="badge badge-neutral font-mono">
+          <template v-if="transactionDetails">{{ transactionDetails?.transaction.uetr }}</template>
+          <template v-else>{{ transferId }} (Internal ID)</template>
+        </code>
       </p>
     </div>
 

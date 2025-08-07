@@ -72,14 +72,15 @@ export function convertBackendTransferToFrontend(backendTransfer: BackendTransfe
   }
 
   return {
-    uetr:
-      backendTransfer.transferId?.toString() || backendTransfer.endToEndId || backendTransfer.messageId || 'unknown',
+    uetr: backendTransfer.endToEndId || backendTransfer.messageId || 'unknown',
+    id: backendTransfer.transferId,
     status: convertBackendTransferStatusToFrontend(backendTransfer.status),
     type: 'transfer',
     debtor,
     creditor,
     createdAt: backendTransfer.transferTimestamp ? new Date(backendTransfer.transferTimestamp) : new Date(),
-    updatedAt: backendTransfer.transferTimestamp ? new Date(backendTransfer.transferTimestamp) : new Date()
+    updatedAt: backendTransfer.transferTimestamp ? new Date(backendTransfer.transferTimestamp) : new Date(),
+    comment: backendTransfer.remittanceInfo || null
   }
 }
 
@@ -110,7 +111,7 @@ export function convertBackendTransfersToFrontendJSON(backendTransfers: BackendT
  * Convert frontend transaction to backend transfer details for creation
  */
 export function convertFrontendTransactionToBackendTransferDetails(
-  transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & { comment: string | null }
+  transaction: Omit<Transaction, 'id' | 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & { comment: string | null }
 ): BackendTransferDetails {
   return {
     debtorIban: transaction.debtor.accountId,

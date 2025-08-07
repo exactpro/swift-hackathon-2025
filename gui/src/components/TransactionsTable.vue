@@ -29,7 +29,6 @@ type TransformedTransaction = JSONify<Transaction> & {
   updatedAtDate: Date
 }
 
-import UUID from './UUID.vue'
 import TransactionActions from './TransactionActions.vue'
 
 const props = defineProps<{
@@ -324,9 +323,9 @@ const clearFilter = () => {
       </Column>
 
       <!-- UETR Column -->
-      <Column field="uetr" header="ID" sortable>
+      <Column field="uetr" header="UETR" sortable>
         <template #body="{ data }: { data: TransformedTransaction }">
-          <UUID :uuid="data.uetr" />
+          {{ data.uetr }}
         </template>
         <template #filter="{ filterModel }">
           <InputText v-model="filterModel.value" type="text" placeholder="Search by UETR" />

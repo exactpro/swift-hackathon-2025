@@ -40,9 +40,7 @@ export async function fetchTransactionFormData(currentBank: BankName): ReturnTyp
 
 export async function newTransaction(
   currentBank: BankName,
-  transaction: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & {
-    comment: string | null
-  }
+  transaction: Omit<Transaction, 'id' | 'uetr' | 'createdAt' | 'updatedAt' | 'status'>
 ): Promise<void> {
   if (config.useMock) {
     const { newTransaction } = await import('./mock-backend/api.js')
@@ -54,11 +52,11 @@ export async function newTransaction(
 
 export async function fetchTransactionDetails(
   currentBank: BankName,
-  uetr: string
+  transferId: string
 ): Promise<JSONify<{ transaction: Transaction; messages: JSONify<TransactionMessageStatus>[] }> | null> {
   if (config.useMock) {
     const { getTransactionDetails } = await import('./mock-backend/api.js')
-    return getTransactionDetails(uetr)
+    return getTransactionDetails(transferId)
   }
-  return api.getTransferStatus(currentBank, uetr)
+  return api.getTransferStatus(currentBank, transferId)
 }

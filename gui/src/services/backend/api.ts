@@ -186,7 +186,7 @@ function mapTransfers(transfers: any[]): Transfer[] {
 
 export async function makeTransfer(
   bank: BankName,
-  transferDetails: Omit<Transaction, 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & { comment: string | null }
+  transferDetails: Omit<Transaction, 'id' | 'uetr' | 'createdAt' | 'updatedAt' | 'status'> & { comment: string | null }
 ): Promise<void> {
   try {
     const convertedDetails = convertFrontendTransactionToBackendTransferDetails(transferDetails)

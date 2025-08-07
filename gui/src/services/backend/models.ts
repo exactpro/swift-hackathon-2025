@@ -35,7 +35,7 @@ export type TransferDetails = z.infer<typeof TransferDetailsSchema>
  * Transfer entity schema (full transfer object)
  */
 export const TransferSchema = z.object({
-  transferId: z.number().int().optional(),
+  transferId: z.number().int(),
   clientId: z.number().int().nullable(),
   status: TransferStatusSchema,
   messageId: z.string().optional(),
