@@ -123,7 +123,7 @@ async function startTransaction() {
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-[18rem_1fr_18rem] gap-6 items-start max-w-2xl lg:max-w-[unset] mx-auto">
     <div class="order-3 lg:order-1"></div>
-    <form v-if="utils" @submit.prevent="startTransaction" class="order-2">
+    <form v-if="utils" @submit.prevent="startTransaction" autocomplete="off" class="order-2">
       <!-- Debtor Section -->
       <section>
         <h2 class="section-title">Transfer Details</h2>
