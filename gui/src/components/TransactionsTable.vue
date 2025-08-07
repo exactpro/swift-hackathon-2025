@@ -324,7 +324,7 @@ const clearFilter = () => {
       </Column>
 
       <!-- UETR Column -->
-      <Column field="uetr" header="UETR" sortable>
+      <Column field="uetr" header="ID" sortable>
         <template #body="{ data }: { data: TransformedTransaction }">
           <UUID :uuid="data.uetr" />
         </template>
