@@ -13,15 +13,13 @@ public interface TransferRepository extends ReactiveCrudRepository<Transfer, Int
 
     @NonNull Flux<Transfer> findByClientId(int clientId);
 
-    @NonNull Flux<Transfer> findByEndToEndId(String endToEndId);
-
-    default @NonNull Mono<Transfer> getByEndToEndId(String endToEndId) {
+    default @NonNull Mono<Transfer> getByTransferId(int transferId) {
         return
-            findByEndToEndId(endToEndId)
+            findByTransferId(transferId)
             .single()
             .onErrorMap(
                 NoSuchElementException.class,
-                error -> new Exception(String.format("Transfer with EndToEndId '%s' doesn't exist", endToEndId), error)
+                error -> new Exception(String.format("Transfer with transferId '%d' doesn't exist", transferId), error)
             );
     }
 }
