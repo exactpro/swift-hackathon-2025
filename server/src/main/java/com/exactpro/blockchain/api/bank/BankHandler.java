@@ -39,13 +39,13 @@ public class BankHandler {
     }
 
     public Mono<ServerResponse> getTransfer(ServerRequest request) {
-        String endToEndId = request.pathVariable("endToEndId");
-        return ServerResponse.ok().body(transferRepository.getByEndToEndId(endToEndId), Transfer.class);
+        int transferId = Integer.parseInt(request.pathVariable("transferId"));
+        return ServerResponse.ok().body(transferRepository.getByTransferId(transferId), Transfer.class);
     }
 
     public Mono<ServerResponse> getMessages(ServerRequest request) {
-        String endToEndId = request.pathVariable("endToEndId");
-        return ServerResponse.ok().body(messageRepository.findByEndToEndId(endToEndId), Transfer.class);
+        int transferId = Integer.parseInt(request.pathVariable("transferId"));
+        return ServerResponse.ok().body(messageRepository.findByTransferId(transferId), Transfer.class);
     }
 
     public Mono<ServerResponse> getAllIbans(ServerRequest request) {
