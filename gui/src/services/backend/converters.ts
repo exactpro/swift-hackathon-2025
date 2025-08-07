@@ -91,10 +91,11 @@ export function convertBackendTransfersToFrontend(backendTransfers: BackendTrans
 }
 
 export function convertBackendTransferToFrontendJSON(backendTransfer: BackendTransfer): JSONify<Transaction> {
+  const converted = convertBackendTransferToFrontend(backendTransfer)
   return {
-    ...convertBackendTransferToFrontend(backendTransfer),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    ...converted,
+    createdAt: new Date(converted.createdAt).toISOString(),
+    updatedAt: new Date(converted.updatedAt).toISOString()
   }
 }
 
