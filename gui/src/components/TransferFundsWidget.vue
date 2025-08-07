@@ -16,6 +16,8 @@ const { addToast } = useToasts()
 
 const { copy } = useClipboard()
 
+const DISPLAY_DROPDOWN = false
+
 const props = defineProps<{
   debtorAccounts: Account[]
 }>()
@@ -157,10 +159,10 @@ async function startTransaction() {
               required
               pattern="^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
               title="BIC/Swift code must be 8 or 11 characters (e.g., DEUTDEFF)"
-              list="bicList"
+              :list="DISPLAY_DROPDOWN ? 'bicList' : undefined"
             />
-            <datalist id="bicList">
-              <!-- <option v-for="bic in utils.bics" :key="bic" :value="bic">{{ bic }}</option> -->
+            <datalist v-if="DISPLAY_DROPDOWN" id="bicList">
+              <option v-for="bic in utils.bics" :key="bic" :value="bic">{{ bic }}</option>
             </datalist>
             <div class="validator-hint">BIC/Swift code must be 8 or 11 characters</div>
           </label>
@@ -172,7 +174,7 @@ async function startTransaction() {
             </div>
             <input
               id="creditorIban"
-              list="ibanList"
+              :list="DISPLAY_DROPDOWN ? 'ibanList' : undefined"
               v-model="form.creditorAccountId"
               type="text"
               placeholder="Enter IBAN"
@@ -181,8 +183,8 @@ async function startTransaction() {
               pattern="^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$"
               title="IBAN must start with 2 letters, followed by 2 digits, then up to 30 alphanumeric characters"
             />
-            <datalist id="ibanList">
-              <!-- <option v-for="iban in utils.ibans" :key="iban" :value="iban">{{ iban }}</option> -->
+            <datalist v-if="DISPLAY_DROPDOWN" id="ibanList">
+              <option v-for="iban in utils.ibans" :key="iban" :value="iban">{{ iban }}</option>
             </datalist>
             <div class="validator-hint">Valid IBAN required (e.g., DE89370400440532013000)</div>
           </label>
